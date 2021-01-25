@@ -9,7 +9,7 @@ const env = require('../config');
 const LRU = require('lru-cache');
 
 const searchIndex = env.es.index;
-const field = env.es.coordinateField;
+const locationField = env.es.coordinateField;
 
 const agent = () => new Agent({
   maxSockets: 1000, // Default = Infinity
@@ -32,27 +32,27 @@ let resolutions = {
   high: [2, 2, 3, 4, 4, 4, 5, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10]
 }
 
-async function getTile(x, y, z, q, resolution, req) {
+async function getTile({ x, y, z, q, resolution, srs = 'EPSG_3857', req }) {
   let userQuery = q;
   resolution = typeof resolution !== 'undefined' ? resolution : 'medium';
   let precisionLookUp = resolutions[resolution] || resolutions.medium;
   let precision = precisionLookUp[z] || 11;
   // merge tile query and user query
   // regarding precision in it can be 1 cm off in what it includes in the bounding box. ES https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-geo-bounding-box-query.html#_notes_on_precision
-  let tileQuery = composeTileQuery(x, y, z, precision, userQuery, field);
+  let tileQuery = composeTileQuery({x, y, z, precision, userQuery, srs, locationField});
   let esQuery = {
     size: 0,
     query: tileQuery,
     aggs: {
       geo: {
         geohash_grid: {
-          field: field,
+          field: locationField,
           precision: precision,
           size: 40000
         },
         aggs: {
           geo: {
-            geo_centroid: { field: field }
+            geo_centroid: { field: locationField }
           }
         }
       }
@@ -61,7 +61,7 @@ async function getTile(x, y, z, q, resolution, req) {
 
   let queryKey = hash({ esQuery });
   let data = cache.get(queryKey);
-  
+
   if (!data) {
     data = await getFromES({ esQuery, req });
     cache.set(queryKey, data);

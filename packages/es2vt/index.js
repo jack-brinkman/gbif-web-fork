@@ -33,9 +33,11 @@ app.use(
   })
 );
 
+const srsOptions = ['EPSG_4326', 'EPSG_3857'];
 app.get('/api/tile/point/:x/:y/:z.mvt', function (req, res) {
   let filter = req.query.filter,
     resolution = req.query.resolution,
+    srs = srsOptions.find(x => x === req.query.srs),
     x = parseInt(req.params.x),
     y = parseInt(req.params.y),
     z = parseInt(req.params.z);
@@ -45,9 +47,9 @@ app.get('/api/tile/point/:x/:y/:z.mvt', function (req, res) {
   } catch (err) {
     filter = undefined;
   }
-
+  x = y = z = 1;
   tileHelper
-    .getTile(x, y, z, filter, resolution, req)
+    .getTile({x, y, z, filter, resolution, srs, req})
     .then(function (data) {
       res.setHeader('Cache-Control', 'public, max-age=' + 600); // unit seconds
       res.type('application/octet-stream')

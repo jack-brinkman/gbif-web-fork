@@ -38,7 +38,6 @@ export const tabList = ({ theme, vertical }) => css`
 `;
 
 export const tabSeperator = ({ theme, vertical }) => css`
-  margin: 0 10px;
   width: 1px;
   margin: 5px 0;
   flex: 0 1 auto;

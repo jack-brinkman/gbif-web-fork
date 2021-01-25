@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <style>
+      html,
+      body {
+        padding: 0;
+        margin: 0;
+      }
+      .map {
+        height: 100vh;
+        width: 100%;
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.4.3/css/ol.css"
+      type="text/css"
+    />
+    <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.4.3/build/ol.js"></script>
+    <script src="/proj4.js"></script>
+
+    <!-- <link  href="https://tile.gbif.org/ui/ol.css" rel="stylesheet" type="text/css">
+    <script src="https://tile.gbif.org/ui/ol-debug.js"></script>
+    <script src="https://tile.gbif.org/ui/proj4.js"></script> -->
+    <title>OpenLayers example</title>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <script type="text/javascript">
+      var gbifBaselayerBase = 'https://tile.gbif.org';
+      var gbifOccurrenceLayerBase = 'https://api.gbif.org/v2';
+      var gbifOccurrenceVectorLayerBase = gbifOccurrenceLayerBase;
+      var gbifOccurrenceRasterLayerBase = gbifOccurrenceLayerBase;
+      var tileSize = 512;
+      var densityColours = [
+        '#FFFF00FF',
+        '#FFCC00BB',
+        '#FF9900AA',
+        '#FF660099',
+        '#FF330099',
+        '#FF000099',
+      ];
+
+      var densityPoints = [
+        new ol.style.Style({
+          image: new ol.style.Circle({
+            fill: new ol.style.Fill({ color: densityColours[0] }),
+            radius: 2,
+          }),
+          fill: new ol.style.Fill({ color: densityColours[0] }),
+        }),
+        new ol.style.Style({
+          image: new ol.style.Circle({
+            fill: new ol.style.Fill({ color: densityColours[1] }),
+            radius: 3,
+          }),
+          fill: new ol.style.Fill({ color: densityColours[1] }),
+        }),
+        new ol.style.Style({
+          image: new ol.style.Circle({
+            fill: new ol.style.Fill({ color: densityColours[2] }),
+            radius: 3,
+          }),
+          fill: new ol.style.Fill({ color: densityColours[2] }),
+        }),
+        new ol.style.Style({
+          image: new ol.style.Circle({
+            fill: new ol.style.Fill({ color: densityColours[3] }),
+            radius: 4,
+          }),
+          fill: new ol.style.Fill({ color: densityColours[3] }),
+        }),
+        new ol.style.Style({
+          image: new ol.style.Circle({
+            fill: new ol.style.Fill({ color: densityColours[4] }),
+            radius: 5,
+          }),
+          fill: new ol.style.Fill({ color: densityColours[4] }),
+        }),
+        new ol.style.Style({
+          image: new ol.style.Circle({
+            fill: new ol.style.Fill({ color: densityColours[5] }),
+            radius: 6,
+          }),
+          fill: new ol.style.Fill({ color: densityColours[5] }),
+        }),
+      ];
+
+      var magnitude = function (total) {
+        if (total <= 10) return 0;
+        if (total <= 1000) return 1;
+        if (total <= 10000) return 2;
+        if (total <= 100000) return 3;
+        if (total <= 1000000) return 4;
+        return 5;
+      };
+
+      function densityStyle() {
+        return function (feature, resolution) {
+          var styles = [];
+          var m = magnitude(feature.get('count'));
+          var type = feature.getType();
+
+          if (type == 'Point') {
+            styles[0] = densityPoints[m];
+          } else if (type == 'Polygon') {
+            styles[0] = densityHexagons[m];
+          }
+
+          return styles;
+        };
+      }
+
+      // class GBIFTiles {
+      //   // srs
+      //   // extent
+      //   // tileGrid
+      //   // resolutions
+
+      //   constructor(config) {
+      //     this.config = config;
+      //     proj4.defs(config.projection, config.proj4);
+      //     ol.proj.get(config.projection).setExtent(config.extent);
+      //   }
+
+      //   projection() {
+      //     return this.config.projection;
+      //   }
+
+      //   extent() {
+      //     return ol.proj.get(this.config.projection).getExtent();
+      //   }
+
+      //   tileGrid() {
+      //     return new ol.tilegrid.TileGrid({
+      //       extent: ol.proj.get(this.config.projection).getExtent(),
+      //       origin: this.config.gridOrigin,
+      //       minZoom: this.config.minZoom,
+      //       maxZoom: this.config.maxZoom,
+      //       resolutions: this.config.resolutions,
+      //       tileSize: this.config.tileSize,
+      //     });
+      //   }
+      // }
+      // var GBIF_4326 = new GBIFTiles({
+      //   projection: 'EPSG:4326',
+      //   proj4: '+proj=longlat +ellps=WGS84 +datum=WGS84 +units=degrees',
+      //   extent: [-180.0, -90.0, 180.0, 90.0],
+      //   worldExtent: [-180.0, -90.0, 180.0, 90.0],
+      //   tileSize: tileSize,
+      //   resolutions: Array(17)
+      //     .fill()
+      //     .map((_, i) => 180.0 / tileSize / Math.pow(2, i)),
+      //   gridOrigin: [-180, 90],
+      //   minZoom: 0,
+      //   maxZoom: 16,
+      // });
+
+      proj4.defs(
+        'EPSG:4326',
+        '+proj=longlat +ellps=WGS84 +datum=WGS84 +units=degrees'
+      );
+      var map = new ol.Map({
+        target: 'map',
+        layers: [
+          new ol.layer.Tile({
+            //extent: GBIF_4326.extent(),
+            source: new ol.source.TileImage({
+              projection: 'EPSG:4326',
+              tileGrid: new ol.tilegrid.TileGrid({
+                extent: ol.proj.get('EPSG:4326').getExtent(),
+                origin: [-180, 90],
+                minZoom: 0,
+                maxZoom: 16,
+                resolutions: Array(17)
+                  .fill()
+                  .map((_, i) => 180.0 / tileSize / Math.pow(2, i)),
+                tileSize: tileSize,
+              }),
+              tilePixelRatio: 2,
+              // url: 'https://tile.gbif.org/4326/omt/{z}/{x}/{y}@2x.png?',
+              url: gbifBaselayerBase + '/4326/omt/{z}/{x}/{y}@2x.png?',
+              wrapX: true,
+            }),
+          }),
+          // new ol.layer.VectorTile({
+          //   renderMode: 'image',
+          //   source: new ol.source.VectorTile({
+          //     projection: 'EPSG:4326',
+              // tileGrid: new ol.tilegrid.TileGrid({
+              //   extent: ol.proj.get('EPSG:4326').getExtent(),
+              //   origin: [-180, 90],
+              //   minZoom: 0,
+              //   maxZoom: 16,
+              //   resolutions: Array(17)
+              //     .fill()
+              //     .map((_, i) => 180.0 / tileSize / Math.pow(2, i)),
+              //   tileSize: tileSize,
+              // }),
+          //     // tilePixelRatio: 8,
+          //     format: new ol.format.MVT(),
+          //     url:
+          //       gbifOccurrenceVectorLayerBase +
+          //       '/map/occurrence/density/{z}/{x}/{y}.mvt?srs=EPSG:4326&',
+          //     // 'http://localhost:4200/api/tile/point/{x}/{y}/{z}.mvt?srs=EPSG_4326&resolution=medium&field=coordinates&filter=%7B%7D',
+          //     wrapX: false,
+          //   }),
+          //   // style: densityStyle(),
+          // }),
+          new ol.layer.Tile({
+            source: new ol.source.TileImage({
+              projection: 'EPSG:4326',
+              tileGrid: new ol.tilegrid.TileGrid({
+                extent: ol.proj.get('EPSG:4326').getExtent(),
+                origin: [-180, 90],
+                minZoom: 0,
+                maxZoom: 16,
+                resolutions: Array(17)
+                  .fill()
+                  .map((_, i) => 180.0 / tileSize / Math.pow(2, i)),
+                tileSize: tileSize,
+              }),
+              tilePixelRatio: 2,
+              url: gbifBaselayerBase + '/4326/omt/{z}/{x}/{y}@2x.png?',
+              wrapX: true,
+            }),
+          }),
+        ],
+        view: new ol.View({
+          projection: ol.proj.get('EPSG:4326'),
+          center: ol.proj.fromLonLat([37.41, 8.82]),
+          zoom: 4,
+        }),
+      });
+    </script>
+  </body>
+</html>
