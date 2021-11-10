@@ -10,6 +10,7 @@ import Map from './views/Map';
 import Table from './views/Table';
 import Gallery from './views/Gallery';
 import Datasets from './views/Datasets';
+import Clusters from './views/Clusters';
 import Download from './views/Download';
 
 import { FilterBar } from '../FilterBar';
@@ -41,6 +42,9 @@ const Layout = ({
     </Tab>,
     DATASETS: <Tab tabId="DATASETS" key="datasets">
       <FormattedMessage id="search.tabs.datasets" defaultMessage="Datasets"/>
+    </Tab>,
+    CLUSTERS: <Tab tabId="CLUSTERS" key="clusters">
+      <FormattedMessage id="search.tabs.clusters" defaultMessage="Clusters"/>
     </Tab>
   }
 
@@ -77,6 +81,9 @@ const Layout = ({
       </TabPanel>
       <TabPanel lazy tabId="DATASETS" className={`${prefix}-${elementName}-views`} css={cssViewArea({ theme })}>
         <Datasets />
+      </TabPanel>
+      <TabPanel lazy tabId="CLUSTERS" className={`${prefix}-${elementName}-views`} css={cssViewArea({ theme })}>
+        <Clusters />
       </TabPanel>
       <TabPanel lazy tabId="download" className={`${prefix}-${elementName}-views`} css={cssViewArea({ theme })}>
         <Download />

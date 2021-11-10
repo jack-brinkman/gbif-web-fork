@@ -56,6 +56,13 @@ module.exports = {
         _downloadPredicate: predicate2v1(args.predicate),
       };
     },
+    occurrenceClusterSearch: (parent, args) => {
+      // custom cluster search
+      return {
+        nodes: [],
+        links: [{source: 'hej', target: 'goddag'}]
+      }
+    },
     occurrence: (parent, { key }, { dataSources }) =>
       dataSources.occurrenceAPI.getOccurrenceByKey({ key }),
     globe: (parent, { cLat, cLon, pLat, pLon, sphere, graticule, land }) => {

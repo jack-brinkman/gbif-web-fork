@@ -101,12 +101,15 @@ const rootPredicate = {
   "key": "country",
   "value": "DK"
 };
-const config = { 
-  // rootPredicate, 
-  labels, 
-  getSuggests, 
-  filters, 
-  occurrenceSearchTabs: ['TABLE', 'GALLERY', 'MAP', 'DATASETS'],
+const config = {
+  // rootPredicate: { type: 'in', key: 'occurrenceId', values: ['https://data.biodiversitydata.nl/naturalis/specimen/WAG.1639432'] },
+  // rootPredicate: { type: 'in', key: 'occurrenceId', values: ['BR_304314'] },
+  // rootPredicate: { type: 'in', key: 'occurrenceId', values: ['BR_304314', 'https://data.biodiversitydata.nl/naturalis/specimen/WAG.1639432'] },
+  // rootPredicate: {type: 'equals', key: 'occurrenceId', value: 'https://data.biodiversitydata.nl/naturalis/specimen/WAG.1639432'}, 
+  labels,
+  getSuggests,
+  filters,
+  occurrenceSearchTabs: ['CLUSTERS', 'TABLE', 'GALLERY', 'MAP', 'DATASETS'],
   // highlightedFilters: ['gbifId']
 };
 // const config = { labels, getSuggests, filters, rootPredicate: {type: 'equals', key: 'publishingOrganizationKey', value: '1cd669d0-80ea-11de-a9d0-f1765f95f18b'}};
@@ -115,7 +118,7 @@ const config = {
 // const config = { labels, getSuggests, filters, rootPredicate: {type: 'in', key: 'datasetKey', values: inboDatasets}};
 
 export const Example = () => <Router initialEntries={[`/`]}>
-{/* export const Example = () => <Router initialEntries={[`/?filter=eyJtdXN0Ijp7Im9jY3VycmVuY2VJZCI6WyJlIl19LCJtdXN0X25vdCI6eyJvY2N1cnJlbmNlSXNzdWUiOlsiWkVST19DT09SRElOQVRFIl0sIm9jY3VycmVuY2VJZCI6WyIxIiwiMiJdfX0%3D`]}> */}
+  {/* export const Example = () => <Router initialEntries={[`/?filter=eyJtdXN0Ijp7Im9jY3VycmVuY2VJZCI6WyJlIl19LCJtdXN0X25vdCI6eyJvY2N1cnJlbmNlSXNzdWUiOlsiWkVST19DT09SRElOQVRFIl0sIm9jY3VycmVuY2VJZCI6WyIxIiwiMiJdfX0%3D`]}> */}
   <QueryParamProvider ReactRouterRoute={Route}>
     <AddressBar />
     <OccurrenceSearch config={config} style={{ margin: 'auto', maxWidth: 1200, height: 'calc(100vh - 50px)' }}></OccurrenceSearch>
@@ -127,4 +130,4 @@ Example.story = {
 };
 
 
-export const StandaloneExample = () => <Standalone locale="en" style={{height: 'calc(100vh - 20px)'}}></Standalone>;
+export const StandaloneExample = () => <Standalone locale="en" style={{ height: 'calc(100vh - 20px)' }}></Standalone>;
