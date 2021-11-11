@@ -28,36 +28,65 @@ query clusters($predicate: Predicate, $size: Int = 20, $from: Int = 0){
             isTreament
           }
         }
-        related {
-          occurrence {
-            key
-            basisOfRecord
-            catalogNumber
-            publishingOrgKey
-            publisherTitle
-            stillImageCount
-            datasetKey
-        		datasetTitle
-            volatile {
-              features {
-                isSequenced
-                isTreament
+        related(size: 10) {
+          count
+          size
+          from
+          relatedOccurrences {
+            occurrence {
+              key
+              basisOfRecord
+              catalogNumber
+              publishingOrgKey
+              publisherTitle
+              stillImageCount
+              datasetKey
+              datasetTitle
+              volatile {
+                features {
+                  isSequenced
+                  isTreament
+                }
               }
-            }
-            related {
-              occurrence {
-                key
-                basisOfRecord
-                catalogNumber
-                publishingOrgKey
-                publisherTitle
-                stillImageCount
-                datasetKey
-                datasetTitle
-                volatile {
-                  features {
-                    isSequenced
-                    isTreament
+              related(size: 8) {
+								count
+                relatedOccurrences {
+                  occurrence {
+                    key
+                    basisOfRecord
+                    catalogNumber
+                    publishingOrgKey
+                    publisherTitle
+                    stillImageCount
+                    datasetKey
+                    datasetTitle
+                    volatile {
+                      features {
+                        isSequenced
+                        isTreament
+                      }
+                    }
+                    related(size: 5) {
+                      count
+                      relatedOccurrences {
+                        occurrence {
+                          key
+                          basisOfRecord
+                          catalogNumber
+                          publishingOrgKey
+                          publisherTitle
+                          stillImageCount
+                          datasetKey
+                          datasetTitle
+                          volatile {
+                            features {
+                              isSequenced
+                              isTreament
+                            }
+                          }
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -68,13 +97,14 @@ query clusters($predicate: Predicate, $size: Int = 20, $from: Int = 0){
     }
   }
 }
+
 `;
 
 function Clusters() {
   const [from = 0, setFrom] = useQueryParam('from', NumberParam);
   const [graph, setGraph] = useState();
 
-  const size = 30;
+  const size = 50;
   const currentFilterContext = useContext(FilterContext);
   const { rootPredicate, predicateConfig } = useContext(OccurrenceContext);
   const { data, error, loading, load } = useQuery(OCCURRENCE_CLUSTERS, { lazyLoad: true });
@@ -146,14 +176,16 @@ function Clusters() {
 export default Clusters;
 
 
-function getNodeFromOccurrence(o, isEntry) {
+function getNodeFromOccurrence(o, isEntry, hasTooManyRelations) {
   return {
     name: o.key + '',
     catalogNumber: o.catalogNumber,
     type: o.basisOfRecord,
     isTreatment: o?.volatile?.features?.isTreament,
     isSequenced: o?.volatile?.features?.isSequenced,
-    isEntry
+    publishingOrgKey: o.publishingOrgKey,
+    isEntry,
+    capped: hasTooManyRelations
   };
 }
 
@@ -173,8 +205,24 @@ function getNodeFromPublisher(o, rootKey) {
   };
 }
 
-function processOccurrence(x, rootKey, nodes, links, isEntry) {
-  nodes.push(getNodeFromOccurrence(x, isEntry));
+function getNodeFromImage(o) {
+  return {
+    name: `${o.key}_image`,
+    title: 'Imaged',
+    type: 'IMAGE'
+  };
+}
+
+function getNodeFromSequence(o) {
+  return {
+    name: `${o.key}_sequence`,
+    title: 'Sequenced',
+    type: 'SEQUENCE'
+  };
+}
+
+function processOccurrence(x, rootKey, nodes, links, isEntry, hasTooManyRelations) {
+  nodes.push(getNodeFromOccurrence(x, isEntry, hasTooManyRelations));
 
   // add publisher nodes
   // nodes.push(getNodeFromPublisher(x, rootKey));
@@ -185,12 +233,26 @@ function processOccurrence(x, rootKey, nodes, links, isEntry) {
   //   nodes.push(getNodeFromDataset(x));
   //   links.push({ source: x.key + '', target: x.datasetKey })
   // }
+
+  //add sequence node
+  if (x?.volatile?.features?.isSequenced) {
+    let sequenceNode = getNodeFromSequence(x);
+    nodes.push(sequenceNode);
+    links.push({ source: x.key + '', target: sequenceNode.name })
+  }
+
+  // add image nodes
+  if (x?.stillImageCount > 0) {
+    let imageNode = getNodeFromImage(x);
+    nodes.push(imageNode);
+    links.push({ source: x.key + '', target: imageNode.name })
+  }
 }
 
 function processRelated({parent, related, nodes, links, rootKey}) {
-  if (related && related.length > 0) {
-    related.forEach(e => {
-      processOccurrence(e.occurrence, rootKey, nodes, links);
+  if (related && related.count > 0) {
+    related.relatedOccurrences.forEach(e => {
+      processOccurrence(e.occurrence, rootKey, nodes, links, false, e.occurrence?.related?.count > e.occurrence?.related?.relatedOccurrences?.length);
       // and add link to the related
       links.push({ source: parent.key + '', target: e.occurrence.key + '' });
       const itemRelations = e.occurrence.related;
@@ -204,8 +266,8 @@ function transformResult({ data }) {
   let links = [];
   const items = data.occurrenceSearch.documents.results;
   items.forEach(x => {
-    if (x.related && x.related.length > 0) {
-      processOccurrence(x, x.key, nodes, links, true);
+    if (x.related && x.related.count > 0) {
+      processOccurrence(x, x.key, nodes, links, true, x.related.count > x.related.relatedOccurrences.length);
       processRelated({parent: x, related: x.related, nodes, links, rootKey: x.key});
     }
   });

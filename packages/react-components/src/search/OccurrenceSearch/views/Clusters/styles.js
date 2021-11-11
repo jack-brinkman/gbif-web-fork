@@ -16,10 +16,6 @@ export const clusters = props => css`
     stroke-opacity: 0.6;
   }
 
-  .nodes circle {
-    stroke: black	;
-    stroke-width: 0px;
-  }
   .node {
     font-size: 2px;
   }
@@ -34,6 +30,7 @@ export const clusters = props => css`
     height: 100%;
     flex-direction: column;
     position: relative;
+    z-index: 10;
   }
   .nodeContent-info {
     display: none;
@@ -41,6 +38,48 @@ export const clusters = props => css`
   .nodeContent:hover .nodeContent-info {
     display: block;
   }
+
+  .node-circle {
+    fill: rgb(82, 149, 164);
+    stroke: black	;
+    stroke-width: 0px;
+  }
+
+  .node-capped {
+    stroke: rgb(82, 149, 164);
+    stroke-width: 2px;
+  }
+
+  .node-entry {
+    stroke: deepskyblue;
+    stroke-width: 1px;
+  }
+
+  .node-sequence {
+    fill: rgb(203, 56, 53);
+  }
+
+  .node-image {
+    fill: rgb(44, 79, 123);
+  }
+
+  .node-treatment {
+    fill: rgb(239, 152, 146)
+  }
+
+  .node-specimen {
+    fill: rgb(250, 185, 61);
+  }
+
+  .nodeContent-wrapper {
+    overflow: visible;
+  }
+  /* .nodeContent-wrapper:hover {
+    box-shadow: 0 0 10px 10px #ff000055;
+    border-radius: 50%;
+    overflow: visible;
+    background: deepskyblue;
+  } */
 `;
 
 export const footer = ({theme}) => css`

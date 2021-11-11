@@ -56,12 +56,31 @@ module.exports = {
         _downloadPredicate: predicate2v1(args.predicate),
       };
     },
-    occurrenceClusterSearch: (parent, args) => {
+    occurrenceClusterSearch: (parent, {predicate, ...query}, { dataSources }) => {
       // custom cluster search
-      return {
-        nodes: [],
-        links: [{source: 'hej', target: 'goddag'}]
+      let nodes = [];
+      let links = [];
+      return dataSources.occurrenceAPI.searchOccurrenceDocuments({
+        query: { predicate: {
+          type: 'and',
+          predicates: [
+            {
+              type: 'equals',
+              key: 'isInCluster',
+              value: true
+            },
+            predicate
+          ]
+        },
+        ...query
       }
+      }).then(response => {
+        console.log(response);
+        return {
+          nodes: [],
+          links: [{ source: 'hej', target: 'goddag' }]
+        }
+      });
     },
     occurrence: (parent, { key }, { dataSources }) =>
       dataSources.occurrenceAPI.getOccurrenceByKey({ key }),
@@ -131,9 +150,16 @@ module.exports = {
       return formattedCoordinates({ lat: decimalLatitude, lon: decimalLongitude });
     },
     volatile: (occurrence) => occurrence,
-    related: ({ key }, args, { dataSources }) => {
+    related: ({ key }, { from = 0, size = 20 }, { dataSources }) => {
       return dataSources.occurrenceAPI.getRelated({ key })
-        .then(response => response.relatedOccurrences);
+        .then(response => {
+          return {
+            size, 
+            from, 
+            count: response.relatedOccurrences.length,
+            relatedOccurrences: response.relatedOccurrences.slice(from, from + size)
+          }
+        })
     },
     groups: (occurrence, args, { dataSources }) => {
       return dataSources.occurrenceAPI.getVerbatim({ key: occurrence.key })

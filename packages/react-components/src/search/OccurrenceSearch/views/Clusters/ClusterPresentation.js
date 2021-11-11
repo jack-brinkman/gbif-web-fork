@@ -48,10 +48,10 @@ export const ClusterPresentation = ({ first, prev, next, size, from, data, graph
     //  .text('Hello from D3');
     if (ref && ref.current && graph) {
       test({
-        element: ref.current, 
-        nodes_data: graph.nodes, 
+        element: ref.current,
+        nodes_data: graph.nodes,
         links_data: graph.links,
-        onNodeClick: ({key}) => setActiveKey(key)
+        onNodeClick: ({ key }) => setActiveKey(key)
       })
     }
   }, [ref, graph]);
@@ -68,13 +68,14 @@ export const ClusterPresentation = ({ first, prev, next, size, from, data, graph
       flexDirection: "column",
     }}>
       <ViewHeader loading={loading} total={total} />
-      <svg height="1000" css={css.clusters} ref={ref} style={{pointerEvents: loading ? 'none' : null, filter: loading ? 'grayscale(8)' : null, opacity: loading ? 0.5 : 1}}></svg>
       
+      <svg height="500" css={css.clusters} ref={ref} style={{ pointerEvents: loading ? 'none' : null, filter: loading ? 'grayscale(8)' : null, opacity: loading ? 0.5 : 1 }}></svg>
+
       {next && <div css={css.footer({ theme })}>
-        {first && page > 2 && <Button appearance="text" css={css.footerItem({ theme })} direction="right" tip={intl.formatMessage({id: 'pagination.first'})} onClick={first}>
+        {first && page > 2 && <Button appearance="text" css={css.footerItem({ theme })} direction="right" tip={intl.formatMessage({ id: 'pagination.first' })} onClick={first}>
           <MdFirstPage />
         </Button>}
-        {prev && page > 1 && <Button appearance="text" css={css.footerItem({ theme })} direction="right" tip={intl.formatMessage({id: 'pagination.previous'})} onClick={prev}>
+        {prev && page > 1 && <Button appearance="text" css={css.footerItem({ theme })} direction="right" tip={intl.formatMessage({ id: 'pagination.previous' })} onClick={prev}>
           <MdChevronLeft />
         </Button>}
         {total > 0 && <span css={css.footerText({ theme })}>
@@ -84,7 +85,7 @@ export const ClusterPresentation = ({ first, prev, next, size, from, data, graph
             values={{ current: <FormattedNumber value={page} />, total: <FormattedNumber value={totalPages} /> }}
           />
         </span>}
-        {next && page < totalPages && <Button appearance="text" css={css.footerItem({ theme })} direction="left" tip={intl.formatMessage({id: 'pagination.next'})} onClick={next}>
+        {next && page < totalPages && <Button appearance="text" css={css.footerItem({ theme })} direction="left" tip={intl.formatMessage({ id: 'pagination.next' })} onClick={next}>
           <MdChevronRight />
         </Button>}
       </div>}
