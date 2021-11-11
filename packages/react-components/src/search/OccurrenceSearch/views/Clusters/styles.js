@@ -1,4 +1,4 @@
-import { css } from '@emotion/react';
+import { css, keyframes } from '@emotion/react';
 import { tooltip } from '../../../../style/shared';
 
 //This media query approach isn't ideal. 
@@ -74,15 +74,55 @@ export const clusters = props => css`
   .nodeContent-wrapper {
     overflow: visible;
   }
+
+  .node[data-highlight="false"] .nodeContent-wrapper {
+    &:before {
+      content: '';
+      position: relative;
+      display: block;
+      width: 300%;
+      height: 300%;
+      box-sizing: border-box;
+      margin-left: -100%;
+      margin-top: -100%;
+      border-radius: 45px;
+      background-color: #01a4e9;
+      animation: ${pulseRing} 1.25s cubic-bezier(0.215, 0.61, 0.355, 1) forwards 2;//infinite;
+    }
+  }
+
+  .node[data-highlight="true"] .nodeContent-wrapper {
+    box-shadow: 0 0 0px 10px #91919155;
+  }
+
+  .nodeContent-wrapper {
+    border-radius: 50%;
+  }
   /* .nodeContent-wrapper:hover {
     box-shadow: 0 0 10px 10px #ff000055;
     border-radius: 50%;
     overflow: visible;
     background: deepskyblue;
   } */
+  
 `;
 
-export const footer = ({theme}) => css`
+export const pulseRing = keyframes`
+  0% {
+    opacity: 1;
+    transform: scale(.33);
+  }
+  80%, 99% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(.33);
+  }
+`;
+
+export const footer = ({ theme }) => css`
   height: 30px;
   display: flex;
   flex-direction: row;
@@ -92,7 +132,7 @@ export const footer = ({theme}) => css`
   border-top: 1px solid ${theme.paperBorderColor};
 `;
 
-export const footerItemBase = ({theme}) => css`
+export const footerItemBase = ({ theme }) => css`
   flex: 0 0 auto;
   padding: 0 10px;
   height: 30px;

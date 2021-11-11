@@ -7,6 +7,7 @@ import { filter2predicate } from '../../../../dataManagement/filterAdapter';
 import { ClusterPresentation } from './ClusterPresentation';
 import { useQueryParam, NumberParam } from 'use-query-params';
 import uniqBy from 'lodash/uniqBy'
+import uniq from 'lodash/uniq'
 
 const OCCURRENCE_CLUSTERS = `
 query clusters($predicate: Predicate, $size: Int = 20, $from: Int = 0){
@@ -176,7 +177,7 @@ function Clusters() {
 export default Clusters;
 
 
-function getNodeFromOccurrence(o, isEntry, hasTooManyRelations) {
+function getNodeFromOccurrence(o, isEntry, hasTooManyRelations, rootKey) {
   return {
     name: o.key + '',
     catalogNumber: o.catalogNumber,
@@ -185,7 +186,8 @@ function getNodeFromOccurrence(o, isEntry, hasTooManyRelations) {
     isSequenced: o?.volatile?.features?.isSequenced,
     publishingOrgKey: o.publishingOrgKey,
     isEntry,
-    capped: hasTooManyRelations
+    capped: hasTooManyRelations,
+    rootKey: rootKey || o.key
   };
 }
 
@@ -222,7 +224,7 @@ function getNodeFromSequence(o) {
 }
 
 function processOccurrence(x, rootKey, nodes, links, isEntry, hasTooManyRelations) {
-  nodes.push(getNodeFromOccurrence(x, isEntry, hasTooManyRelations));
+  nodes.push(getNodeFromOccurrence(x, isEntry, hasTooManyRelations, rootKey));
 
   // add publisher nodes
   // nodes.push(getNodeFromPublisher(x, rootKey));
@@ -249,14 +251,16 @@ function processOccurrence(x, rootKey, nodes, links, isEntry, hasTooManyRelation
   }
 }
 
-function processRelated({parent, related, nodes, links, rootKey}) {
+function processRelated({parent, related, nodes, links, rootKey, clusterContext}) {
   if (related && related.count > 0) {
     related.relatedOccurrences.forEach(e => {
+      clusterContext.size++;
+      clusterContext.clusterNodes.push(e.occurrence.key);
       processOccurrence(e.occurrence, rootKey, nodes, links, false, e.occurrence?.related?.count > e.occurrence?.related?.relatedOccurrences?.length);
       // and add link to the related
       links.push({ source: parent.key + '', target: e.occurrence.key + '' });
       const itemRelations = e.occurrence.related;
-      processRelated({parent: e.occurrence, related: itemRelations, nodes, links, rootKey});
+      processRelated({parent: e.occurrence, related: itemRelations, nodes, links, rootKey, clusterContext});
     });
   }
 }
@@ -264,11 +268,17 @@ function processRelated({parent, related, nodes, links, rootKey}) {
 function transformResult({ data }) {
   let nodes = [];
   let links = [];
+  let clusterMap = {};
   const items = data.occurrenceSearch.documents.results;
   items.forEach(x => {
+    let clusterContext = {size: 1, clusterNodes: [x.key]};
     if (x.related && x.related.count > 0) {
       processOccurrence(x, x.key, nodes, links, true, x.related.count > x.related.relatedOccurrences.length);
-      processRelated({parent: x, related: x.related, nodes, links, rootKey: x.key});
+      processRelated({parent: x, related: x.related, nodes, links, rootKey: x.key, clusterContext});
+
+      clusterContext.clusterNodes = uniq(clusterContext.clusterNodes);
+      clusterContext.size = clusterContext.clusterNodes.length;
+      clusterMap[x.key] = clusterContext;
     }
   });
 
@@ -278,5 +288,5 @@ function transformResult({ data }) {
     let val = `${sorted[0]} - ${sorted[1]}`;
     return val;
   });
-  return { nodes: n, links: l };
+  return { nodes: n, links: l, clusterMap };
 }
