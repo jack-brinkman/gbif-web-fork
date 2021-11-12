@@ -5,11 +5,12 @@ import { tooltip } from '../../../../style/shared';
 // Better would be to calculate the available space and decide based on that since the number of 
 // filters applied influence the decision. But this simple approach will perform better and is used for now.
 export const clusters = props => css`
-  width: 100%auto;
+  width: 100%;
   flex: 1 1 auto;
   background: white;
   border-radius: 4;
   border: 1px solid #e5ebed;
+  display: block;
 
   .links line {
     stroke: #999;
@@ -175,4 +176,68 @@ export const footerText = props => css`
   font-size: 12px;
   text-align: center;
   flex: 1 1 auto;
+`;
+
+export const clusterWrapper = props => css`
+  flex: 1 1 auto;
+  svg {
+    width: 100%;
+  }
+`;
+
+export const meta = props => css`
+  flex: 0 0 280px;
+  margin-left: 8px;
+`;
+
+export const main = props => css`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+`;
+
+
+export const card = props => css`
+  background: white;
+  border: 1px solid #eee;
+`;
+
+export const headline = props => css`
+  border-bottom: 1px solid #eee;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  padding: 12px;
+  h2 {
+    font-size: 15px;
+    flex: 1 1 auto;
+    margin: 0;
+    padding: 0;
+  }
+  div {
+    flex: 0 0 auto;
+  }
+`;
+
+export const contentWrapper = props => css`
+  overflow: auto;
+  max-height: 200px;
+`;
+
+export const content = props => css`
+  margin: 12px;
+  font-size: 13px;
+`;
+
+export const tooltip2 = props => css`
+  background: #333;
+  color: white;
+  border-radius: 4px;
+  position:absolute;
+  height: auto;
+  visibility:hidden;
+  z-index:9999;
+  padding: 0 3px;
+  font-size: .85em;
+  /* box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1); */
 `;

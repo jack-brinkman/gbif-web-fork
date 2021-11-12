@@ -42,30 +42,20 @@ export default function test({ element, links_data, nodes_data, onNodeClick }) {
 
   svg.selectAll("*").remove();
 
-  // svg.append('defs')
-  //   .append('pattern')
-  //     .attr('id', 'diagonalHatch')
-  //     .attr('patternUnits', 'userSpaceOnUse')
-  //     .attr('width', 4)
-  //     .attr('height', 4)
-  //   .append('path')
-  //     .attr('d', 'M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2')
-  //     .attr('stroke', '#000000')
-  //     .attr('stroke-width', 1);
   svg.append('defs')
     .append('pattern')
-      .attr('id', 'diagonalHatch')
-      .attr('patternUnits', 'userSpaceOnUse')
-      .attr('width', 8)
-      .attr('height', 8)
-      .attr('patternTransform', 'rotate(45 0 0)')
+    .attr('id', 'diagonalHatch')
+    .attr('patternUnits', 'userSpaceOnUse')
+    .attr('width', 8)
+    .attr('height', 8)
+    .attr('patternTransform', 'rotate(45 0 0)')
     .append('line')
-      .attr('x1', 0)
-      .attr('y1', 0)
-      .attr('x2', 0)
-      .attr('y2', 8)
-      .attr('stroke', '#00000088')
-      .attr('stroke-width', 8);
+    .attr('x1', 0)
+    .attr('y1', 0)
+    .attr('x2', 0)
+    .attr('y2', 8)
+    .attr('stroke', '#00000088')
+    .attr('stroke-width', 8);
 
   var radius = 10,
     side = 2 * radius * Math.cos(Math.PI / 4);
@@ -143,19 +133,6 @@ export default function test({ element, links_data, nodes_data, onNodeClick }) {
   //   .append("text")
   //   .attr("y", 10)
   //   .text("this text is in the inner SVG");
-
-  // https://stackoverflow.com/questions/20913869/wrap-text-within-circle
-  // node.append("foreignObject")
-  //   .attr("class", "nodeContent-wrapper")
-  //   // .attr('x', function (d) { return -(side / 2) })
-  //   // .attr('y', function (d) { return -(side / 2) })
-  //   .attr('x', function (d) { return -radius })
-  //   .attr('y', function (d) { return -radius })
-  //   .attr('width', radius * 2) // used to be side instead of radius
-  //   .attr('height', radius * 2)
-  //   .append("xhtml:div")
-  //   .attr("class", "nodeContent")
-  //   .html(function (d) { return `<div class="nodeContent-info" style="background: #333; color: white; position: absolute; right: 0; bottom: 0;">${d.title || d.name}</div></div>` });
   node.append("circle")
     .attr("r", d => {
       if (d.type === 'IMAGE') return 5;
@@ -165,6 +142,43 @@ export default function test({ element, links_data, nodes_data, onNodeClick }) {
     })
     // .attr("fill", circleColour)
     .attr("class", 'node-overlay');
+
+  // https://stackoverflow.com/questions/20913869/wrap-text-within-circle
+  node.append("foreignObject")
+    .attr("class", "nodeContent-wrapper")
+    // .attr('x', function (d) { return -(side / 2) })
+    // .attr('y', function (d) { return -(side / 2) })
+    .attr('x', function (d) { return -radius })
+    .attr('y', function (d) { return -radius })
+    .attr('width', radius * 2) // used to be side instead of radius
+    .attr('height', radius * 2)
+    .append("xhtml:div")
+    .attr("class", "nodeContent")
+  //   .html(function (d) { return `<div class="nodeContent-info" style="background: #333; color: white; position: absolute; right: 0; bottom: 0;">${d.title || d.name}</div></div>` });
+
+  // https://stackoverflow.com/questions/41577546/how-do-i-add-a-simple-mouseover-info-window
+  node.on("mouseover", function (e, d) {
+    d3.select("#tooltip")
+      .style("left", () => {
+        if (e.x > width - 100) {
+          return e.x - 100 + "px"
+        } else {
+          return e.x + 10 + "px"
+        }
+      })
+      .style("top", e.y + 20 + "px")
+      .transition()
+      .style("visibility", "visible");
+    d3.select("#series")
+      .text(() => {
+        return `${d.type} ${d.isTreatment ? ' - Treatment' : ''} ${d.distinctTaxa > 1 ? ' - Cluster contains different identifications' : ''}`;
+      });
+  });
+  node.on("mouseleave", function (e) {
+    d3.select("#tooltip")
+      .transition()
+      .style("visibility", "hidden");
+  });
 
   //add zoom capabilities 
   //https://observablehq.com/@d3/delaunay-find-zoom

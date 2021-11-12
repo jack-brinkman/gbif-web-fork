@@ -102,27 +102,65 @@ export const ClusterPresentation = ({ first, prev, next, size, from, data, graph
       flexDirection: "column",
     }}>
       <ViewHeader loading={loading} total={total} />
-      <svg height="500" css={css.clusters} ref={ref} style={{ pointerEvents: loading ? 'none' : null, filter: loading ? 'grayscale(8)' : null, opacity: loading ? 0.5 : 1 }}></svg>
-
-      {next && <div css={css.footer({ theme })}>
-        {first && page > 2 && <Button appearance="text" css={css.footerItem({ theme })} direction="right" tip={intl.formatMessage({ id: 'pagination.first' })} onClick={first}>
-          <MdFirstPage />
-        </Button>}
-        {prev && page > 1 && <Button appearance="text" css={css.footerItem({ theme })} direction="right" tip={intl.formatMessage({ id: 'pagination.previous' })} onClick={prev}>
-          <MdChevronLeft />
-        </Button>}
-        {total > 0 && <span css={css.footerText({ theme })}>
-          <FormattedMessage
-            id='pagination.pageXofY'
-            defaultMessage={'Loading'}
-            values={{ current: <FormattedNumber value={page} />, total: <FormattedNumber value={totalPages} /> }}
-          />
-        </span>}
-        {next && page < totalPages && <Button appearance="text" css={css.footerItem({ theme })} direction="left" tip={intl.formatMessage({ id: 'pagination.next' })} onClick={next}>
-          <MdChevronRight />
-        </Button>}
-      </div>}
+      <div css={css.main}>
+        <div css={css.clusterWrapper}>
+          <div id="tooltip" css={css.tooltip2}>
+            <div id="container">
+              <div id="series">about this node</div>
+            </div>
+          </div>
+          <svg height="500" css={css.clusters} ref={ref} style={{ pointerEvents: loading ? 'none' : null, filter: loading ? 'grayscale(8)' : null, opacity: loading ? 0.5 : 1 }}></svg>
+          {next && <div css={css.footer({ theme })}>
+            {first && page > 2 && <Button appearance="text" css={css.footerItem({ theme })} direction="right" tip={intl.formatMessage({ id: 'pagination.first' })} onClick={first}>
+              <MdFirstPage />
+            </Button>}
+            {prev && page > 1 && <Button appearance="text" css={css.footerItem({ theme })} direction="right" tip={intl.formatMessage({ id: 'pagination.previous' })} onClick={prev}>
+              <MdChevronLeft />
+            </Button>}
+            {total > 0 && <span css={css.footerText({ theme })}>
+              <FormattedMessage
+                id='pagination.pageXofY'
+                defaultMessage={'Loading'}
+                values={{ current: <FormattedNumber value={page} />, total: <FormattedNumber value={totalPages} /> }}
+              />
+            </span>}
+            {next && page < totalPages && <Button appearance="text" css={css.footerItem({ theme })} direction="left" tip={intl.formatMessage({ id: 'pagination.next' })} onClick={next}>
+              <MdChevronRight />
+            </Button>}
+          </div>}
+        </div>
+        <div css={css.meta}>
+          <InfoCard headline="About" collapsible>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+          </InfoCard>
+          <InfoCard headline="Legend" style={{marginTop: 8}}>
+            <div>
+              <input type="checkbox" /> something
+            </div>
+            <div>
+              <input type="checkbox" /> something
+            </div>
+            <div>
+              <input type="checkbox" /> something
+            </div>
+          </InfoCard>
+        </div>
+      </div>
       {/* <pre>{JSON.stringify(graph, null, 2)}</pre> */}
     </div>
   </>
+}
+
+function InfoCard({ headline, children, style, props }) {
+  return <div css={css.card} style={style}>
+    <div css={css.headline}>
+      <h2>{ headline }</h2>
+      <div>v</div>
+    </div>
+    <div css={css.contentWrapper}>
+      <div css={css.content}>
+        {children}
+      </div>
+    </div>
+  </div>;
 }
