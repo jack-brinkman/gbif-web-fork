@@ -8,6 +8,7 @@ import { ClusterPresentation } from './ClusterPresentation';
 import { useQueryParam, NumberParam } from 'use-query-params';
 import uniqBy from 'lodash/uniqBy'
 import uniq from 'lodash/uniq'
+import { findDOMNode } from "react-dom";
 
 const OCCURRENCE_CLUSTERS = `
 query clusters($predicate: Predicate, $size: Int = 20, $from: Int = 0){
@@ -24,6 +25,7 @@ query clusters($predicate: Predicate, $size: Int = 20, $from: Int = 0){
         datasetKey
         datasetTitle
         typeStatus
+        taxonKey
         volatile {
           features {
             isSequenced
@@ -45,6 +47,7 @@ query clusters($predicate: Predicate, $size: Int = 20, $from: Int = 0){
               datasetKey
               datasetTitle
               typeStatus
+              taxonKey
               volatile {
                 features {
                   isSequenced
@@ -64,6 +67,7 @@ query clusters($predicate: Predicate, $size: Int = 20, $from: Int = 0){
                     datasetKey
                     datasetTitle
                     typeStatus
+                    taxonKey
                     volatile {
                       features {
                         isSequenced
@@ -83,6 +87,7 @@ query clusters($predicate: Predicate, $size: Int = 20, $from: Int = 0){
                           datasetKey
                           datasetTitle
                           typeStatus
+                          taxonKey
                           volatile {
                             features {
                               isSequenced
@@ -182,6 +187,7 @@ export default Clusters;
 
 function getNodeFromOccurrence(o, isEntry, hasTooManyRelations, rootKey) {
   return {
+    key: o.key,
     name: o.key + '',
     catalogNumber: o.catalogNumber,
     type: o.basisOfRecord,
@@ -189,6 +195,7 @@ function getNodeFromOccurrence(o, isEntry, hasTooManyRelations, rootKey) {
     isTreatment: o?.volatile?.features?.isTreament,
     isSequenced: o?.volatile?.features?.isSequenced,
     publishingOrgKey: o.publishingOrgKey,
+    taxonKey: o.taxonKey,
     isEntry,
     capped: hasTooManyRelations,
     rootKey: rootKey || o.key
@@ -236,7 +243,8 @@ function getNodeFromTypeStatus(o) {
 }
 
 function processOccurrence(x, rootKey, nodes, links, isEntry, hasTooManyRelations) {
-  nodes.push(getNodeFromOccurrence(x, isEntry, hasTooManyRelations, rootKey));
+  const mainNode = getNodeFromOccurrence(x, isEntry, hasTooManyRelations, rootKey);
+  nodes.push(mainNode);
 
   // add publisher nodes
   // nodes.push(getNodeFromPublisher(x, rootKey));
@@ -268,14 +276,15 @@ function processOccurrence(x, rootKey, nodes, links, isEntry, hasTooManyRelation
     nodes.push(typeNode);
     links.push({ source: x.key + '', target: typeNode.name })
   }
+
+  return mainNode;
 }
 
 function processRelated({parent, related, nodes, links, rootKey, clusterContext}) {
   if (related && related.count > 0) {
     related.relatedOccurrences.forEach(e => {
-      clusterContext.size++;
-      clusterContext.clusterNodes.push(e.occurrence.key);
-      processOccurrence(e.occurrence, rootKey, nodes, links, false, e.occurrence?.related?.count > e.occurrence?.related?.relatedOccurrences?.length);
+      const mainNode = processOccurrence(e.occurrence, rootKey, nodes, links, false, e.occurrence?.related?.count > e.occurrence?.related?.relatedOccurrences?.length);
+      clusterContext.clusterNodes.push(mainNode);
       // and add link to the related
       links.push({ source: parent.key + '', target: e.occurrence.key + '' });
       const itemRelations = e.occurrence.related;
@@ -290,13 +299,18 @@ function transformResult({ data }) {
   let clusterMap = {};
   const items = data.occurrenceSearch.documents.results;
   items.forEach(x => {
-    let clusterContext = {size: 1, clusterNodes: [x.key]};
+    let clusterContext = {clusterNodes: []};
     if (x.related && x.related.count > 0) {
-      processOccurrence(x, x.key, nodes, links, true, x.related.count > x.related.relatedOccurrences.length);
+      const mainNode = processOccurrence(x, x.key, nodes, links, true, x.related.count > x.related.relatedOccurrences.length);
+      clusterContext.clusterNodes.push(mainNode);
       processRelated({parent: x, related: x.related, nodes, links, rootKey: x.key, clusterContext});
 
-      clusterContext.clusterNodes = uniq(clusterContext.clusterNodes);
+      const uniqNodes = uniqBy(clusterContext.clusterNodes, x => x.key);
+      const distinctTaxonKeys = uniqBy(uniqNodes, x => x.taxonKey);
+      clusterContext.clusterNodes = uniqNodes.map(x => x.key);
       clusterContext.size = clusterContext.clusterNodes.length;
+      clusterContext.distinctTaxa = distinctTaxonKeys.length;
+      mainNode.distinctTaxa = clusterContext.distinctTaxa;
       clusterMap[x.key] = clusterContext;
     }
   });

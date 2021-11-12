@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 
-export function highlightNode({element, key, remove}) {
+export function highlightNode({ element, key, remove }) {
   const svg = d3.select(element);
   svg
     .selectAll(".node")
@@ -40,8 +40,32 @@ export default function test({ element, links_data, nodes_data, onNodeClick }) {
   const width = element.clientWidth;
   const height = element.clientHeight;
 
-
   svg.selectAll("*").remove();
+
+  // svg.append('defs')
+  //   .append('pattern')
+  //     .attr('id', 'diagonalHatch')
+  //     .attr('patternUnits', 'userSpaceOnUse')
+  //     .attr('width', 4)
+  //     .attr('height', 4)
+  //   .append('path')
+  //     .attr('d', 'M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2')
+  //     .attr('stroke', '#000000')
+  //     .attr('stroke-width', 1);
+  svg.append('defs')
+    .append('pattern')
+      .attr('id', 'diagonalHatch')
+      .attr('patternUnits', 'userSpaceOnUse')
+      .attr('width', 8)
+      .attr('height', 8)
+      .attr('patternTransform', 'rotate(45 0 0)')
+    .append('line')
+      .attr('x1', 0)
+      .attr('y1', 0)
+      .attr('x2', 0)
+      .attr('y2', 8)
+      .attr('stroke', '#00000088')
+      .attr('stroke-width', 8);
 
   var radius = 10,
     side = 2 * radius * Math.cos(Math.PI / 4);
@@ -51,12 +75,12 @@ export default function test({ element, links_data, nodes_data, onNodeClick }) {
     .nodes(nodes_data);
 
   var link_force = d3.forceLink(links_data)
-     .distance(function(d) {
-       if (d.target.type === 'IMAGE') return radius;
-       if (d.target.type === 'SEQUENCE') return radius;
-       if (d.target.type === 'TYPE') return radius;
-       return d.source.publishingOrgKey !== d.target.publishingOrgKey ? 50 : 25;
-      })
+    .distance(function (d) {
+      if (d.target.type === 'IMAGE') return radius;
+      if (d.target.type === 'SEQUENCE') return radius;
+      if (d.target.type === 'TYPE') return radius;
+      return d.source.publishingOrgKey !== d.target.publishingOrgKey ? 50 : 25;
+    })
     // .strength(0.1)
     .id(function (d) { return d.name; });
 
@@ -68,8 +92,8 @@ export default function test({ element, links_data, nodes_data, onNodeClick }) {
     .force("charge_force", charge_force)
     // .force("x", d3.forceX(width / 2))
     // .force("y", d3.forceY(height / 2));
-    .force('x', d3.forceX(width/2).strength(.05))
-    .force('y', d3.forceY(height/2).strength(.1));
+    .force('x', d3.forceX(width / 2).strength(.05))
+    .force('y', d3.forceY(height / 2).strength(.1));
 
   //add tick instructions: 
   simulation.on("tick", tickActions);
@@ -112,26 +136,35 @@ export default function test({ element, links_data, nodes_data, onNodeClick }) {
     })
     // .attr("fill", circleColour)
     .attr("class", circleClass);
-    // node.html(testContent);
-    // var innerSVG = node.append("svg")
-    // innerSVG
-    //   .attr("y", -10)
-    //   .append("text")
-    //   .attr("y", 10)
-    //   .text("this text is in the inner SVG");
+  // node.html(testContent);
+  // var innerSVG = node.append("svg")
+  // innerSVG
+  //   .attr("y", -10)
+  //   .append("text")
+  //   .attr("y", 10)
+  //   .text("this text is in the inner SVG");
 
   // https://stackoverflow.com/questions/20913869/wrap-text-within-circle
-  node.append("foreignObject")
-    .attr("class", "nodeContent-wrapper")
-    // .attr('x', function (d) { return -(side / 2) })
-    // .attr('y', function (d) { return -(side / 2) })
-    .attr('x', function (d) { return -radius })
-    .attr('y', function (d) { return -radius })
-    .attr('width', radius*2) // used to be side instead of radius
-    .attr('height', radius*2)
-    .append("xhtml:div")
-    .attr("class", "nodeContent")
-    .html(function (d) { return `<div class="nodeContent-info" style="background: #333; color: white; position: absolute; right: 0; bottom: 0;">${d.title || d.name}</div></div>` });
+  // node.append("foreignObject")
+  //   .attr("class", "nodeContent-wrapper")
+  //   // .attr('x', function (d) { return -(side / 2) })
+  //   // .attr('y', function (d) { return -(side / 2) })
+  //   .attr('x', function (d) { return -radius })
+  //   .attr('y', function (d) { return -radius })
+  //   .attr('width', radius * 2) // used to be side instead of radius
+  //   .attr('height', radius * 2)
+  //   .append("xhtml:div")
+  //   .attr("class", "nodeContent")
+  //   .html(function (d) { return `<div class="nodeContent-info" style="background: #333; color: white; position: absolute; right: 0; bottom: 0;">${d.title || d.name}</div></div>` });
+  node.append("circle")
+    .attr("r", d => {
+      if (d.type === 'IMAGE') return 5;
+      if (d.type === 'SEQUENCE') return 5;
+      if (d.type === 'TYPE') return 5;
+      return radius
+    })
+    // .attr("fill", circleColour)
+    .attr("class", 'node-overlay');
 
   //add zoom capabilities 
   //https://observablehq.com/@d3/delaunay-find-zoom
@@ -171,7 +204,11 @@ export default function test({ element, links_data, nodes_data, onNodeClick }) {
     if (d.type === 'TYPE') {
       str += 'node-type ';
     }
-    
+
+    if (d.distinctTaxa && d.distinctTaxa > 1) {
+      str += 'node-multiple-identifications ';
+    }
+
     if (['PRESERVED_SPECIMEN', 'FOSSIL_SPECIMEN', 'LIVING_SPECIMEN'].includes(d.type)) {
       str += 'node-specimen ';
     }

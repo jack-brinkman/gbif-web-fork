@@ -67,12 +67,23 @@ export const clusters = props => css`
     fill: rgb(44, 79, 123);
   }
 
-  .node-treatment {
-    fill: rgb(239, 152, 146)
-  }
-
   .node-specimen {
     fill: rgb(250, 185, 61);
+  }
+
+  .node-multiple-identifications + .node-overlay {
+    display: block;
+    fill: url(#diagonalHatch)
+    /* background-image: linear-gradient(45deg, #00000000 25%, #00000088 25%, #00000088 50%, #00000000 50%, #00000000 75%, #00000088 75%, #00000088 100%);
+    background-size: 10px 10px; */
+  }
+
+  .node-overlay {
+    display: none;
+  }
+
+  .node-treatment {
+    fill: rgb(239, 152, 146)
   }
 
   .nodeContent-wrapper {

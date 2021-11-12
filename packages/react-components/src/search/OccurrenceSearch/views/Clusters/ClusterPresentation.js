@@ -102,7 +102,6 @@ export const ClusterPresentation = ({ first, prev, next, size, from, data, graph
       flexDirection: "column",
     }}>
       <ViewHeader loading={loading} total={total} />
-      
       <svg height="500" css={css.clusters} ref={ref} style={{ pointerEvents: loading ? 'none' : null, filter: loading ? 'grayscale(8)' : null, opacity: loading ? 0.5 : 1 }}></svg>
 
       {next && <div css={css.footer({ theme })}>
