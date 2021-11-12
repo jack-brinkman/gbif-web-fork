@@ -54,6 +54,7 @@ export default function test({ element, links_data, nodes_data, onNodeClick }) {
      .distance(function(d) {
        if (d.target.type === 'IMAGE') return radius;
        if (d.target.type === 'SEQUENCE') return radius;
+       if (d.target.type === 'TYPE') return radius;
        return d.source.publishingOrgKey !== d.target.publishingOrgKey ? 50 : 25;
       })
     // .strength(0.1)
@@ -106,6 +107,7 @@ export default function test({ element, links_data, nodes_data, onNodeClick }) {
     .attr("r", d => {
       if (d.type === 'IMAGE') return 5;
       if (d.type === 'SEQUENCE') return 5;
+      if (d.type === 'TYPE') return 5;
       return radius
     })
     // .attr("fill", circleColour)
@@ -166,8 +168,11 @@ export default function test({ element, links_data, nodes_data, onNodeClick }) {
     if (d.isTreatment) {
       str += 'node-treatment ';
     }
+    if (d.type === 'TYPE') {
+      str += 'node-type ';
+    }
     
-    if (!d.isTreatment && !d.isSequenced && ['PRESERVED_SPECIMEN', 'FOSSIL_SPECIMEN', 'LIVING_SPECIMEN'].includes(d.type)) {
+    if (['PRESERVED_SPECIMEN', 'FOSSIL_SPECIMEN', 'LIVING_SPECIMEN'].includes(d.type)) {
       str += 'node-specimen ';
     }
     return str;

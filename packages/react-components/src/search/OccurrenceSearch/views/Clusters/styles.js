@@ -56,6 +56,10 @@ export const clusters = props => css`
   }
 
   .node-sequence {
+    fill: rgb(43, 151, 128);
+  }
+
+  .node-type {
     fill: rgb(203, 56, 53);
   }
 

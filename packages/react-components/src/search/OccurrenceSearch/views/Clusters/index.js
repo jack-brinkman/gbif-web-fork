@@ -23,6 +23,7 @@ query clusters($predicate: Predicate, $size: Int = 20, $from: Int = 0){
         stillImageCount
         datasetKey
         datasetTitle
+        typeStatus
         volatile {
           features {
             isSequenced
@@ -43,6 +44,7 @@ query clusters($predicate: Predicate, $size: Int = 20, $from: Int = 0){
               stillImageCount
               datasetKey
               datasetTitle
+              typeStatus
               volatile {
                 features {
                   isSequenced
@@ -61,6 +63,7 @@ query clusters($predicate: Predicate, $size: Int = 20, $from: Int = 0){
                     stillImageCount
                     datasetKey
                     datasetTitle
+                    typeStatus
                     volatile {
                       features {
                         isSequenced
@@ -79,6 +82,7 @@ query clusters($predicate: Predicate, $size: Int = 20, $from: Int = 0){
                           stillImageCount
                           datasetKey
                           datasetTitle
+                          typeStatus
                           volatile {
                             features {
                               isSequenced
@@ -98,7 +102,6 @@ query clusters($predicate: Predicate, $size: Int = 20, $from: Int = 0){
     }
   }
 }
-
 `;
 
 function Clusters() {
@@ -182,6 +185,7 @@ function getNodeFromOccurrence(o, isEntry, hasTooManyRelations, rootKey) {
     name: o.key + '',
     catalogNumber: o.catalogNumber,
     type: o.basisOfRecord,
+    isType: o.typeStatus,
     isTreatment: o?.volatile?.features?.isTreament,
     isSequenced: o?.volatile?.features?.isSequenced,
     publishingOrgKey: o.publishingOrgKey,
@@ -223,6 +227,14 @@ function getNodeFromSequence(o) {
   };
 }
 
+function getNodeFromTypeStatus(o) {
+  return {
+    name: `${o.key}_type`,
+    title: 'Type',
+    type: 'TYPE'
+  };
+}
+
 function processOccurrence(x, rootKey, nodes, links, isEntry, hasTooManyRelations) {
   nodes.push(getNodeFromOccurrence(x, isEntry, hasTooManyRelations, rootKey));
 
@@ -248,6 +260,13 @@ function processOccurrence(x, rootKey, nodes, links, isEntry, hasTooManyRelation
     let imageNode = getNodeFromImage(x);
     nodes.push(imageNode);
     links.push({ source: x.key + '', target: imageNode.name })
+  }
+
+  // add type nodes
+  if (x?.typeStatus) {
+    let typeNode = getNodeFromTypeStatus(x);
+    nodes.push(typeNode);
+    links.push({ source: x.key + '', target: typeNode.name })
   }
 }
 
