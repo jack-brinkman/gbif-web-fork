@@ -4,16 +4,17 @@ import { useUpdateEffect } from 'react-use';
 // import { FilterContext } from '../../../../widgets/Filter/state';
 import OccurrenceContext from '../../../SearchContext';
 import { useIntl, FormattedMessage, FormattedNumber } from 'react-intl';
-import { DetailsDrawer, Button } from '../../../../components';
+import { DetailsDrawer, Button, OptImage as Image } from '../../../../components';
 import { OccurrenceSidebar } from '../../../../entities';
 import { useDialogState } from "reakit/Dialog";
 import { ViewHeader } from '../ViewHeader';
-import { MdChevronRight, MdChevronLeft, MdFirstPage } from "react-icons/md";
+import { MdChevronRight, MdChevronLeft, MdFirstPage, MdExpandMore, MdExpandLess } from "react-icons/md";
 // import { useUrlState } from '../../../../dataManagement/state/useUrlState';
 import { useQueryParam, NumberParam } from 'use-query-params';
 import ThemeContext from '../../../../style/themes/ThemeContext';
 import * as d3 from 'd3';
 import test, { highlightNode } from './test';
+import { prettifyEnum } from '../../../../utils/labelMaker/config2labels';
 
 import * as css from './styles';
 
@@ -23,6 +24,7 @@ export const ClusterPresentation = ({ first, prev, next, size, from, data, graph
   const [activeKey, setActiveKey] = useQueryParam('entity', NumberParam);
   const ref = useRef(null);
   const [activeCluster, setActiveCluster] = useState();
+  const [tooltipItem, setTooltipItem] = useState();
   const dialog = useDialogState({ animated: true, modal: false });
   const items = data?.occurrenceSearch?.documents?.results || [];
 
@@ -85,7 +87,8 @@ export const ClusterPresentation = ({ first, prev, next, size, from, data, graph
         links_data: graph.links,
         onNodeClick: ({ key }) => {
           setActiveKey(key);
-        }
+        },
+        setTooltipItem
       })
     }
   }, [ref, graph]);
@@ -104,12 +107,32 @@ export const ClusterPresentation = ({ first, prev, next, size, from, data, graph
       <ViewHeader loading={loading} total={total} />
       <div css={css.main}>
         <div css={css.clusterWrapper}>
-          <div id="tooltip" css={css.tooltip2}>
-            <div id="container">
-              <div id="series">about this node</div>
-            </div>
+          <div id="tooltip" css={css.tooltipWrapper}>
+            {tooltipItem && <>
+              {tooltipItem.link && <>
+                {tooltipItem.link?.reasons?.length > 0 && <div>
+                  About the link: {tooltipItem.link.reasons.map(x => <span>{prettifyEnum(x)} </span>)}
+                </div>}
+                <div>
+                  {tooltipItem.link.source.taxonKey !== tooltipItem.link.target.taxonKey && <div>
+                    Identifications differ
+                  </div>}
+                  {tooltipItem.link.source.publishingOrgKey !== tooltipItem.link.target.publishingOrgKey && <div>
+                    Different publishers
+                  </div>}
+                </div>
+              </>}
+              {tooltipItem.node && <>
+                <div><FormattedMessage id={`enums.basisOfRecord.${tooltipItem.node.type}`} /></div>
+                {tooltipItem.node.isTreatment && <div>Treatment</div>}
+                {tooltipItem.node.distinctTaxa > 1 && <div>Cluster contains different identifications</div>}
+                {tooltipItem.node.capped && <div>This node has more connections, than shown here. Go to the record to see the full list.</div>}
+                {tooltipItem.node.image && <div>
+                  <Image src={tooltipItem.node.image.identifier} w={200}/></div>}
+              </>}
+            </>}
           </div>
-          <svg height="500" css={css.clusters} ref={ref} style={{ pointerEvents: loading ? 'none' : null, filter: loading ? 'grayscale(8)' : null, opacity: loading ? 0.5 : 1 }}></svg>
+          <svg css={css.clusters} ref={ref} style={{ pointerEvents: loading ? 'none' : null, filter: loading ? 'grayscale(8)' : null, opacity: loading ? 0.5 : 1 }}></svg>
           {next && <div css={css.footer({ theme })}>
             {first && page > 2 && <Button appearance="text" css={css.footerItem({ theme })} direction="right" tip={intl.formatMessage({ id: 'pagination.first' })} onClick={first}>
               <MdFirstPage />
@@ -133,34 +156,81 @@ export const ClusterPresentation = ({ first, prev, next, size, from, data, graph
           <InfoCard headline="About" collapsible>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
           </InfoCard>
-          <InfoCard headline="Legend" style={{marginTop: 8}}>
-            <div>
-              <input type="checkbox" /> something
+          <InfoCard headline="Legend" style={{ marginTop: 8 }}>
+            <div css={css.legendItem}>
+              <div>
+                <div style={{ borderRadius: '50%', width: 25, height: 25, background: '#fab93d' }}></div>
+              </div>
+              <div style={{ flex: '1 1 auto;' }}>Specimen</div>
             </div>
-            <div>
-              <input type="checkbox" /> something
+            <div css={css.legendItem}>
+              <div>
+                <div style={{ borderRadius: '50%', width: 25, height: 25, background: '#5295a4' }}></div>
+              </div>
+              <div style={{ flex: '1 1 auto;' }}>Observation</div>
             </div>
-            <div>
-              <input type="checkbox" /> something
+            <div css={css.legendItem}>
+              <div>
+                <div style={{ borderRadius: '50%', width: 25, height: 25, background: '#56bda7' }}></div>
+              </div>
+              <div style={{ flex: '1 1 auto;' }}>Treatment</div>
+            </div>
+            <div css={css.legendItem}>
+              <div>
+                <div css={css.stripes} style={{ borderRadius: '50%', width: 25, height: 25 }}></div>
+              </div>
+              <div style={{ flex: '1 1 auto;' }}>Contains differemt identifications</div>
+            </div>
+            <div css={css.legendItem}>
+              <div>
+                <div style={{ borderRadius: '50%', width: 15, height: 15, background: '#e9c0dc' }}></div>
+              </div>
+              <div style={{ flex: '1 1 auto;' }}>Sequence</div>
+            </div>
+            <div css={css.legendItem}>
+              <div>
+                <div style={{ borderRadius: '50%', width: 15, height: 15, background: 'rgb(203, 56, 53)' }}></div>
+              </div>
+              <div style={{ flex: '1 1 auto;' }}>Type specimen</div>
+            </div>
+            <div css={css.legendItem}>
+              <div>
+                <div style={{ borderRadius: '50%', width: 15, height: 15, background: 'rgb(44, 79, 123)' }}></div>
+              </div>
+              <div style={{ flex: '1 1 auto;' }}>Images</div>
+            </div>
+            <div css={css.legendItem}>
+              <div>
+                <div style={{ width: 25, height: 3, background: 'pink' }}></div>
+              </div>
+              <div style={{ flex: '1 1 auto;' }}>Different publishers</div>
+            </div>
+            <div css={css.legendItem}>
+              <div>
+                <div style={{ width: 15, height: 3, background: 'deepskyblue' }}></div>
+              </div>
+              <div style={{ flex: '1 1 auto;' }}>Same publisher</div>
             </div>
           </InfoCard>
         </div>
       </div>
-      {/* <pre>{JSON.stringify(graph, null, 2)}</pre> */}
     </div>
   </>
 }
 
-function InfoCard({ headline, children, style, props }) {
+function InfoCard({ headline, children, style, collapsed = false, props }) {
+  const [expanded, setExpanded] = useState(!collapsed);
   return <div css={css.card} style={style}>
     <div css={css.headline}>
-      <h2>{ headline }</h2>
-      <div>v</div>
+      <h2>{headline}</h2>
+      <div style={{padding: '0 10px'}} onClick={() => setExpanded(!expanded)} >
+        {expanded ? <MdExpandMore /> : <MdExpandLess />}
+      </div>
     </div>
-    <div css={css.contentWrapper}>
+    {expanded && <div css={css.contentWrapper}>
       <div css={css.content}>
         {children}
       </div>
-    </div>
+    </div>}
   </div>;
 }

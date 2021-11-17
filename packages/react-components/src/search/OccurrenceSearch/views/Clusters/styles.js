@@ -47,8 +47,8 @@ export const clusters = props => css`
   }
 
   .node-capped {
-    stroke: rgb(82, 149, 164);
-    stroke-width: 2px;
+    /* stroke: rgb(82, 149, 164);
+    stroke-width: 2px; */
   }
 
   .node-entry {
@@ -57,7 +57,7 @@ export const clusters = props => css`
   }
 
   .node-sequence {
-    fill: rgb(43, 151, 128);
+    fill: #e9c0dc;
   }
 
   .node-type {
@@ -84,7 +84,7 @@ export const clusters = props => css`
   }
 
   .node-treatment {
-    fill: rgb(239, 152, 146)
+    fill: #56bda7;
   }
 
   .nodeContent-wrapper {
@@ -180,8 +180,11 @@ export const footerText = props => css`
 
 export const clusterWrapper = props => css`
   flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
   svg {
     width: 100%;
+    flex: 1 1 auto;
   }
 `;
 
@@ -194,6 +197,7 @@ export const main = props => css`
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
+  height: 100%;
 `;
 
 
@@ -221,7 +225,7 @@ export const headline = props => css`
 
 export const contentWrapper = props => css`
   overflow: auto;
-  max-height: 200px;
+  max-height: 300px;
 `;
 
 export const content = props => css`
@@ -229,7 +233,7 @@ export const content = props => css`
   font-size: 13px;
 `;
 
-export const tooltip2 = props => css`
+export const tooltipWrapper = props => css`
   background: #333;
   color: white;
   border-radius: 4px;
@@ -237,7 +241,46 @@ export const tooltip2 = props => css`
   height: auto;
   visibility:hidden;
   z-index:9999;
-  padding: 0 3px;
+  padding: 8px;
   font-size: .85em;
+  max-width: 250px;
   /* box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1); */
+  > div {
+    margin-bottom: 12px;
+  }
+  > div:last-of-type {
+    margin-bottom: 0;
+  }
+`;
+
+export const stripes = css`
+  /* background: repeating-linear-gradient(
+    -45deg,
+    #606dbc,
+    #606dbc 10px,
+    #465298 10px,
+    #465298 20px
+  ); */
+  background-image: linear-gradient(-45deg, #00000000 25%, #00000088 25%, #00000088 50%, #00000000 50%, #00000000 75%, #00000088 75%, #00000088 100%);
+  background-size: 12px 12px;
+  border: 1px solid #bbb;
+`;
+
+export const legendItem = css`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  padding-bottom: 8px;
+  > div:first-of-type {
+    width: 30px;
+    text-align: center;
+    >div {
+      margin: auto;
+    }
+  }
+  > * {
+    flex: 0 0 auto;
+    margin-right: 12px;
+  }
 `;

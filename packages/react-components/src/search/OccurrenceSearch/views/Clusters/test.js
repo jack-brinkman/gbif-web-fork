@@ -13,7 +13,7 @@ export function highlightNode({ element, key, remove }) {
     });
 }
 
-export default function test({ element, links_data, nodes_data, onNodeClick }) {
+export default function test({ element, links_data, nodes_data, onNodeClick, setTooltipItem }) {
   // this is forked from https://bl.ocks.org/puzzler10/4438752bb93f45dc5ad5214efaa12e4a and modified to my needs
 
   // i think i might rather wnt to use another force as in this example https://observablehq.com/@d3/disjoint-force-directed-graph
@@ -39,6 +39,7 @@ export default function test({ element, links_data, nodes_data, onNodeClick }) {
   const svg = d3.select(element);
   const width = element.clientWidth;
   const height = element.clientHeight;
+  const ratio = width / height;
 
   svg.selectAll("*").remove();
 
@@ -83,7 +84,7 @@ export default function test({ element, links_data, nodes_data, onNodeClick }) {
     // .force("x", d3.forceX(width / 2))
     // .force("y", d3.forceY(height / 2));
     .force('x', d3.forceX(width / 2).strength(.05))
-    .force('y', d3.forceY(height / 2).strength(.1));
+    .force('y', d3.forceY(height / 2).strength(.05 * ratio));
 
   //add tick instructions: 
   simulation.on("tick", tickActions);
@@ -105,6 +106,30 @@ export default function test({ element, links_data, nodes_data, onNodeClick }) {
   // https://stackoverflow.com/questions/19132118/d3js-force-directed-mouseover-on-line-link-doesnt-work-properly
   // link.on("mouseover", function () { d3.select(this).style("stroke", "red"); });
   // link.on("mouseleave", function () { d3.select(this).style("stroke", "pink"); });
+
+  link.on("mouseover", function (e, d) {
+    d3.select("#tooltip")
+      .style("left", () => {
+        setTooltipItem({ link: d });
+        return e.x + 10 + "px";
+        if (e.x > width - 100) {
+          return e.x - 100 + "px"
+        } else {
+          return e.x + 10 + "px"
+        }
+      })
+      .style("top", e.y + 20 + "px")
+      .transition()
+      .style("visibility", "visible");
+  });
+  link.on("mouseleave", function (e) {
+    d3.select("#tooltip")
+      .transition()
+      .style("visibility", () => {
+        setTooltipItem();
+        return "hidden";
+      });
+  });
 
 
   //draw circles for the nodes 
@@ -148,10 +173,22 @@ export default function test({ element, links_data, nodes_data, onNodeClick }) {
     .attr("class", "nodeContent-wrapper")
     // .attr('x', function (d) { return -(side / 2) })
     // .attr('y', function (d) { return -(side / 2) })
-    .attr('x', function (d) { return -radius })
-    .attr('y', function (d) { return -radius })
-    .attr('width', radius * 2) // used to be side instead of radius
-    .attr('height', radius * 2)
+    .attr('x', function (d) {
+      const r = ['IMAGE', 'SEQUENCE', 'TYPE'].indexOf(d.type) > -1 ? 5 : radius;
+      return -r;
+    })
+    .attr('y', function (d) {
+      const r = ['IMAGE', 'SEQUENCE', 'TYPE'].indexOf(d.type) > -1 ? 5 : radius;
+      return -r;
+    })
+    .attr('width', function (d) {
+      const r = ['IMAGE', 'SEQUENCE', 'TYPE'].indexOf(d.type) > -1 ? 5 : radius;
+      return r*2; // used to be side instead of radius
+    })
+    .attr('height', function (d) {
+      const r = ['IMAGE', 'SEQUENCE', 'TYPE'].indexOf(d.type) > -1 ? 5 : radius;
+      return r*2;
+    })
     .append("xhtml:div")
     .attr("class", "nodeContent")
   //   .html(function (d) { return `<div class="nodeContent-info" style="background: #333; color: white; position: absolute; right: 0; bottom: 0;">${d.title || d.name}</div></div>` });
@@ -160,6 +197,7 @@ export default function test({ element, links_data, nodes_data, onNodeClick }) {
   node.on("mouseover", function (e, d) {
     d3.select("#tooltip")
       .style("left", () => {
+        setTooltipItem({ node: d });
         if (e.x > width - 100) {
           return e.x - 100 + "px"
         } else {
@@ -169,15 +207,14 @@ export default function test({ element, links_data, nodes_data, onNodeClick }) {
       .style("top", e.y + 20 + "px")
       .transition()
       .style("visibility", "visible");
-    d3.select("#series")
-      .text(() => {
-        return `${d.type} ${d.isTreatment ? ' - Treatment' : ''} ${d.distinctTaxa > 1 ? ' - Cluster contains different identifications' : ''}`;
-      });
   });
   node.on("mouseleave", function (e) {
     d3.select("#tooltip")
       .transition()
-      .style("visibility", "hidden");
+      .style("visibility", () => {
+        setTooltipItem();
+        return "hidden";
+      });
   });
 
   //add zoom capabilities 
@@ -195,7 +232,7 @@ export default function test({ element, links_data, nodes_data, onNodeClick }) {
 
   /** Functions **/
 
-  //Dimensions that could be intersting to show.
+  // Dimensions that could be intersting to show.
   // occurrenceFeature: specimen, holotype, sequenced, treatment, hasMedia, hasLocation, hasDate
   // always: isCapped, isEntry
   function circleClass(d) {
@@ -332,10 +369,15 @@ export default function test({ element, links_data, nodes_data, onNodeClick }) {
 
   // zoom fit http://bl.ocks.org/TWiStErRob/b1c62730e01fe33baa2dea0d0aa29359
   // https://stackoverflow.com/questions/16236600/d3-js-force-layout-auto-zoom-scale-after-loading
-  function lapsedZoomFit(ticks, transitionDuration) {
-    for (var i = ticks || 200; i > 0; --i) simulation.tick();
-    simulation.stop();
-    zoomFit(undefined, transitionDuration);
+  function lapsedZoomFit(ticks = 200, transitionDuration = 1000) {
+    for (var i = ticks; i > 0; --i) {
+      simulation.tick();
+    }
+    simulation.alphaTarget(0).restart();
+    setTimeout(() => {
+      zoomFit(undefined, transitionDuration);
+    }, 0);
+    // simulation.alphaTarget(0);
   }
 
   function zoomFit(paddingPercent, transitionDuration) {
@@ -350,7 +392,11 @@ export default function test({ element, links_data, nodes_data, onNodeClick }) {
     if (width == 0 || height == 0) return; // nothing to fit
     var scale = (paddingPercent || 0.75) / Math.max(width / fullWidth, height / fullHeight);
     var translate = [fullWidth / 2 - scale * midX, fullHeight / 2 - scale * midY];
-
+    /*
+    svg
+    .call(zoom)
+    .call(zoom.transform, d3.zoomIdentity)
+    */
     console.trace("zoomFit", translate, scale);
     var transform = d3.zoomIdentity
       .translate(translate[0], translate[1])
@@ -365,6 +411,7 @@ export default function test({ element, links_data, nodes_data, onNodeClick }) {
   console.log('test');
   globalThis.lapsedZoomFit = lapsedZoomFit;
   // lapsedZoomFit(undefined, 0);
+  lapsedZoomFit(200, 0);
 
   // ideasfor server side rendering this 
   // https://gist.github.com/danioyuan/d776a8034b64ceaa80bb

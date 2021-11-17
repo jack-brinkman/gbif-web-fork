@@ -22,6 +22,9 @@ query clusters($predicate: Predicate, $size: Int = 20, $from: Int = 0){
         publishingOrgKey
         publisherTitle
         stillImageCount
+        primaryImage {
+          identifier
+        }
         datasetKey
         datasetTitle
         typeStatus
@@ -37,6 +40,7 @@ query clusters($predicate: Predicate, $size: Int = 20, $from: Int = 0){
           size
           from
           relatedOccurrences {
+            reasons
             occurrence {
               key
               basisOfRecord
@@ -44,6 +48,9 @@ query clusters($predicate: Predicate, $size: Int = 20, $from: Int = 0){
               publishingOrgKey
               publisherTitle
               stillImageCount
+              primaryImage {
+                identifier
+              }
               datasetKey
               datasetTitle
               typeStatus
@@ -57,6 +64,7 @@ query clusters($predicate: Predicate, $size: Int = 20, $from: Int = 0){
               related(size: 8) {
 								count
                 relatedOccurrences {
+                  reasons
                   occurrence {
                     key
                     basisOfRecord
@@ -64,6 +72,9 @@ query clusters($predicate: Predicate, $size: Int = 20, $from: Int = 0){
                     publishingOrgKey
                     publisherTitle
                     stillImageCount
+                    primaryImage {
+                      identifier
+                    }
                     datasetKey
                     datasetTitle
                     typeStatus
@@ -77,6 +88,7 @@ query clusters($predicate: Predicate, $size: Int = 20, $from: Int = 0){
                     related(size: 5) {
                       count
                       relatedOccurrences {
+                        reasons
                         occurrence {
                           key
                           basisOfRecord
@@ -84,6 +96,9 @@ query clusters($predicate: Predicate, $size: Int = 20, $from: Int = 0){
                           publishingOrgKey
                           publisherTitle
                           stillImageCount
+                          primaryImage {
+                            identifier
+                          }
                           datasetKey
                           datasetTitle
                           typeStatus
@@ -113,7 +128,7 @@ function Clusters() {
   const [from = 0, setFrom] = useQueryParam('from', NumberParam);
   const [graph, setGraph] = useState();
 
-  const size = 50;
+  const size = 25;
   const currentFilterContext = useContext(FilterContext);
   const { rootPredicate, predicateConfig } = useContext(OccurrenceContext);
   const { data, error, loading, load } = useQuery(OCCURRENCE_CLUSTERS, { lazyLoad: true });
@@ -222,6 +237,7 @@ function getNodeFromImage(o) {
   return {
     name: `${o.key}_image`,
     title: 'Imaged',
+    image: o.primaryImage,
     type: 'IMAGE'
   };
 }
@@ -286,7 +302,7 @@ function processRelated({parent, related, nodes, links, rootKey, clusterContext}
       const mainNode = processOccurrence(e.occurrence, rootKey, nodes, links, false, e.occurrence?.related?.count > e.occurrence?.related?.relatedOccurrences?.length);
       clusterContext.clusterNodes.push(mainNode);
       // and add link to the related
-      links.push({ source: parent.key + '', target: e.occurrence.key + '' });
+      links.push({ source: parent.key + '', target: e.occurrence.key + '', reasons: e.reasons });
       const itemRelations = e.occurrence.related;
       processRelated({parent: e.occurrence, related: itemRelations, nodes, links, rootKey, clusterContext});
     });
