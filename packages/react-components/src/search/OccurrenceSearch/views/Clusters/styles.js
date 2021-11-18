@@ -6,6 +6,7 @@ import { tooltip } from '../../../../style/shared';
 // filters applied influence the decision. But this simple approach will perform better and is used for now.
 export const clusters = props => css`
   width: 100%;
+  height: 100%;
   flex: 1 1 auto;
   background: white;
   border-radius: 4;
@@ -205,10 +206,6 @@ export const clusterWrapper = props => css`
     width: 100%;
     flex: 1 1 auto;
     overflow: hidden;
-  }
-  svg {
-    width: 100%;
-    height: 100%;
   }
 `;
 
