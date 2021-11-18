@@ -127,8 +127,9 @@ query clusters($predicate: Predicate, $size: Int = 20, $from: Int = 0){
 function Clusters() {
   const [from = 0, setFrom] = useQueryParam('from', NumberParam);
   const [graph, setGraph] = useState();
+  const [attempt, setAttempt] = useState();
 
-  const size = 25;
+  const size = 50;
   const currentFilterContext = useContext(FilterContext);
   const { rootPredicate, predicateConfig } = useContext(OccurrenceContext);
   const { data, error, loading, load } = useQuery(OCCURRENCE_CLUSTERS, { lazyLoad: true });
@@ -147,7 +148,7 @@ function Clusters() {
       ].filter(x => x)
     }
     load({ keepDataWhileLoading: true, variables: { predicate, size, from } });
-  }, [currentFilterContext.filterHash, rootPredicate, from]);
+  }, [currentFilterContext.filterHash, rootPredicate, from, attempt]);
 
   useEffect(() => {
     return function cleanup() {
@@ -172,20 +173,28 @@ function Clusters() {
     setFrom(0);
   });
 
+  const reload = useCallback(() => {
+    setAttempt(Math.random());
+  });
+
   // process and remap data to structure we can use
   useEffect(() => {
     if (data) {
       if (error) {
         console.log(error);
+        setGraph();
+      } else {
+        const graph = transformResult({ data });
+        setGraph(graph);
       }
-      const graph = transformResult({ data });
-      setGraph(graph);
     }
   }, [data]);
 
   return <>
     <ClusterPresentation
       loading={loading}
+      error={error}
+      reload={reload}
       graph={graph}
       next={next}
       prev={prev}
@@ -201,11 +210,13 @@ export default Clusters;
 
 
 function getNodeFromOccurrence(o, isEntry, hasTooManyRelations, rootKey) {
+  const isSpecimen = ['PRESERVED_SPECIMEN', 'FOSSIL_SPECIMEN', 'LIVING_SPECIMEN', 'MATERIAL_SAMPLE'].indexOf(o.basisOfRecord) > -1;
   return {
     key: o.key,
     name: o.key + '',
     catalogNumber: o.catalogNumber,
-    type: o.basisOfRecord,
+    type: isSpecimen ? 'SPECIMEN' : 'OBSERVATION',
+    basisOfRecord: o.basisOfRecord,
     isType: o.typeStatus,
     isTreatment: o?.volatile?.features?.isTreament,
     isSequenced: o?.volatile?.features?.isSequenced,

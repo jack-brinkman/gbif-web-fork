@@ -42,8 +42,10 @@ export const clusters = props => css`
 
   .node-circle {
     fill: rgb(82, 149, 164);
-    stroke: black	;
     stroke-width: 0px;
+    &.node-entry {
+      stroke: #427581;
+    }
   }
 
   .node-capped {
@@ -52,8 +54,7 @@ export const clusters = props => css`
   }
 
   .node-entry {
-    stroke: deepskyblue;
-    stroke-width: 1px;
+    stroke-width: 3px;
   }
 
   .node-sequence {
@@ -70,6 +71,28 @@ export const clusters = props => css`
 
   .node-specimen {
     fill: rgb(250, 185, 61);
+    &.node-entry {
+      stroke: #c18719;
+    }
+    ~ .nodeContent-wrapper {
+      cursor: pointer;
+    }
+  }
+
+  .node-observation {
+    ~ .nodeContent-wrapper {
+      cursor: pointer;
+    }
+  }
+
+  .node-treatment {
+    fill: #56bda7;
+    &.node-entry {
+      stroke: #3f917f;
+    }
+    ~ .nodeContent-wrapper {
+      cursor: pointer;
+    }
   }
 
   .node-multiple-identifications + .node-overlay {
@@ -81,10 +104,6 @@ export const clusters = props => css`
 
   .node-overlay {
     display: none;
-  }
-
-  .node-treatment {
-    fill: #56bda7;
   }
 
   .nodeContent-wrapper {
@@ -182,9 +201,14 @@ export const clusterWrapper = props => css`
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  svg {
+  >div:first-of-type {
     width: 100%;
     flex: 1 1 auto;
+    overflow: hidden;
+  }
+  svg {
+    width: 100%;
+    height: 100%;
   }
 `;
 
@@ -211,15 +235,16 @@ export const headline = props => css`
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  padding: 12px;
   h2 {
     font-size: 15px;
+    font-weight: normal;
     flex: 1 1 auto;
     margin: 0;
-    padding: 0;
+    padding: 12px;
   }
-  div {
+  button {
     flex: 0 0 auto;
+    padding: 12px;
   }
 `;
 
@@ -233,18 +258,16 @@ export const content = props => css`
   font-size: 13px;
 `;
 
-export const tooltipWrapper = props => css`
+export const tooltipContent = props => css`
+  position: absolute;
+
+  padding: 8px;
+  height: auto;
   background: #333;
   color: white;
   border-radius: 4px;
-  position:absolute;
-  height: auto;
-  visibility:hidden;
-  z-index:9999;
-  padding: 8px;
   font-size: .85em;
   max-width: 250px;
-  /* box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1); */
   > div {
     margin-bottom: 12px;
   }
@@ -253,14 +276,14 @@ export const tooltipWrapper = props => css`
   }
 `;
 
+export const tooltipWrapper = props => css`
+  position:absolute;
+  visibility:hidden;
+  z-index:9999;
+  pointer-events: none;
+`;
+
 export const stripes = css`
-  /* background: repeating-linear-gradient(
-    -45deg,
-    #606dbc,
-    #606dbc 10px,
-    #465298 10px,
-    #465298 20px
-  ); */
   background-image: linear-gradient(-45deg, #00000000 25%, #00000088 25%, #00000088 50%, #00000000 50%, #00000000 75%, #00000088 75%, #00000088 100%);
   background-size: 12px 12px;
   border: 1px solid #bbb;
@@ -282,5 +305,14 @@ export const legendItem = css`
   > * {
     flex: 0 0 auto;
     margin-right: 12px;
+  }
+`;
+
+export const requestError = css`
+  text-align: center;
+  margin-top: 48px;
+  flex: 1 1 auto;
+  div {
+    margin-top: 12px;
   }
 `;

@@ -108,7 +108,7 @@ export default function test({ element, links_data, nodes_data, onNodeClick, set
   // link.on("mouseleave", function () { d3.select(this).style("stroke", "pink"); });
 
   link.on("mouseover", function (e, d) {
-    d3.select("#tooltip")
+    d3.select("#gb-cluster-tooltip")
       .style("left", () => {
         setTooltipItem({ link: d });
         return e.x + 10 + "px";
@@ -123,7 +123,7 @@ export default function test({ element, links_data, nodes_data, onNodeClick, set
       .style("visibility", "visible");
   });
   link.on("mouseleave", function (e) {
-    d3.select("#tooltip")
+    d3.select("#gb-cluster-tooltip")
       .transition()
       .style("visibility", () => {
         setTooltipItem();
@@ -183,11 +183,11 @@ export default function test({ element, links_data, nodes_data, onNodeClick, set
     })
     .attr('width', function (d) {
       const r = ['IMAGE', 'SEQUENCE', 'TYPE'].indexOf(d.type) > -1 ? 5 : radius;
-      return r*2; // used to be side instead of radius
+      return r * 2; // used to be side instead of radius
     })
     .attr('height', function (d) {
       const r = ['IMAGE', 'SEQUENCE', 'TYPE'].indexOf(d.type) > -1 ? 5 : radius;
-      return r*2;
+      return r * 2;
     })
     .append("xhtml:div")
     .attr("class", "nodeContent")
@@ -195,26 +195,48 @@ export default function test({ element, links_data, nodes_data, onNodeClick, set
 
   // https://stackoverflow.com/questions/41577546/how-do-i-add-a-simple-mouseover-info-window
   node.on("mouseover", function (e, d) {
-    d3.select("#tooltip")
+    d3.select("#gb-cluster-tooltip")
       .style("left", () => {
         setTooltipItem({ node: d });
-        if (e.x > width - 100) {
-          return e.x - 100 + "px"
-        } else {
-          return e.x + 10 + "px"
-        }
+        return e.x + 'px';
+        // if (e.x > width - 100) {
+        //   return e.x - 100 + "px"
+        // } else {
+        //   return e.x + 10 + "px"
+        // }
       })
       .style("top", e.y + 20 + "px")
       .transition()
       .style("visibility", "visible");
+
+    d3.select("#gb-cluster-tooltip-content")
+      .attr("style", function (d) {
+        let style = '';
+        if (e.x > width - 100) {
+          style += 'right: 20px; ';
+        } else {
+          style += 'left: 0px; ';
+        }
+
+        if (e.y > height - 100) {
+          style += 'bottom: 20px; ';
+        } else {
+          style += 'top: 0px; ';
+        }
+        return style;
+      });
   });
+
+
   node.on("mouseleave", function (e) {
-    d3.select("#tooltip")
+    d3.select("#gb-cluster-tooltip")
       .transition()
       .style("visibility", () => {
         setTooltipItem();
         return "hidden";
       });
+    d3.select("#gb-cluster-tooltip-content")
+      .attr("style", '');
   });
 
   //add zoom capabilities 
@@ -260,8 +282,11 @@ export default function test({ element, links_data, nodes_data, onNodeClick, set
       str += 'node-multiple-identifications ';
     }
 
-    if (['PRESERVED_SPECIMEN', 'FOSSIL_SPECIMEN', 'LIVING_SPECIMEN'].includes(d.type)) {
+    if (d.type === 'SPECIMEN') {
       str += 'node-specimen ';
+    }
+    if (d.type === 'OBSERVATION') {
+      str += 'node-observation ';
     }
     return str;
   }
@@ -306,12 +331,9 @@ export default function test({ element, links_data, nodes_data, onNodeClick, set
   node.call(drag).on("click", click);
 
   function click(event, d) {
-    console.log(d.name);
-    onNodeClick({ key: d.name })
-    // delete d.fx;
-    // delete d.fy;
-    // d3.select(this).classed("fixed", false);
-    // simulation.alpha(1).restart();
+    if (d.key) {
+      onNodeClick({ key: d.key });
+    }
   }
 
   node.call(drag(simulation));
@@ -392,12 +414,7 @@ export default function test({ element, links_data, nodes_data, onNodeClick, set
     if (width == 0 || height == 0) return; // nothing to fit
     var scale = (paddingPercent || 0.75) / Math.max(width / fullWidth, height / fullHeight);
     var translate = [fullWidth / 2 - scale * midX, fullHeight / 2 - scale * midY];
-    /*
-    svg
-    .call(zoom)
-    .call(zoom.transform, d3.zoomIdentity)
-    */
-    console.trace("zoomFit", translate, scale);
+    
     var transform = d3.zoomIdentity
       .translate(translate[0], translate[1])
       .scale(scale);
@@ -408,7 +425,6 @@ export default function test({ element, links_data, nodes_data, onNodeClick, set
       .call(zoom.transform, transform);
   }
 
-  console.log('test');
   globalThis.lapsedZoomFit = lapsedZoomFit;
   // lapsedZoomFit(undefined, 0);
   lapsedZoomFit(200, 0);

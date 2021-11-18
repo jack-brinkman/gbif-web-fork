@@ -18,7 +18,7 @@ import { prettifyEnum } from '../../../../utils/labelMaker/config2labels';
 
 import * as css from './styles';
 
-export const ClusterPresentation = ({ first, prev, next, size, from, data, graph, total, loading }) => {
+export const ClusterPresentation = ({ reload, first, prev, next, size, from, error, data, graph, total, loading }) => {
   const theme = useContext(ThemeContext);
   const intl = useIntl();
   const [activeKey, setActiveKey] = useQueryParam('entity', NumberParam);
@@ -106,33 +106,44 @@ export const ClusterPresentation = ({ first, prev, next, size, from, data, graph
     }}>
       <ViewHeader loading={loading} total={total} />
       <div css={css.main}>
-        <div css={css.clusterWrapper}>
-          <div id="tooltip" css={css.tooltipWrapper}>
-            {tooltipItem && <>
-              {tooltipItem.link && <>
-                {tooltipItem.link?.reasons?.length > 0 && <div>
-                  About the link: {tooltipItem.link.reasons.map(x => <span>{prettifyEnum(x)} </span>)}
-                </div>}
-                <div>
-                  {tooltipItem.link.source.taxonKey !== tooltipItem.link.target.taxonKey && <div>
-                    Identifications differ
-                  </div>}
-                  {tooltipItem.link.source.publishingOrgKey !== tooltipItem.link.target.publishingOrgKey && <div>
-                    Different publishers
-                  </div>}
-                </div>
-              </>}
-              {tooltipItem.node && <>
-                <div><FormattedMessage id={`enums.basisOfRecord.${tooltipItem.node.type}`} /></div>
-                {tooltipItem.node.isTreatment && <div>Treatment</div>}
-                {tooltipItem.node.distinctTaxa > 1 && <div>Cluster contains different identifications</div>}
-                {tooltipItem.node.capped && <div>This node has more connections, than shown here. Go to the record to see the full list.</div>}
-                {tooltipItem.node.image && <div>
-                  <Image src={tooltipItem.node.image.identifier} w={200}/></div>}
-              </>}
-            </>}
+        {error && <div css={css.requestError}>
+          Failed to load data
+          <div>
+            <Button onClick={reload}>Retry</Button>
           </div>
-          <svg css={css.clusters} ref={ref} style={{ pointerEvents: loading ? 'none' : null, filter: loading ? 'grayscale(8)' : null, opacity: loading ? 0.5 : 1 }}></svg>
+        </div>}
+        {!error && <div css={css.clusterWrapper}>
+          <div>
+            <div id="gb-cluster-tooltip" css={css.tooltipWrapper}>
+              <div id="gb-cluster-tooltip-content" css={css.tooltipContent}>
+                {tooltipItem && <>
+                  {tooltipItem.link && <>
+                    {tooltipItem.link?.reasons?.length > 0 && <div>
+                      About the link: {tooltipItem.link.reasons.map(x => <span>{prettifyEnum(x)} </span>)}
+                    </div>}
+                    <div>
+                      {tooltipItem.link.source.taxonKey !== tooltipItem.link.target.taxonKey && <div>
+                        Identifications differ
+                      </div>}
+                      {tooltipItem.link.source.publishingOrgKey !== tooltipItem.link.target.publishingOrgKey && <div>
+                        Different publishers
+                      </div>}
+                    </div>
+                  </>}
+                  {tooltipItem.node && <>
+                    {tooltipItem.node.basisOfRecord && <div style={{ whiteSpace: 'nowrap' }}>Basis of record: <FormattedMessage id={`enums.basisOfRecord.${tooltipItem.node.basisOfRecord}`} /></div>}
+                    {!tooltipItem.node.basisOfRecord && <div>{tooltipItem.node.type}</div>}
+                    {tooltipItem.node.isTreatment && <div>Treatment</div>}
+                    {tooltipItem.node.distinctTaxa > 1 && <div>Cluster contains different identifications</div>}
+                    {tooltipItem.node.capped && <div>This node has more connections, than shown here. Go to the record to see the full list.</div>}
+                    {/* {tooltipItem.node.image && <div>
+                      <Image src={tooltipItem.node.image.identifier} w={200}/></div>} */}
+                  </>}
+                </>}
+              </div>
+            </div>
+            <svg css={css.clusters} ref={ref} style={{ pointerEvents: loading ? 'none' : null, filter: loading ? 'grayscale(8)' : null, opacity: loading ? 0.5 : 1 }}></svg>
+          </div>
           {next && <div css={css.footer({ theme })}>
             {first && page > 2 && <Button appearance="text" css={css.footerItem({ theme })} direction="right" tip={intl.formatMessage({ id: 'pagination.first' })} onClick={first}>
               <MdFirstPage />
@@ -151,12 +162,18 @@ export const ClusterPresentation = ({ first, prev, next, size, from, data, graph
               <MdChevronRight />
             </Button>}
           </div>}
-        </div>
+        </div>}
         <div css={css.meta}>
-          <InfoCard headline="About" collapsible>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+          <InfoCard headline="About" collapsed>
+            <p>
+              Some intro text about what this is. A la: we try to detect if records are related. An example could be a specimen that was sequenced by another institution. Or simply 2 people reporting the same bird the same day at the same location.
+            </p>
+            <p>
+              This view lists individual occurrences and how they relate to other. The same cluster wil appear multiple times as it is not a list of distinct clusters, but of the occurrences.
+            </p>
+
           </InfoCard>
-          <InfoCard headline="Legend" style={{ marginTop: 8 }}>
+          <InfoCard headline="Legend" collapsible={false} style={{ marginTop: 8 }}>
             <div css={css.legendItem}>
               <div>
                 <div style={{ borderRadius: '50%', width: 25, height: 25, background: '#fab93d' }}></div>
@@ -218,14 +235,14 @@ export const ClusterPresentation = ({ first, prev, next, size, from, data, graph
   </>
 }
 
-function InfoCard({ headline, children, style, collapsed = false, props }) {
+function InfoCard({ headline, children, style, collapsible = true, collapsed = false, props }) {
   const [expanded, setExpanded] = useState(!collapsed);
   return <div css={css.card} style={style}>
     <div css={css.headline}>
       <h2>{headline}</h2>
-      <div style={{padding: '0 10px'}} onClick={() => setExpanded(!expanded)} >
+      {collapsible && <Button appearance="text" onClick={() => setExpanded(!expanded)} >
         {expanded ? <MdExpandMore /> : <MdExpandLess />}
-      </div>
+      </Button>}
     </div>
     {expanded && <div css={css.contentWrapper}>
       <div css={css.content}>
