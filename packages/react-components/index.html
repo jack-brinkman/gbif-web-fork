@@ -34,20 +34,37 @@
       //   ),
       //   document.getElementById('root')
       // );
-      const messages = {
-        'filter.publisherKey.name': 'test danish name'
-      };
+
       ReactDOM.render(
         React.createElement(
-          gbifReactComponents.DatasetSearch,
+          gbifReactComponents.OccurrenceSearch,
           { 
-            config: {rootPredicate: {type: 'CHECKLIST'}}, style: { height: 'calc(100vh - 20px)' },
-            locale: 'de-ch',
+            config: {
+              occurrenceSearchTabs: ['CLUSTERS', 'TABLE', 'GALLERY', 'MAP', 'DATASETS']
+            }, style: { height: 'calc(100vh - 20px)' },
+            locale: 'en'//'de-ch',
             // messages: messages
           }
         ),
         document.getElementById('root')
       );
+
+      // const messages = {
+      //   'filter.publisherKey.name': 'test danish name'
+      // };
+
+      // ReactDOM.render(
+      //   React.createElement(
+      //     gbifReactComponents.DatasetSearch,
+      //     { 
+      //       config: {rootPredicate: {type: 'CHECKLIST'}}, style: { height: 'calc(100vh - 20px)' },
+      //       locale: 'de-ch',
+      //       // messages: messages
+      //     }
+      //   ),
+      //   document.getElementById('root')
+      // );
+
     </script>
   </body>
 </html>
