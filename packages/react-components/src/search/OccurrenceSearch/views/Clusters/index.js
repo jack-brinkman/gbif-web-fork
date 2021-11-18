@@ -41,6 +41,9 @@ query clusters($predicate: Predicate, $size: Int = 20, $from: Int = 0){
           from
           relatedOccurrences {
             reasons
+            stub {
+              gbifId
+            }
             occurrence {
               key
               basisOfRecord
@@ -65,6 +68,9 @@ query clusters($predicate: Predicate, $size: Int = 20, $from: Int = 0){
 								count
                 relatedOccurrences {
                   reasons
+                  stub {
+                    gbifId
+                  }
                   occurrence {
                     key
                     basisOfRecord
@@ -88,6 +94,9 @@ query clusters($predicate: Predicate, $size: Int = 20, $from: Int = 0){
                     related(size: 5) {
                       count
                       relatedOccurrences {
+                        stub {
+                          gbifId
+                        }
                         reasons
                         occurrence {
                           key
@@ -128,6 +137,7 @@ function Clusters() {
   const [from = 0, setFrom] = useQueryParam('from', NumberParam);
   const [graph, setGraph] = useState();
   const [attempt, setAttempt] = useState();
+  const [criticalError, setCriticalError] = useState();
 
   const size = 30;
   const currentFilterContext = useContext(FilterContext);
@@ -148,6 +158,7 @@ function Clusters() {
       ].filter(x => x)
     }
     load({ keepDataWhileLoading: true, variables: { predicate, size, from } });
+    setCriticalError(false);
   }, [currentFilterContext.filterHash, rootPredicate, from, attempt]);
 
   useEffect(() => {
@@ -180,20 +191,28 @@ function Clusters() {
   // process and remap data to structure we can use
   useEffect(() => {
     if (data) {
+      
+      // this isn't ideal, but try to process the request even if it did fail
       if (error) {
         console.log(error);
-        setGraph();
-      } else {
+        // setGraph();
+      }
+      
+      try {
         const graph = transformResult({ data });
         setGraph(graph);
+        setCriticalError(false);
+      } catch(err) {
+        setCriticalError(true);
       }
+      
     }
   }, [data]);
 
   return <>
     <ClusterPresentation
       loading={loading}
-      error={error}
+      error={criticalError}
       reload={reload}
       graph={graph}
       next={next}
@@ -210,6 +229,12 @@ export default Clusters;
 
 
 function getNodeFromOccurrence(o, isEntry, hasTooManyRelations, rootKey) {
+  if (!o) {
+    return {
+      type: 'DELETED',
+      name: Math.random
+    }
+  }
   const isSpecimen = ['PRESERVED_SPECIMEN', 'FOSSIL_SPECIMEN', 'LIVING_SPECIMEN', 'MATERIAL_SAMPLE'].indexOf(o.basisOfRecord) > -1;
   return {
     key: o.key,
@@ -310,6 +335,13 @@ function processOccurrence(x, rootKey, nodes, links, isEntry, hasTooManyRelation
 function processRelated({parent, related, nodes, links, rootKey, clusterContext}) {
   if (related && related.count > 0) {
     related.relatedOccurrences.forEach(e => {
+      if (!e.occurrence) {
+        clusterContext.invalidCluster = true;
+        const mainNode = {type: 'DELETED', key: e?.stub?.gbifID, name: e?.stub?.gbifID + ''};
+        nodes.push(mainNode);
+        links.push({ source: parent.key + '', target: e?.stub?.gbifID + '', reasons: e.reasons });
+        return;
+      }
       const mainNode = processOccurrence(e.occurrence, rootKey, nodes, links, false, e.occurrence?.related?.count > e.occurrence?.related?.relatedOccurrences?.length);
       clusterContext.clusterNodes.push(mainNode);
       // and add link to the related

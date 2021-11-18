@@ -80,16 +80,28 @@ export const ClusterPresentation = ({ reload, first, prev, next, size, from, err
     // d3.select(ref.current)
     //  .append('p')
     //  .text('Hello from D3');
-    if (ref && ref.current && graph) {
-      test({
-        element: ref.current,
-        nodes_data: graph.nodes,
-        links_data: graph.links,
-        onNodeClick: ({ key }) => {
-          setActiveKey(key);
-        },
-        setTooltipItem
-      })
+    if (ref && ref.current) {
+      if (graph) {
+        test({
+          element: ref.current,
+          nodes_data: graph.nodes,
+          links_data: graph.links,
+          onNodeClick: ({ key }) => {
+            setActiveKey(key);
+          },
+          setTooltipItem
+        })
+      } else {
+        test({
+          element: ref.current,
+          nodes_data: [],
+          links_data: [],
+          onNodeClick: ({ key }) => {
+            setActiveKey(key);
+          },
+          setTooltipItem
+        })
+      }
     }
   }, [ref, graph]);
 
@@ -131,6 +143,7 @@ export const ClusterPresentation = ({ reload, first, prev, next, size, from, err
                     </div>
                   </>}
                   {tooltipItem.node && <>
+                    {tooltipItem.node.type === 'DELETED' && <div>This record has since been deleted</div>}
                     {tooltipItem.node.basisOfRecord && <div style={{ whiteSpace: 'nowrap' }}>Basis of record: <FormattedMessage id={`enums.basisOfRecord.${tooltipItem.node.basisOfRecord}`} /></div>}
                     {!tooltipItem.node.basisOfRecord && <div>{tooltipItem.node.type}</div>}
                     {tooltipItem.node.isTreatment && <div>Treatment</div>}

@@ -80,6 +80,10 @@ export const clusters = props => css`
     }
   }
 
+  .node-deleted {
+    fill: tomato;
+  }
+
   .node-observation {
     ~ .nodeContent-wrapper {
       cursor: pointer;

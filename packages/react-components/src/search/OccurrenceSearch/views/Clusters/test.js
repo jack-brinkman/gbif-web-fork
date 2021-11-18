@@ -288,27 +288,12 @@ export default function test({ element, links_data, nodes_data, onNodeClick, set
     if (d.type === 'OBSERVATION') {
       str += 'node-observation ';
     }
+    if (d.type === 'DELETED') {
+      str += 'node-deleted ';
+    }
     return str;
   }
-  function circleColour(d) {
-    if (d.capped) {
-      return 'tomato';
-    }
-    if (d.isEntry) {
-      return "blue";
-    }
-    if (d.type == "CITATION") {
-      return "tomato";
-    } else if (d.type === "PUBLISHER") {
-      return "deepskyblue";
-    } else if (d.isSequenced) {
-      return "yellow";
-    } else if (d.isTreatment) {
-      return "orange";
-    } else {
-      return "pink";
-    }
-  }
+  
 
   //Function to choose the line colour and thickness 
   //If the link type is "A" return green 
