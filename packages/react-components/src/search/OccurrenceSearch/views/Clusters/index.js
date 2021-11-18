@@ -129,7 +129,7 @@ function Clusters() {
   const [graph, setGraph] = useState();
   const [attempt, setAttempt] = useState();
 
-  const size = 50;
+  const size = 30;
   const currentFilterContext = useContext(FilterContext);
   const { rootPredicate, predicateConfig } = useContext(OccurrenceContext);
   const { data, error, loading, load } = useQuery(OCCURRENCE_CLUSTERS, { lazyLoad: true });
