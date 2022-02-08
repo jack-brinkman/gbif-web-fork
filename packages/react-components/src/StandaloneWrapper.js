@@ -1,5 +1,4 @@
 import React from "react";
-import { IntlProvider } from "react-intl";
 import PropTypes from "prop-types";
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import { QueryParamProvider } from 'use-query-params';
@@ -35,14 +34,12 @@ function StandaloneWrapper({
   return (
     <ApiContext.Provider value={client}>
       <LocaleProvider locale={locale}>
-        {/* <IntlProvider locale={locale} messages={customMessages || messages}> */}
         <ThemeContext.Provider value={theme}>
           {routeContext && <RouteContext.Provider value={{ ...defaultContext, ...routeContext }}>
             {root}
           </RouteContext.Provider>}
           {!routeContext && root}
         </ThemeContext.Provider>
-        {/* </IntlProvider> */}
       </LocaleProvider>
     </ApiContext.Provider>
   );
