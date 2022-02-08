@@ -23,7 +23,6 @@ const client = new ApiClient({
 function StandaloneWrapper({
   defaultBaseName, theme = lightTheme, locale = 'en', messages: customMessages, routeContext, ...props
 }) {
-  // const defaultBaseName = typeof window !== 'undefined' ? window.location.pathname : undefined;
   const basename = _get(routeContext, 'basename');
   const root = <Root id="application" appRoot>
     <Router {...props} basename={basename}>
