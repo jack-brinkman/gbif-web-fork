@@ -58,27 +58,27 @@ function getSuggests({ client, suggestStyle }) {
 }
 
 const filters = {
-  elevation: {
-    type: 'NUMBER_RANGE',
+  myCustomFilter: {
+    type: 'ENUM',
     config: {
       std: {
-        filterHandle: 'elevation',
-        id2labelHandle: 'elevation',
+        filterHandle: 'alternativeCode',
+        id2labelHandle: 'alternativeCode',
         translations: {
-          count: 'filter.elevation.count', // translation path to display names with counts. e.g. "3 scientific names"
-          name: 'filter.elevation.name',// translation path to a title for the popover and the button
-          description: 'filter.elevation.description', // translation path for the filter description
+          count: 'filters.basisOfRecord.count', // translation path to display names with counts. e.g. "3 scientific names"
+          name: 'My custom alternative code filter',// translation path to a title for the popover and the button
+          description: 'What other names are the collection known by', // translation path for the filter description
         }
       },
       specific: {
-        placeholder: 'Elevation range or single value'
+        options: ['ENUMS', 'MAKES', 'LITTLE', 'SENSE', 'HERE'],
       }
     }
   }
 }
 
 
-const config = { labels, getSuggests, filters };
+const config = { labels, getSuggests, filters, includedFilters: ['q', 'institution', 'city', 'code', 'myCustomFilter'] };
 
 export const Example = () => <Router initialEntries={[`/collection/search`]}>
   <QueryParamProvider ReactRouterRoute={Route}>
@@ -91,4 +91,4 @@ Example.story = {
   name: 'Collection search',
 };
 
-export const StandaloneExample = () => <Standalone style={{height: 'calc(100vh - 40px)'}}></Standalone>;
+export const StandaloneExample = () => <Standalone style={{ height: 'calc(100vh - 40px)' }}></Standalone>;

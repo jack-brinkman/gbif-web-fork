@@ -24,6 +24,9 @@ const filterConf = {
     code: {
       singleValue: true
     },
+    alternativeCode: {
+      singleValue: true
+    }
   }
 }
 

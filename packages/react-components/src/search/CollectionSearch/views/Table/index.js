@@ -6,8 +6,8 @@ import RouteContext from '../../../../dataManagement/RouteContext';
 import { ResourceLink } from '../../../../components';
 
 const QUERY = `
-query list($institution: [GUID], $code: String, $q: String, $offset: Int, $limit: Int, $country: Country, $fuzzyName: String, $city: String, $name: String, $active: Boolean){
-  collectionSearch(institution: $institution, code: $code, q: $q, limit: $limit, offset: $offset, country: $country, fuzzyName: $fuzzyName, city: $city, name: $name, active: $active) {
+query list($institution: [GUID], $code: String, $alternativeCode: String, $q: String, $offset: Int, $limit: Int, $country: Country, $fuzzyName: String, $city: String, $name: String, $active: Boolean){
+  collectionSearch(institution: $institution, alternativeCode: $alternativeCode, code: $code, q: $q, limit: $limit, offset: $offset, country: $country, fuzzyName: $fuzzyName, city: $city, name: $name, active: $active) {
     count
     offset
     limit
