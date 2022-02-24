@@ -77,8 +77,8 @@ const filters = {
 }
 
 
-const config = { labels, getSuggests, filters, rootFilter: {publishingCountry: 'CO'} };
-// const config = { labels, getSuggests, filters };
+// const config = { labels, getSuggests, filters, rootFilter: {publishingCountry: 'CO'} };
+const config = { labels, getSuggests, filters };
 
 export const Example = () => <Router initialEntries={[`/dataset/search`]}>
   <QueryParamProvider ReactRouterRoute={Route}>
