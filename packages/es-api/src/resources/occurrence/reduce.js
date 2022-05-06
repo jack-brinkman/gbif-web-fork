@@ -12,6 +12,17 @@ function removeUndefined(obj) {
   return obj;
 }
 
+/*
+ * Temporary function to parse vocaulary values. The schemas differ in prod and uat, and to easy deployment the UI use a fallback
+ * https://github.com/gbif/gbif-web/issues/109
+ */
+function vocabularFallback(obj) {
+  if (typeof obj === 'object' && obj.concept) {
+    return obj.concept;
+  } else {
+    return obj;
+  }
+}
 /**
  * Map ES response to something similar to v1
  */
@@ -48,8 +59,6 @@ function reduce(item) {
     coverage:                           source.verbatim.core['http://purl.org/dc/terms/coverage'],
     creator:                            source.verbatim.core['http://purl.org/dc/terms/creator'],
     dataGeneralizations:                source.verbatim.core['http://rs.tdwg.org/dwc/terms/dataGeneralizations'],
-    datasetID:                          source.verbatim.core['http://rs.tdwg.org/dwc/terms/datasetID'],
-    datasetName:                        source.verbatim.core['http://rs.tdwg.org/dwc/terms/datasetName'],
     date:                               source.verbatim.core['http://purl.org/dc/terms/date'],
     dateAccepted:                       source.verbatim.core['http://purl.org/dc/terms/dateAccepted'],
     dateCopyrighted:                    source.verbatim.core['http://purl.org/dc/terms/dateCopyrighted'],
@@ -148,14 +157,12 @@ function reduce(item) {
     organismScope:                      source.verbatim.core['http://rs.tdwg.org/dwc/terms/organismScope'],
     originalNameUsage:                  source.verbatim.core['http://rs.tdwg.org/dwc/terms/originalNameUsage'],
     originalNameUsageID:                source.verbatim.core['http://rs.tdwg.org/dwc/terms/originalNameUsageID'],
-    otherCatalogNumbers:                source.verbatim.core['http://rs.tdwg.org/dwc/terms/otherCatalogNumbers'],
     ownerInstitutionCode:               source.verbatim.core['http://rs.tdwg.org/dwc/terms/ownerInstitutionCode'],
     parentEventID:                      source.verbatim.core['http://rs.tdwg.org/dwc/terms/parentEventID'],
     parentNameUsage:                    source.verbatim.core['http://rs.tdwg.org/dwc/terms/parentNameUsage'],
     parentNameUsageID:                  source.verbatim.core['http://rs.tdwg.org/dwc/terms/parentNameUsageID'],
     // phylum:                             source.verbatim.core['http://rs.tdwg.org/dwc/terms/phylum'],
     pointRadiusSpatialFit:              source.verbatim.core['http://rs.tdwg.org/dwc/terms/pointRadiusSpatialFit'],
-    preparations:                       source.verbatim.core['http://rs.tdwg.org/dwc/terms/preparations'],
     previousIdentifications:            source.verbatim.core['http://rs.tdwg.org/dwc/terms/previousIdentifications'],
     provenance:                         source.verbatim.core['http://purl.org/dc/terms/provenance'],
     publisher:                          source.verbatim.core['http://purl.org/dc/terms/publisher'],
@@ -189,12 +196,14 @@ function reduce(item) {
     verbatimDepth:                      source.verbatim.core['http://rs.tdwg.org/dwc/terms/verbatimDepth'],
     verbatimElevation:                  source.verbatim.core['http://rs.tdwg.org/dwc/terms/verbatimElevation'],
     verbatimEventDate:                  source.verbatim.core['http://rs.tdwg.org/dwc/terms/verbatimEventDate'],
+    verbatimIdentification:             source.verbatim.core['http://rs.tdwg.org/dwc/terms/verbatimIdentification'],
     verbatimLatitude:                   source.verbatim.core['http://rs.tdwg.org/dwc/terms/verbatimLatitude'],
     verbatimLocality:                   source.verbatim.core['http://rs.tdwg.org/dwc/terms/verbatimLocality'],
     verbatimLongitude:                  source.verbatim.core['http://rs.tdwg.org/dwc/terms/verbatimLongitude'],
     verbatimSRS:                        source.verbatim.core['http://rs.tdwg.org/dwc/terms/verbatimSRS'],
     verbatimTaxonRank:                  source.verbatim.core['http://rs.tdwg.org/dwc/terms/verbatimTaxonRank'],
     vernacularName:                     source.verbatim.core['http://rs.tdwg.org/dwc/terms/vernacularName'],
+    verticalDatum:                      source.verbatim.core['http://rs.tdwg.org/dwc/terms/verticalDatum'],
   });
     
   const normalized = {
@@ -218,13 +227,15 @@ function reduce(item) {
     elevation:                          source.elevation,
     elevationAccuracy:                  source.elevationAccuracy,
     endDayOfYear:                       source.endDayOfYear,
-    establishmentMeans:                 source.establishmentMeans,
+    establishmentMeans:                 vocabularFallback(source.establishmentMeans),
     eventDate:                          source.eventDateSingle,
     identifiedBy:                       source.identifiedBy,
     individualCount:                    source.individualCount,
     institutionCode:                    source.institutionCode,
     license:                            source.license,
-    lifeStage:                          source.lifeStage,
+    lifeStage:                          vocabularFallback(source.lifeStage),
+    pathway:                            vocabularFallback(source.pathway),
+    degreeOfEstablishment:              vocabularFallback(source.degreeOfEstablishment),
     locality:                           source.locality,
     identifier:                         source.id,
     
@@ -259,6 +270,11 @@ function reduce(item) {
     year:                               source.year,
     identifiedByIDs:                    source.identifiedByIds || [],
     recordedByIDs:                      source.recordedByIds || [],
+
+    preparations:                       source.preparations,
+    datasetID:                          source.datasetID,
+    datasetName:                        source.datasetName,
+    otherCatalogNumbers:                source.otherCatalogNumbers,
   };
 
   const gbifSpecific = {

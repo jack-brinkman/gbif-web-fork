@@ -5,7 +5,7 @@ import ThemeContext from '../../style/themes/ThemeContext';
 import { withFilter } from '../../widgets/Filter/state';
 import { FormattedMessage } from 'react-intl';
 import { cssLayout, cssNavBar, cssViewArea, cssFilter, cssViews, cssFooter } from '../Layout.styles';
-import { Tabs } from '../../components'
+import { Tabs, DataHeader, NavBar, NavItem } from '../../components'
 import Map from './views/Map';
 import Table from './views/Table';
 import Gallery from './views/Gallery';
@@ -31,67 +31,37 @@ const Layout = ({
   const elementName = 'occurrenceSearchLayout';
 
   const tabComponents = {
-    TABLE: <Tab tabId="TABLE" key="table">
-      <FormattedMessage id="search.tabs.table" defaultMessage="Table"/>
-    </Tab>,
-    MAP: <Tab tabId="MAP" key="map">
-      <FormattedMessage id="search.tabs.map" defaultMessage="Map"/>
-    </Tab>,
-    GALLERY: <Tab tabId="GALLERY" key="gallery">
-      <FormattedMessage id="search.tabs.gallery" defaultMessage="Gallery"/>
-    </Tab>,
-    DATASETS: <Tab tabId="DATASETS" key="datasets">
-      <FormattedMessage id="search.tabs.datasets" defaultMessage="Datasets"/>
-    </Tab>,
-    CLUSTERS: <Tab tabId="CLUSTERS" key="clusters">
-      <FormattedMessage id="search.tabs.clusters" defaultMessage="Clusters"/>
-    </Tab>
+    TABLE: <NavItem key="table" label={<FormattedMessage id="search.tabs.table" defaultMessage="Table"/>} data-targetid="table" onClick={e => setActiveView('TABLE')} isActive={activeView === 'TABLE'} />,
+    MAP: <NavItem key="map" label={<FormattedMessage id="search.tabs.map" defaultMessage="Map"/>} data-targetid="map" onClick={e => setActiveView('MAP')} isActive={activeView === 'MAP'} />,
+    GALLERY: <NavItem key="gallery" label={<FormattedMessage id="search.tabs.gallery" defaultMessage="Gallery"/>} data-targetid="gallery" onClick={e => setActiveView('GALLERY')} isActive={activeView === 'GALLERY'} />,
+    DATASETS: <NavItem key="datasets" label={<FormattedMessage id="search.tabs.datasets" defaultMessage="Datasets"/>} data-targetid="dataset" onClick={e => setActiveView('DATASETS')} isActive={activeView === 'DATASETS'} />,
+    CLUSTERS: <NavItem key="clusters" label={<FormattedMessage id="search.tabs.clusters" defaultMessage="Clusters"/>} data-targetid="clusters" onClick={e => setActiveView('CLUSTERS')} isActive={activeView === 'CLUSTERS'} />
   }
 
   return <div className={`${className} ${prefix}-${elementName}`}
     css={cssLayout({ theme })} {...props}>
-    <Tabs activeId={activeView} onChange={setActiveView} >
-      <div css={cssNavBar({ theme })}>
-        <div css={cssFilter({ theme })}>
-          <FilterBar config={config}></FilterBar>
-        </div>
-        <div css={cssViews({ theme })}>
-          <TabList aria-labelledby="Views">
-            {tabs.map(tab => tabComponents[tab])}
-            <TapSeperator />
-            <Tab tabId="download">
-              <FormattedMessage id="search.tabs.download" defaultMessage="Download"/>
-            </Tab>
-            {/* <TapSeperator /> */}
-            {/* <Tab tabId="publisher">Publishers</Tab> */}
-            {/* <TapSpacer />
-            <TapSeperator />
-            <Tab tabId="test">Test</Tab> */}
-          </TabList>
-        </div>
+    <div css={cssNavBar({ theme })}>
+      <div css={cssFilter({ theme })}>
+        <FilterBar config={config}></FilterBar>
       </div>
-      <TabPanel lazy tabId="TABLE" className={`${prefix}-${elementName}-views`} css={cssViewArea({ theme })}>
-        <Table />
-      </TabPanel>
-      <TabPanel lazy tabId="MAP" className={`${prefix}-${elementName}-views`} css={cssViewArea({ theme })}>
-        <Map />
-      </TabPanel>
-      <TabPanel lazy tabId="GALLERY" className={`${prefix}-${elementName}-views`} css={cssViewArea({ theme })}>
-        <Gallery />
-      </TabPanel>
-      <TabPanel lazy tabId="DATASETS" className={`${prefix}-${elementName}-views`} css={cssViewArea({ theme })}>
-        <Datasets />
-      </TabPanel>
-      <TabPanel lazy tabId="CLUSTERS" className={`${prefix}-${elementName}-views`} css={cssViewArea({ theme })}>
-        <Clusters />
-      </TabPanel>
-      <TabPanel lazy tabId="download" className={`${prefix}-${elementName}-views`} css={cssViewArea({ theme })}>
-        <Download />
-      </TabPanel>
-      {/* <div className={`${prefix}-${elementName}-footer`} css={cssFooter({ theme })}>
-        <div>Footer content</div>
-      </div> */}
-    </Tabs>
+      <div>
+        <NavBar style={{ marginLeft: 10 }}>
+          {tabs.map(tab => tabComponents[tab])}
+          <NavItem label="Download" data-targetid="download" onClick={e => setActiveView('DOWNLOAD')} isActive={activeView === 'DOWNLOAD'} />
+        </NavBar>
+      </div>
+    </div>
+    <div css={cssViewArea({ theme })}>
+      {activeView === 'TABLE' && <Table />}
+      {activeView === 'MAP' && <Map />}
+      {activeView === 'GALLERY' && <Gallery />}
+      {activeView === 'DATASETS' && <Datasets />}
+      {activeView === 'CLUSTERS' && <Clusters />}
+      {activeView === 'DOWNLOAD' && <Download />}
+    </div>
+    {/* <div className={`${prefix}-${elementName}-footer`} css={cssFooter({ theme })}>
+      <div>Footer content</div>
+    </div> */}
   </div>
 }
 

@@ -29,26 +29,39 @@ const typeDef = gql`
     Get number of distinct values for a field. E.g. how many distinct datasetKeys in this result set
     """
     cardinality: OccurrenceCardinality
+    """
+    Get histogram for a numeric field with the option to specify an interval size
+    """
+    histogram: OccurrenceHistogram
+    autoDateHistogram: OccurrenceAutoDateHistogram
     _predicate: JSON
     _downloadPredicate: JSON
+    """
+    Register the search predicate with the v1 endpoints and get a hash back. This can be used to query e.g. the tile API.
+    """
+    _v1PredicateHash: String,
     _meta: JSON
   }
 
   type OccurrenceDocuments {
     size: Int!
     from: Int!
-    total: Int!
+    total: Long!
     results: [Occurrence]!
   }
 
   type OccurrenceStats {
     year: Stats!
+    decimalLatitude: Stats!
+    decimalLongitude: Stats!
+    eventDate: Stats!
   }
 
   type OccurrenceCardinality {
     datasetKey: Int!
     publishingOrgKey: Int!
     recordedBy: Int!
+    catalogNumber: Int!
     identifiedBy: Int!
     locality: Int!
     waterBody: Int!
@@ -56,6 +69,20 @@ const typeDef = gql`
     samplingProtocol: Int!
     sampleSizeUnit: Int!
     verbatimScientificName: Int!
+    eventId: Int!
+  }
+
+  type OccurrenceHistogram {
+    decimalLongitude(interval: Float): LongitudeHistogram!
+  }
+
+  type OccurrenceAutoDateHistogram {
+    eventDate(buckets: Float): JSON!
+  }
+
+  type LongitudeHistogram {
+    buckets: JSON!
+    bounds: JSON
   }
 
   type OccurrenceFacet {
@@ -68,6 +95,7 @@ const typeDef = gql`
     continent(size: Int): [OccurrenceFacetResult_string]
     countryCode(size: Int): [OccurrenceFacetResult_string]
     datasetPublishingCountry(size: Int): [OccurrenceFacetResult_string]
+    dwcaExtension(size: Int): [OccurrenceFacetResult_string]
     establishmentMeans(size: Int): [OccurrenceFacetResult_string]
     eventId(size: Int): [OccurrenceFacetResult_string]
     id(size: Int): [OccurrenceFacetResult_string]
@@ -162,8 +190,8 @@ const typeDef = gql`
     gbifClassification_taxonID(size: Int): [OccurrenceFacetResult_string]
     collectionKey(size: Int): [OccurrenceFacetResult_collection]
     institutionKey(size: Int): [OccurrenceFacetResult_institution]
-    recordedBy(size: Int): [OccurrenceFacetResult_recordedBy]
-    identifiedBy(size: Int): [OccurrenceFacetResult_identifiedBy]
+    recordedBy(size: Int, include: String): [OccurrenceFacetResult_recordedBy]
+    identifiedBy(size: Int, include: String): [OccurrenceFacetResult_identifiedBy]
     
     taxonKey(size: Int):                              [OccurrenceFacetResult_taxon]
     classKey(size: Int):                              [OccurrenceFacetResult_taxon]

@@ -1,8 +1,20 @@
 const _ = require('lodash');
+const hash = require('object-hash');
 
+const emptyAndHash = hash({ "type": "and", "predicates": [] });
 module.exports = function (predicate) {
+  if (!predicate) {
+    return {}
+  }
   try {
-    const copy = JSON.parse(JSON.stringify(predicate));
+    const strCopy = JSON.stringify(predicate);
+    if (hash(predicate) === emptyAndHash) {
+      return {
+        err: null,
+        predicate: null
+      }
+    }
+    const copy = JSON.parse(strCopy);
     const withRange = convertRangeType(copy);
     // const withLike = convertLikePredicates(withRange);
     const notIssues = convertNotIssues(withRange);
@@ -10,7 +22,7 @@ module.exports = function (predicate) {
     const removedEmpty = removeEmpty(withNotNull);
     const nestingSimplified = removeExcessiveNesting(removedEmpty);
     const withCase = uppercaseKeys(nestingSimplified);
-    
+
     //check for simple known errors
     if (hasFuzzyTypes(withCase)) return {
       err: {
@@ -25,7 +37,7 @@ module.exports = function (predicate) {
     }
   } catch (err) {
     console.log(err);
-    return { err }
+    return { err: 'UNABLE_TO_PARSE_PREDICATE_TO_V1' }
   }
 }
 
@@ -58,7 +70,7 @@ const types = [
 
 function convertRangeType(obj) {
   if (obj.predicate) {
-    return convertRangeType(obj.predicate);
+    convertRangeType(obj.predicate);
   } else if (obj.predicates && Array.isArray(obj.predicates)) {
     obj.predicates = obj.predicates.map(convertRangeType);
   } else if (obj.type === 'range') {
@@ -96,7 +108,7 @@ function convertRangeType(obj) {
 
 function convertNotIssues(obj) {
   if (obj.predicate) {
-    return convertNotIssues(obj.predicate);
+    convertNotIssues(obj.predicate);
   } else if (obj.predicates && Array.isArray(obj.predicates)) {
     obj.predicates = obj.predicates.map(convertNotIssues);
   } else if (obj.key === 'notIssues') {

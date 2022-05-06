@@ -15,7 +15,7 @@ const useUnmounted = () => {
 
 function useTranslation({ locale }) {
   const [messages, setMessages] = useState(en);
-  const [gbifLocale, setGBifLocale] = useState();
+  const [localeMap, setLocaleMap] = useState();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   // functions are called when passed to useState so it has to be wrapped. 
@@ -34,8 +34,8 @@ function useTranslation({ locale }) {
       .promise
       .then(mappingResponse => {
         const localeMapping = mappingResponse.data;
-        setGBifLocale(localeMapping[locale].gbifLocale);
-        const messagesUrl = localeMapping[locale].messages;
+        setLocaleMap(localeMapping[locale]?.localeMap);
+        const messagesUrl = localeMapping[locale]?.messages;
         if (messagesUrl) {
           const { promise: localePromise, cancel } = axios.get(messagesUrl);
           // functions cannot be direct values in states as function are taken as a way to create derived states
@@ -90,7 +90,7 @@ function useTranslation({ locale }) {
     // we have above cleanup useEffect for unmounting
   }, [locale]);
 
-  return { messages, gbifLocale, loading, error };
+  return { messages, localeMap, loading, error };
 }
 
 export default useTranslation;

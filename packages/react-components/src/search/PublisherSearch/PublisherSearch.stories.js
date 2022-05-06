@@ -7,6 +7,7 @@ import AddressBar from '../../StorybookAddressBar';
 import { QueryParamProvider } from 'use-query-params';
 
 import PublisherSearch from './PublisherSearch';
+import Standalone from './Standalone';
 
 export default {
   title: 'Search/PublisherSearch',
@@ -81,13 +82,15 @@ const config = { filters };
 // const config = { filters, rootFilter: {networkKey: '99d66b6c-9087-452f-a9d4-f15f2c2d0e7e'} };
 // const config = { labels, filters, rootFilter: {networkKey: '99d66b6c-9087-452f-a9d4-f15f2c2d0e7e'} };
 
-export const Example = () => <Router initialEntries={[`/`]}>
+export const Example = () => <Router initialEntries={[`/publisher/search`]}>
   <QueryParamProvider ReactRouterRoute={Route}>
     <AddressBar />
-    <PublisherSearch config={config} style={{ margin: 'auto', maxWidth: 1200, height: 'calc(100vh - 40px)' }} />
+    <PublisherSearch pageLayout config={config} style={{ margin: 'auto', height: 'calc(100vh - 40px)' }} />
   </QueryParamProvider>
 </Router>
 
 Example.story = {
   name: 'Publisher search',
 };
+
+export const StandaloneExample = () => <Standalone style={{height: 'calc(100vh - 40px)'}}></Standalone>;

@@ -1,0 +1,84 @@
+{
+  "en-DK": {
+    "messages": "http://localhost:5002/en-developer.json?v=88e7a2217a0f585cdc2fd5464fdce92a5c970a1c"
+  },
+  "en-ZZ": {
+    "messages": "http://localhost:5002/en-pseudo.json?v=a577382e22136de524ee983c3f8f8d8890032391"
+  },
+  "en": {
+    "messages": "http://localhost:5002/en.json?v=23fd1c91ab96e9a5f60ef48e2529b4bdd8eade4a"
+  },
+  "da": {
+    "messages": "http://localhost:5002/da.json?v=aeb1f3523a5e06dc01c6eaead6f7d3c0a212e7ab"
+  },
+  "ar": {
+    "messages": "http://localhost:5002/ar.json?v=106f385161c052d7915e04adda40daa936438422"
+  },
+  "de": {
+    "messages": "http://localhost:5002/de.json?v=388f9c931a9c96949300d723b3742ad9ab9bdbf6"
+  },
+  "es": {
+    "messages": "http://localhost:5002/es.json?v=212de7e827c2d8cc027b2ca284c63ca99f4f7e2a",
+    "localeMap": {
+      "gbif_org": "es",
+      "vocabulary": "es-ES"
+    }
+  },
+  "fa": {
+    "messages": "http://localhost:5002/fa.json?v=4a18585f97ec9786285a330a82e5ff95f29c5b47"
+  },
+  "fj": {
+    "messages": "http://localhost:5002/fj.json?v=23fd1c91ab96e9a5f60ef48e2529b4bdd8eade4a"
+  },
+  "fr": {
+    "messages": "http://localhost:5002/fr.json?v=7d5ba38dd1b825d89656f99f568f2c871ddd486c",
+    "localeMap": {
+      "gbif_org": "fr"
+    }
+  },
+  "ja": {
+    "messages": "http://localhost:5002/ja.json?v=8a4b5958ca2edeeb03167553f86d993e5bae972a"
+  },
+  "la": {
+    "messages": "http://localhost:5002/la.json?v=23fd1c91ab96e9a5f60ef48e2529b4bdd8eade4a"
+  },
+  "niu": {
+    "messages": "http://localhost:5002/niu.json?v=23fd1c91ab96e9a5f60ef48e2529b4bdd8eade4a"
+  },
+  "nl": {
+    "messages": "http://localhost:5002/nl.json?v=77fb5d869ce88e2fb65e10f9cc5d9e33fa74f4f3"
+  },
+  "pis": {
+    "messages": "http://localhost:5002/pis.json?v=23fd1c91ab96e9a5f60ef48e2529b4bdd8eade4a"
+  },
+  "pt": {
+    "messages": "http://localhost:5002/pt.json?v=5a698c628fc3e5068fab85a450439fadfc5d7a45"
+  },
+  "ru": {
+    "messages": "http://localhost:5002/ru.json?v=74da9e0eb566bda7f3f1f14b092b0efbcd08eeaa"
+  },
+  "sm": {
+    "messages": "http://localhost:5002/sm.json?v=23fd1c91ab96e9a5f60ef48e2529b4bdd8eade4a"
+  },
+  "sw": {
+    "messages": "http://localhost:5002/sw.json?v=23fd1c91ab96e9a5f60ef48e2529b4bdd8eade4a"
+  },
+  "tkl": {
+    "messages": "http://localhost:5002/tkl.json?v=23fd1c91ab96e9a5f60ef48e2529b4bdd8eade4a"
+  },
+  "to": {
+    "messages": "http://localhost:5002/to.json?v=23fd1c91ab96e9a5f60ef48e2529b4bdd8eade4a"
+  },
+  "tvl": {
+    "messages": "http://localhost:5002/tvl.json?v=23fd1c91ab96e9a5f60ef48e2529b4bdd8eade4a"
+  },
+  "uk": {
+    "messages": "http://localhost:5002/uk.json?v=6129e512a51a0425c42861c362b436c5c06fbc84"
+  },
+  "zh": {
+    "messages": "http://localhost:5002/zh.json?v=e28a73c8b2cc7b3fd3f364c5bd00f086b5800943"
+  },
+  "zh-tw": {
+    "messages": "http://localhost:5002/zh-tw.json?v=b341b4321e95080539365a3bc5d0f568c27f485d"
+  }
+}
