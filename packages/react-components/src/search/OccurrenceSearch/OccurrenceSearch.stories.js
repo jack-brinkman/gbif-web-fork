@@ -106,9 +106,9 @@ const config = {
   labels, 
   getSuggests, 
   filters, 
-  occurrenceSearchTabs: ['CLUSTERS', 'MAP', 'GALLERY', 'TABLE', 'DATASETS'],
+  occurrenceSearchTabs: ['CLUSTERS', 'MAP', 'GALLERY', 'TABLE'],
   // highlightedFilters: ['establishmentMeans'],
-  availableCatalogues: ['OCCURRENCE', 'LITERATURE', 'COLLECTION'],
+  // availableCatalogues: ['OCCURRENCE', 'LITERATURE', 'COLLECTION'],
   // defaultTableColumns: ['year', 'country']
   // mapSettings: {
   //   zoom: 10.290782035199692,
