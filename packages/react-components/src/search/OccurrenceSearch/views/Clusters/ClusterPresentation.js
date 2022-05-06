@@ -177,14 +177,11 @@ export const ClusterPresentation = ({ reload, first, prev, next, size, from, err
           </div>}
         </div>}
         <div css={css.meta}>
-          <InfoCard headline="About" collapsed>
-            <p>
-              Some intro text about what this is. A la: we try to detect if records are related. An example could be a specimen that was sequenced by another institution. Or simply 2 people reporting the same bird the same day at the same location.
-            </p>
-            <p>
-              This view lists individual occurrences and how they relate to other. The same cluster wil appear multiple times as it is not a list of distinct clusters, but of the occurrences.
-            </p>
+          <InfoCard headline="About" >
+          <p style={{fontWeight: 800}}>This is an experimental feature</p>
 
+          <p>GBIF automatically detects records that may be related. Examples could be a specimen sequenced by another institution, type material deposited at different institutions, or two people reporting the same bird at the same location and time.</p>
+          <p>This view shows the first N occurrences from the result, and for each record shows the related records. The same cluster may appear multiple times as it is not a list of distinct clusters, but of the occurrences.</p>
           </InfoCard>
           <InfoCard headline="Legend" collapsible={false} style={{ marginTop: 8 }}>
             <div css={css.legendItem}>
