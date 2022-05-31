@@ -60,7 +60,7 @@ class Map extends Component {
   }
 
   addLayer() {
-    var tileString = `${env.API_V2}/map/occurrence/adhoc/{z}/{x}/{y}.mvt?style=scaled.circles&mode=GEO_CENTROID&srs=EPSG%3A3857&squareSize=256&predicateHash=${this.props.predicateHash}`;
+    var tileString = `${env.API_V2}/map/occurrence/adhoc/{z}/{x}/{y}.mvt?style=scaled.circles&mode=GEO_CENTROID&srs=EPSG%3A3857&squareSize=256&predicateHash=${this.props.predicateHash}&${this.props.q ? `&q=${this.props.q} ` : ''}`;
     this.map.addLayer(
       getLayerConfig({ tileString, theme: this.props.theme }),
       "poi-scalerank2"
@@ -110,8 +110,8 @@ class Map extends Component {
   }
 
   render() {
-    const { query, onMapClick, onPointClick, predicateHash, ...props } = this.props;
-    return <div ref={this.myRef} {...props} />
+    const { query, onMapClick, onPointClick, predicateHash, style, className, ...props } = this.props;
+    return <div ref={this.myRef} {...{style, className}} />
   }
 }
 
