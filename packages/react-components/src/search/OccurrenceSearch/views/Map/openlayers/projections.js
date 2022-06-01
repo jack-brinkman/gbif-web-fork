@@ -61,7 +61,7 @@ function get4326() {
       });
     },
     getBaseLayer: function (params = {}) {
-      return getLayer(basemaps.EPSG_4326.url, this, params);
+      return getLayer(basemaps.EPSG_4326.url, this, params, 'baseLayer');
     },
     getOccurrenceLayer: function (params = {}) {
       return getLayer(env.API_V2 + '/map/occurrence/density/{z}/{x}/{y}.mvt?', this, params);
@@ -101,7 +101,7 @@ function get3857() {
       });
     },
     getBaseLayer: function (params = {}) {
-      return getLayer(basemaps.EPSG_3857.url, this, params);
+      return getLayer(basemaps.EPSG_3857.url, this, params, 'baseLayer');
     },
     getOccurrenceLayer: function (params = {}) {
       return getLayer(env.API_V2 + '/map/occurrence/density/{z}/{x}/{y}.mvt?', this, params);
@@ -151,7 +151,7 @@ function get3575() {
       });
     },
     getBaseLayer: function (params = {}) {
-      return getLayer(basemaps.EPSG_3575.url, this, params);
+      return getLayer(basemaps.EPSG_3575.url, this, params, 'baseLayer');
     },
     getOccurrenceLayer: function (params = {}) {
       return getLayer(env.API_V2 + '/map/occurrence/density/{z}/{x}/{y}.mvt?', this, params);
@@ -202,7 +202,7 @@ function get3031() {
       });
     },
     getBaseLayer: function (params = {}) {
-      return getLayer(basemaps.EPSG_3031.url, this, params);
+      return getLayer(basemaps.EPSG_3031.url, this, params, 'baseLayer');
     },
     getOccurrenceLayer: function (params = {}) {
       return getLayer(env.API_V2 + '/map/occurrence/density/{z}/{x}/{y}.mvt?', this, params);

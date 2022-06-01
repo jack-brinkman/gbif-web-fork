@@ -4,19 +4,9 @@ import env from '../../../../../.env.json';
 import { projections } from './openlayers/projections';
 
 import OlMap from 'ol/Map';
-import View from 'ol/View';
-import { fromLonLat } from 'ol/proj';
-import { Style, Fill, Stroke, Icon, Text, Circle } from 'ol/style';
-import { VectorTile as VectorTileLayer } from 'ol/layer';
-import { VectorTile as VectorTileSource } from 'ol/source';
-import { MVT as MVTFormat } from 'ol/format';
 import * as olInteraction from 'ol/interaction';
-// const WebGLTile = ol.layer.WebGLTile;
 
-// const projectionEPSG = '3857';// mercator
-const projectionEPSG = '3031';// antarctic;
-
-var interactions = olInteraction.defaults({altShiftDragRotate: false, pinchRotate: false, mouseWheelZoom: true});
+var interactions = olInteraction.defaults({ altShiftDragRotate: false, pinchRotate: false, mouseWheelZoom: true });
 
 class Map extends Component {
   constructor(props) {
@@ -42,10 +32,10 @@ class Map extends Component {
     // this.map.on("load", this.addLayer);
 
 
-    // const currentProjection = projections.EPSG_3031;
-    const currentProjection = projections.EPSG_3031;
+    // TODO: handle controls, set zoom, center from storage/defaults and generate style from theme
+    const currentProjection = projections[this.props.projection || 'EPSG_3031'];
     const baseLayer = currentProjection.getBaseLayer();
-    
+
     this.map = new OlMap({
       target: this.myRef.current,
       layers: [baseLayer],
@@ -66,6 +56,12 @@ class Map extends Component {
     if (prevProps.query !== this.props.query && this.mapLoaded) {
       this.updateLayer();
     }
+
+    if (prevProps.projection !== this.props.projection && this.mapLoaded) {
+      this.updateProjection();
+    }
+
+    // TODO: monitor theme and update maps accordingly
     // if (prevProps.theme !== this.props.theme && this.mapLoaded) {
     //   const mapStyle = this.props.theme.darkTheme ? 'dark-v9' : 'light-v9';
     //   this.map.setStyle(`mapbox://styles/mapbox/${mapStyle}`);
@@ -73,6 +69,27 @@ class Map extends Component {
     //     this.updateLayer();
     //   });
     // }
+  }
+
+  removeLayer(name) {
+    this.map.getLayers().getArray()
+      .filter(layer => layer.get('name') === name)
+      .forEach(layer => this.map.removeLayer(layer));
+  }
+
+  updateProjection() {
+    // this.removeLayer('baseLayer');
+    // this.removeLayer('occurrences');
+    this.map.getLayers().clear()
+    const currentProjection = projections[this.props.projection || 'EPSG_3031'];
+    console.log(currentProjection.name);
+    const baseLayer = currentProjection.getBaseLayer();
+    this.map.setView(currentProjection.getView(0, 0, 1));
+    if (currentProjection.fitExtent) {
+      this.map.getView().fit(currentProjection.fitExtent, { constrainResolution: false, maxZoom: 12, minZoom: 0 });
+    }
+    this.map.addLayer(baseLayer);
+    this.addLayer();
   }
 
   updateLayer() {
@@ -87,7 +104,7 @@ class Map extends Component {
   }
 
   addLayer() {
-    const currentProjection = projections.EPSG_3031;
+    const currentProjection = projections[this.props.projection || 'EPSG_3031'];
     const occurrenceLayer = currentProjection.getAdhocLayer({
       style: 'scaled.circles',
       mode: 'GEO_CENTROID',
@@ -105,13 +122,14 @@ class Map extends Component {
 
     const map = this.map
 
-    map.on('moveend', function(e) {
-      const {center, zoom} = map.getView().getState();
-      console.log(center);
+    map.on('moveend', function (e) {
+      const { center, zoom } = map.getView().getState();
       sessionStorage.setItem('mapZoom', zoom);
       sessionStorage.setItem('mapLng', center[0]);
       sessionStorage.setItem('mapLat', center[1]);
     });
+
+    // TODO: find a way to store current extent in a way it can be reused. Should ideallky be the same format as for mapbox: center, zoom
     // const map = this.map
     // if (!this.mapLoaded) {
     //   // remember map position
@@ -128,14 +146,10 @@ class Map extends Component {
     //     sessionStorage.setItem('mapLat', center.lat);
     //   });
 
-    //   map.on('mouseenter', 'occurrences', function (e) {
-    //     // Change the cursor style as a UI indicator.
-    //     map.getCanvas().style.cursor = 'pointer';
-    //   });
-
     const pointClickHandler = this.onPointClick;
     const clickHandler = this.props.onMapClick;
     map.on('singleclick', event => {
+      // todo : hover and click do not agree on wether there is a point or not
       occurrenceLayer.getFeatures(event.pixel).then(function (features) {
         const feature = features.length ? features[0] : undefined;
         if (feature) {
@@ -146,28 +160,12 @@ class Map extends Component {
         }
       });
     });
-    //   map.on('click', 'occurrences', e => {
-    //     this.onPointClick({ geohash: e.features[0].properties.geohash, count: e.features[0].properties.count });
-    //     e.preventDefault();
-    //   });
 
-    map.on('pointermove', function(e){
+    map.on('pointermove', function (e) {
       var pixel = map.getEventPixel(e.originalEvent);
-      var hit = map.hasFeatureAtPixel(pixel, {layerFilter: l => l.values_.name === 'occurrences'});
+      var hit = map.hasFeatureAtPixel(pixel, { layerFilter: l => l.values_.name === 'occurrences' });
       map.getViewport().style.cursor = hit ? 'pointer' : '';
     });
-
-    //   map.on('click', e => {
-    //     if (!e._defaultPrevented && this.props.onMapClick) this.props.onMapClick();
-    //   });
-
-    //   map.on('error', e => {
-    //     if (e?.error?.status === 400 && this.props.registerPredicate) {
-    //       this.props.registerPredicate();
-    //     }
-    //   });
-    // }
-    // this.mapLoaded = true;
   }
 
   render() {
