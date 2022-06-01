@@ -7,7 +7,8 @@ import ThemeContext from '../../../../style/themes/ThemeContext';
 import { useDialogState } from "reakit/Dialog";
 import ListBox from './ListBox';
 import { ViewHeader } from '../ViewHeader';
-import MapboxMap from './MapboxMap';
+// import MapComponent from './MapboxMap';
+import MapComponent from './OpenlayersMap';
 import * as css from './map.styles';
 
 function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading, total, predicateHash, registerPredicate, loadPointData, defaultMapSettings, ...props }) {
@@ -45,7 +46,7 @@ function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading,
                                   loading={pointLoading} 
                                   css={css.resultList({})} 
                                   />}
-        <MapboxMap defaultMapSettings={defaultMapSettings} predicateHash={predicateHash} q={q} css={css.mapComponent({theme})} theme={theme} query={query} onMapClick={e => showList(false)} onPointClick={data => { showList(true); loadPointData(data) }} registerPredicate={registerPredicate} />
+        <MapComponent defaultMapSettings={defaultMapSettings} predicateHash={predicateHash} q={q} css={css.mapComponent({theme})} theme={theme} query={query} onMapClick={e => showList(false)} onPointClick={data => { showList(true); loadPointData(data) }} registerPredicate={registerPredicate} />
       </div>
     </div>
   </>;
