@@ -8,20 +8,24 @@ import { useDialogState } from "reakit/Dialog";
 import ListBox from './ListBox';
 import { MdMoreVert, MdZoomIn, MdZoomOut } from 'react-icons/md'
 import { ViewHeader } from '../ViewHeader';
-// import MapComponent from './MapboxMap';
-import MapComponent from './OpenlayersMap';
+import MapComponentMB from './MapboxMap';
+import MapComponentOL from './OpenlayersMap';
 import * as css from './map.styles';
+import values from 'lodash/values';
 
 function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading, total, predicateHash, registerPredicate, loadPointData, defaultMapSettings, ...props }) {
   const dialog = useDialogState({ animated: true, modal: false });
   const theme = useContext(ThemeContext);
   const [projection, setProjection] = useState('EPSG_3857');
+  const [latestEvent, broadcastEvent] = useState();
   const [view, setView] = useState();
   const [activeId, setActive] = useState();
   const [activeItem, setActiveItem] = useState();
   const [listVisible, showList] = useState(false);
 
   const items = pointData?.occurrenceSearch?.documents?.results || [];
+
+  const [MapComponent, setMapComponent] = useState({ component: MapComponentOL });
 
   useEffect(() => {
     setActiveItem(items[activeId]);
@@ -34,6 +38,42 @@ function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading,
   const previousItem = useCallback(() => {
     setActive(Math.max(0, activeId - 1));
   }, [items, activeId]);
+
+  const basemapOptions = {
+    OL_ANTARCTIC: {
+      name: 'ol_antarctic',
+      projection: 'EPSG_3031',
+      component: MapComponentOL
+    },
+    OL_ARCTIC: {
+      name: 'ol_arctic',
+      projection: 'EPSG_3575',
+      component: MapComponentOL
+    },
+    OL_MERCATOR: {
+      name: 'ol_mercator',
+      projection: 'EPSG_3857',
+      component: MapComponentOL
+    },
+    OL_PLATE_CAREE: {
+      name: 'ol_platee_caree',
+      projection: 'EPSG_4326',
+      component: MapComponentOL
+    },
+    MB_MERCATOR: {
+      name: 'mb_mercator',
+      projection: 'EPSG_3857',
+      component: MapComponentMB
+    }
+  };
+
+  const menuOptions = menuState => values(basemapOptions).map(x => <MenuAction key={x.name} onClick={() => {
+    setProjection(x.projection); 
+    setMapComponent({ component: x.component });
+    menuState.hide();
+  }}>
+    {x.name}
+  </MenuAction>);
 
   return <>
     <DetailsDrawer href={`https://www.gbif.org/occurrence/${activeItem?.key}`} dialog={dialog} nextItem={nextItem} previousItem={previousItem}>
@@ -49,29 +89,16 @@ function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading,
           loading={pointLoading}
           css={css.resultList({})}
         />}
-        <div style={{ position: 'absolute', right: 12, top: 12, zIndex: 100 }}>
-          <Button appearance="text" style={{ background: 'white' }}><MdZoomIn style={{ fontSize: 24, color: theme.color800 }} /></Button>
-          <Button appearance="text" style={{ background: 'white' }}><MdZoomOut style={{ fontSize: 24, color: theme.color800 }} /></Button>
-          <Menu style={{display: 'inline-block'}}
+        <div css={css.mapControls({ theme })}>
+          <Button appearance="text" onClick={() => broadcastEvent({ type: 'ZOOM_IN' })}><MdZoomIn /></Button>
+          <Button appearance="text" onClick={() => broadcastEvent({ type: 'ZOOM_OUT' })}><MdZoomOut /></Button>
+          <Menu style={{ display: 'inline-block' }}
             aria-label="Custom menu"
-            trigger={<Button appearance="text" style={{ background: 'white' }}><MdMoreVert style={{ fontSize: 24, color: theme.color800 }} /></Button>}
-            items={menuState => [
-              <MenuAction key="About" onClick={() => { setProjection('EPSG_3031'); menuState.hide() }}>
-                Antarctic
-              </MenuAction>,
-              <MenuAction key="About" onClick={() => { setProjection('EPSG_3575'); menuState.hide() }}>
-                Arctic
-              </MenuAction>,
-              <MenuAction key="About" onClick={() => { setProjection('EPSG_3857'); menuState.hide() }}>
-                Mercator
-              </MenuAction>,
-              <MenuAction key="About" onClick={() => { setProjection('EPSG_4326'); menuState.hide() }}>
-                Plate Carrée
-              </MenuAction>
-            ]}
+            trigger={<Button appearance="text"><MdMoreVert /></Button>}
+            items={menuOptions}
           />
         </div>
-        <MapComponent view={view} projection={projection} defaultMapSettings={defaultMapSettings} predicateHash={predicateHash} q={q} css={css.mapComponent({ theme })} theme={theme} query={query} onMapClick={e => showList(false)} onPointClick={data => { showList(true); loadPointData(data) }} registerPredicate={registerPredicate} />
+        <MapComponent.component latestEvent={latestEvent} view={view} projection={projection} defaultMapSettings={defaultMapSettings} predicateHash={predicateHash} q={q} css={css.mapComponent({ theme })} theme={theme} query={query} onMapClick={e => showList(false)} onPointClick={data => { showList(true); loadPointData(data) }} registerPredicate={registerPredicate} />
       </div>
     </div>
   </>;

@@ -19,7 +19,33 @@ class Map extends Component {
     mapboxgl.accessToken = env.MAPBOX_KEY;
     this.map = new mapboxgl.Map({
       container: this.myRef.current,
-      style: `mapbox://styles/mapbox/${mapStyle}`,
+      // style: `mapbox://styles/mapbox/${mapStyle}`,
+      style: {
+        'version': 8,
+        'sources': {
+          'raster-tiles': {
+            'type': 'raster',
+            'tiles': [
+              // 'https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg' // http://maps.stamen.com/#toner/12/37.7706/-122.3782
+              // 'https://stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png' // http://maps.stamen.com/#toner/12/37.7706/-122.3782
+              'https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=Xvg05zabkgUuQMSKiq2s' // https://cloud.maptiler.com/maps/hybrid/
+            ],
+            'tileSize': 256,
+            'attribution':
+              'Map tiles by <a target="_top" rel="noopener" href="http://stamen.com">Stamen Design</a>, under <a target="_top" rel="noopener" href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a target="_top" rel="noopener" href="http://openstreetmap.org">OpenStreetMap</a>, under <a target="_top" rel="noopener" href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>'
+          }
+        },
+        'layers': [
+          {
+            'id': 'simple-tiles',
+            'type': 'raster',
+            'source': 'raster-tiles',
+            'minzoom': 0,
+            'maxzoom': 22
+          }
+        ]
+      },
+      // style: 'https://api.maptiler.com/maps/hybrid/style.json?key=Xvg05zabkgUuQMSKiq2s',
       zoom: sessionStorage.getItem('mapZoom') || this.props.defaultMapSettings?.zoom || 0,
       center: [sessionStorage.getItem('mapLng') || this.props.defaultMapSettings?.lng || 0, sessionStorage.getItem('mapLat') || this.props.defaultMapSettings?.lat || 0]
     });
@@ -28,7 +54,7 @@ class Map extends Component {
   }
 
   componentWillUnmount() {
-    this.map.remove();
+    if (this.map) this.map.remove();
   }
 
   componentDidUpdate(prevProps) {
@@ -63,7 +89,7 @@ class Map extends Component {
     var tileString = `${env.API_V2}/map/occurrence/adhoc/{z}/{x}/{y}.mvt?style=scaled.circles&mode=GEO_CENTROID&srs=EPSG%3A3857&squareSize=256&predicateHash=${this.props.predicateHash}&${this.props.q ? `&q=${this.props.q} ` : ''}`;
     this.map.addLayer(
       getLayerConfig({ tileString, theme: this.props.theme }),
-      "poi-scalerank2"
+      // "poi-scalerank2"
     );
 
     const map = this.map
@@ -111,7 +137,7 @@ class Map extends Component {
 
   render() {
     const { query, onMapClick, onPointClick, predicateHash, style, className, ...props } = this.props;
-    return <div ref={this.myRef} {...{style, className}} />
+    return <div ref={this.myRef} {...{ style, className }} />
   }
 }
 

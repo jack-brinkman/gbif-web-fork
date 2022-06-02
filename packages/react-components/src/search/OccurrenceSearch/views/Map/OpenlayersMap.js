@@ -4,6 +4,7 @@ import env from '../../../../../.env.json';
 import { projections } from './openlayers/projections';
 
 import OlMap from 'ol/Map';
+import { defaults as olControlDefaults } from 'ol/control';
 import * as olInteraction from 'ol/interaction';
 
 var interactions = olInteraction.defaults({ altShiftDragRotate: false, pinchRotate: false, mouseWheelZoom: true });
@@ -40,6 +41,7 @@ class Map extends Component {
       target: this.myRef.current,
       layers: [baseLayer],
       view: currentProjection.getView(0, 0, 1),//x,x,zoom
+      controls: olControlDefaults({ zoom: false, attribution: false }),
       interactions,
       // logo: false,
     });
@@ -63,6 +65,14 @@ class Map extends Component {
 
     if (prevProps.view !== this.props.view && this.mapLoaded) {
       this.updateProjection();
+    }
+
+    if (prevProps.latestEvent !== this.props.latestEvent && this.mapLoaded) {
+      if (this.props.latestEvent?.type === 'ZOOM_IN') {
+        this.zoomIn();
+      } else if (this.props.latestEvent?.type === 'ZOOM_OUT') {
+        this.zoomOut();
+      }
     }
 
     // TODO: monitor theme and update maps accordingly
@@ -96,7 +106,6 @@ class Map extends Component {
     // this.removeLayer('occurrences');
     this.map.getLayers().clear()
     const currentProjection = projections[this.props.projection || 'EPSG_3031'];
-    console.log(currentProjection.name);
     const baseLayer = currentProjection.getBaseLayer();
     this.map.setView(currentProjection.getView(0, 0, 1));
     if (currentProjection.fitExtent) {
@@ -148,12 +157,6 @@ class Map extends Component {
     // if (!this.mapLoaded) {
     //   // remember map position
     //   map.on('zoomend', function () {
-    //     const center = map.getCenter();
-    //     sessionStorage.setItem('mapZoom', map.getZoom());
-    //     sessionStorage.setItem('mapLng', center.lng);
-    //     sessionStorage.setItem('mapLat', center.lat);
-    //   });
-    //   map.on('moveend', function () {
     //     const center = map.getCenter();
     //     sessionStorage.setItem('mapZoom', map.getZoom());
     //     sessionStorage.setItem('mapLng', center.lng);
