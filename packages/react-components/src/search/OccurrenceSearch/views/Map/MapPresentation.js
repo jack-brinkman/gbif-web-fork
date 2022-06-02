@@ -6,7 +6,7 @@ import { OccurrenceSidebar } from '../../../../entities';
 import ThemeContext from '../../../../style/themes/ThemeContext';
 import { useDialogState } from "reakit/Dialog";
 import ListBox from './ListBox';
-import { MdMoreVert } from 'react-icons/md'
+import { MdMoreVert, MdZoomIn, MdZoomOut } from 'react-icons/md'
 import { ViewHeader } from '../ViewHeader';
 // import MapComponent from './MapboxMap';
 import MapComponent from './OpenlayersMap';
@@ -16,6 +16,7 @@ function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading,
   const dialog = useDialogState({ animated: true, modal: false });
   const theme = useContext(ThemeContext);
   const [projection, setProjection] = useState('EPSG_3857');
+  const [view, setView] = useState();
   const [activeId, setActive] = useState();
   const [activeItem, setActiveItem] = useState();
   const [listVisible, showList] = useState(false);
@@ -48,10 +49,12 @@ function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading,
           loading={pointLoading}
           css={css.resultList({})}
         />}
-        <div style={{position: 'absolute', right: 12, top: 12, zIndex: 100}}>
-          <Menu
+        <div style={{ position: 'absolute', right: 12, top: 12, zIndex: 100 }}>
+          <Button appearance="text" style={{ background: 'white' }}><MdZoomIn style={{ fontSize: 24, color: theme.color800 }} /></Button>
+          <Button appearance="text" style={{ background: 'white' }}><MdZoomOut style={{ fontSize: 24, color: theme.color800 }} /></Button>
+          <Menu style={{display: 'inline-block'}}
             aria-label="Custom menu"
-            trigger={<Button appearance="text" style={{background: 'white'}}><MdMoreVert style={{ fontSize: 24, color: theme.color800 }} /></Button>}
+            trigger={<Button appearance="text" style={{ background: 'white' }}><MdMoreVert style={{ fontSize: 24, color: theme.color800 }} /></Button>}
             items={menuState => [
               <MenuAction key="About" onClick={() => { setProjection('EPSG_3031'); menuState.hide() }}>
                 Antarctic
@@ -68,7 +71,7 @@ function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading,
             ]}
           />
         </div>
-        <MapComponent projection={projection} defaultMapSettings={defaultMapSettings} predicateHash={predicateHash} q={q} css={css.mapComponent({ theme })} theme={theme} query={query} onMapClick={e => showList(false)} onPointClick={data => { showList(true); loadPointData(data) }} registerPredicate={registerPredicate} />
+        <MapComponent view={view} projection={projection} defaultMapSettings={defaultMapSettings} predicateHash={predicateHash} q={q} css={css.mapComponent({ theme })} theme={theme} query={query} onMapClick={e => showList(false)} onPointClick={data => { showList(true); loadPointData(data) }} registerPredicate={registerPredicate} />
       </div>
     </div>
   </>;

@@ -61,6 +61,10 @@ class Map extends Component {
       this.updateProjection();
     }
 
+    if (prevProps.view !== this.props.view && this.mapLoaded) {
+      this.updateProjection();
+    }
+
     // TODO: monitor theme and update maps accordingly
     // if (prevProps.theme !== this.props.theme && this.mapLoaded) {
     //   const mapStyle = this.props.theme.darkTheme ? 'dark-v9' : 'light-v9';
@@ -70,6 +74,16 @@ class Map extends Component {
     //   });
     // }
   }
+
+  zoomIn() {
+    var view = this.map.getView();
+    view.setZoom(view.getZoom() + 1);
+  };
+
+  zoomOut() {
+    var view = this.map.getView();
+    view.setZoom(view.getZoom() - 1);
+  };
 
   removeLayer(name) {
     this.map.getLayers().getArray()

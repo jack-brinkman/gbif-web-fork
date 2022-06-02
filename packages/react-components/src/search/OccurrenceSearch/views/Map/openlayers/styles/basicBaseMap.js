@@ -66,22 +66,22 @@ export default function basicBaseMap(Style, Fill, Stroke, Icon, Text) {
       cls != 'stream' &&
       cls != 'canal'
     ) {
-      stroke.setColor('#0099CC');
+      stroke.setColor('#66c4e3');
       stroke.setWidth(1);
       styles[length++] = line;
     } else if (layer == 'waterway' && cls == 'river') {
-      stroke.setColor('#0099CC');
+      stroke.setColor('#66c4e3');
       stroke.setWidth(1);
       styles[length++] = line;
     } else if (
       layer == 'waterway' &&
       (cls == 'stream' || cls == 'canal')
     ) {
-      stroke.setColor('#0099CC');
+      stroke.setColor('#66c4e3');
       stroke.setWidth(1);
       styles[length++] = line;
     } else if (layer == 'water') {
-      fill.setColor('#0099CC');
+      fill.setColor('#66c4e3');
       styles[length++] = polygon;
     } else if (layer == 'aeroway' && geom == 'Polygon') {
       fill.setColor('rgb(242,239,235)');
@@ -228,11 +228,11 @@ export default function basicBaseMap(Style, Fill, Stroke, Icon, Text) {
       stroke.setWidth(1);
       styles[length++] = line;
     } else if (layer == 'admin' && adminLevel >= 3 && maritime === 1) {
-      stroke.setColor('#0099CC');
+      stroke.setColor('#66c4e3');
       stroke.setWidth(1);
       styles[length++] = line;
     } else if (layer == 'admin' && adminLevel == 2 && maritime === 1) {
-      stroke.setColor('#0099CC');
+      stroke.setColor('#66c4e3');
       stroke.setWidth(1);
       styles[length++] = line;
     } else if (layer == 'country_label' && scalerank === 1) {
