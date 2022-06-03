@@ -13,7 +13,7 @@ import { register } from 'ol/proj/proj4';
 import * as olProj from 'ol/proj';
 import { createXYZ } from 'ol/tilegrid';
 import View from 'ol/View';
-
+import { transform } from 'ol/proj';
 
 proj4.defs('EPSG:4326', '+proj=longlat +ellps=WGS84 +datum=WGS84 +units=degrees');
 proj4.defs('EPSG:3575', '+proj=laea +lat_0=90 +lon_0=10 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs');
@@ -49,6 +49,7 @@ function get4326() {
     resolutions: resolutions,
     fitExtent: [-179, -1, 179, 1],
     getView: function (lat, lon, zoom) {
+      console.log(lat, lon);
       lat = lat || 0;
       lon = lon || 0;
       zoom = zoom || 0;
@@ -89,6 +90,13 @@ function get3857() {
     // resolutions: resolutions,
     fitExtent: olProj.transformExtent([-90, -75, 90, 75], 'EPSG:4326', 'EPSG:3857'),
     getView: function (lat, lon, zoom) {
+      console.log(lat, lon);
+      if (Math.abs(lat) > 85) {
+        lat = 0;
+        lon = 0;
+        zoom = 1;
+      }
+      [lon, lat] = transform([lon, lat], 'EPSG:4326', 'EPSG:3857');
       lat = lat || 0;
       lon = lon || 0;
       zoom = zoom || 0;
@@ -113,6 +121,7 @@ function get3857() {
 }
 
 function get3575() {
+  var halfWidth = 12367396.2185; // To the Equator
   var extent = [-halfWidth, -halfWidth, halfWidth, halfWidth];
   olProj.get('EPSG:3575').setExtent(extent);
   var resolutions = Array.from(new Array(maxZoom + 1), function (x, i) {
@@ -128,10 +137,6 @@ function get3575() {
     tileSize: tileSize
   });
 
-  var getCenter = function () {
-    return olProj.fromLonLat([0, 89], 'EPSG:3575');
-  };
-
   return {
     name: 'EPSG_3575',
     wrapX: false,
@@ -143,11 +148,22 @@ function get3575() {
     resolutions: resolutions,
     fitExtent: extent,
     getView: function (lat, lon, zoom) {
+      console.log(lat, lon);
+      if (lat < 0) {
+        lat = 90;
+        lon = 0;
+        zoom = 1;
+      }
+      [lon, lat] = transform([lon, lat], 'EPSG:4326', 'EPSG:3575');
+      lat = lat || 0;
+      lon = lon || 0;
+      zoom = zoom || 0;
       return new View({
-        center: getCenter(lat, lon),
+        maxZoom: maxZoom,
+        minZoom: 0,
+        center: [lon, lat],
+        zoom: zoom,
         projection: olProj.get('EPSG:3575'),
-        zoom: zoom || 0,
-        maxResolution: halfWidth / tileSize * 2
       });
     },
     getBaseLayer: function (params = {}) {
@@ -194,11 +210,22 @@ function get3031() {
     resolutions: resolutions,
     fitExtent: extent,
     getView: function (lat, lon, zoom) {
+      console.log(lat, lon);
+      if (lat > 0) {
+        lat = -90;
+        lon = 0;
+        zoom = 1;
+      }
+      [lon, lat] = transform([lon, lat], 'EPSG:4326', 'EPSG:3031');
+      lat = lat || 0;
+      lon = lon || 0;
+      zoom = zoom || 0;
       return new View({
-        center: getCenter(lat, lon),
+        maxZoom: maxZoom,
+        minZoom: 0,
+        center: [lon, lat],
+        zoom: zoom,
         projection: olProj.get('EPSG:3031'),
-        zoom: zoom || 0,
-        maxResolution: halfWidth / tileSize * 2
       });
     },
     getBaseLayer: function (params = {}) {

@@ -16,40 +16,28 @@ class Map extends Component {
 
   componentDidMount() {
     const mapStyle = this.props.theme.darkTheme ? 'dark-v9' : 'light-v9';
+    let zoom = sessionStorage.getItem('mapZoom') || this.props.defaultMapSettings?.zoom || 0;
+    zoom = Math.min(Math.max(0, zoom), 20);
+    zoom -= 1;
+
+    let lng = sessionStorage.getItem('mapLng') || this.props.defaultMapSettings?.lng || 0;
+    lng = Math.min(Math.max(-180, lng), 180);
+
+    let lat = sessionStorage.getItem('mapLat') || this.props.defaultMapSettings?.lat || 0;
+    lat = Math.min(Math.max(-85, lat), 85);
+
+    console.log(this.props.basemap);
     mapboxgl.accessToken = env.MAPBOX_KEY;
     this.map = new mapboxgl.Map({
       container: this.myRef.current,
       // style: `mapbox://styles/mapbox/${mapStyle}`,
-      style: {
-        'version': 8,
-        'sources': {
-          'raster-tiles': {
-            'type': 'raster',
-            'tiles': [
-              // 'https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg' // http://maps.stamen.com/#toner/12/37.7706/-122.3782
-              // 'https://stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png' // http://maps.stamen.com/#toner/12/37.7706/-122.3782
-              'https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=Xvg05zabkgUuQMSKiq2s' // https://cloud.maptiler.com/maps/hybrid/
-            ],
-            'tileSize': 256,
-            'attribution':
-              'Map tiles by <a target="_top" rel="noopener" href="http://stamen.com">Stamen Design</a>, under <a target="_top" rel="noopener" href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a target="_top" rel="noopener" href="http://openstreetmap.org">OpenStreetMap</a>, under <a target="_top" rel="noopener" href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>'
-          }
-        },
-        'layers': [
-          {
-            'id': 'simple-tiles',
-            'type': 'raster',
-            'source': 'raster-tiles',
-            'minzoom': 0,
-            'maxzoom': 22
-          }
-        ]
-      },
+      // style: 'https://api.mapbox.com/styles/v1/mapbox/light-v9?access_token=pk.eyJ1IjoiZ2JpZiIsImEiOiJja3VmZm50Z3kxcm1vMnBtdnBmeGd5cm9hIn0.M2z2n9QP9fRHZUCw9vbgOA',
+      style: this.getStyle(),
       // style: 'https://api.maptiler.com/maps/hybrid/style.json?key=Xvg05zabkgUuQMSKiq2s',
-      zoom: sessionStorage.getItem('mapZoom') || this.props.defaultMapSettings?.zoom || 0,
-      center: [sessionStorage.getItem('mapLng') || this.props.defaultMapSettings?.lng || 0, sessionStorage.getItem('mapLat') || this.props.defaultMapSettings?.lat || 0]
+      zoom,
+      center: [lng, lat]
     });
-    this.map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-left');
+    // this.map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-left');
     this.map.on("load", this.addLayer);
   }
 
@@ -68,8 +56,57 @@ class Map extends Component {
         this.updateLayer();
       });
     }
+    if (prevProps.latestEvent !== this.props.latestEvent && this.mapLoaded) {
+      if (this.props.latestEvent?.type === 'ZOOM_IN') {
+        this.map.zoomIn();
+      } else if (this.props.latestEvent?.type === 'ZOOM_OUT') {
+        this.map.zoomOut();
+      }
+    }
+    if (prevProps.basemap !== this.props.basemap && this.mapLoaded) {
+      var layer = this.map.getSource("simple-tiles");
+      if (layer) {
+        this.map.removeLayer("simple-tiles");
+        this.map.removeSource("raster-tiles");
+      }
+      this.map.setStyle(this.getStyle());
+      this.addLayer();
+    }
   }
 
+  getStyle() {
+    // this.map.setStyle();
+    return {
+      'version': 8,
+      'sources': {
+        'raster-tiles': {
+          'type': 'raster',
+          'tiles': [
+            // 'https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg', // http://maps.stamen.com/#toner/12/37.7706/-122.3782
+            // 'https://stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png', // http://maps.stamen.com/#toner/12/37.7706/-122.3782
+            // 'https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=Xvg05zabkgUuQMSKiq2s', // https://cloud.maptiler.com/maps/hybrid/
+            // 'https://tile.gbif.org/3857/omt/{z}/{x}/{y}@2x.png?style=osm-bright-en&srs=EPSG%3A3857',
+            // 'https://server.arcgisonline.com/arcgis/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}',// https://www.arcgis.com/home/webmap/viewer.html?featurecollection=http%3A%2F%2Fcertmapper.cr.usgs.gov%2Fserver%2Frest%2Fservices%2Fgeology%2Feurope%2Fmapserver%3Ff%3Djson%26option%3Dfootprints&supportsProjection=true&supportsJSONP=true
+            // 'https://mrdata.usgs.gov/mapcache/wmts/?layer=sgmc2&style=default&tilematrixset=GoogleMapsCompatible&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix={z}&TileCol={x}&TileRow={y}',// https://codepen.io/hofft/pen/porNMbM
+            this.props.basemap.basemap.url
+          ],
+          'tileSize': 256,
+          'attribution':
+            // 'Map tiles by <a target="_top" rel="noopener" href="http://stamen.com">Stamen Design</a>, under <a target="_top" rel="noopener" href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a target="_top" rel="noopener" href="http://openstreetmap.org">OpenStreetMap</a>, under <a target="_top" rel="noopener" href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>'
+            this.props.basemap.basemap.attribution
+        }
+      },
+      'layers': [
+        {
+          'id': 'simple-tiles',
+          'type': 'raster',
+          'source': 'raster-tiles',
+          'minzoom': 0,
+          'maxzoom': 22
+        }
+      ]
+    }
+  }
   updateLayer() {
     var layer = this.map.getSource("occurrences");
     if (layer) {
@@ -86,6 +123,11 @@ class Map extends Component {
   }
 
   addLayer() {
+    // this.map.setPaintProperty(
+    //   'simple-tiles',
+    //   'raster-opacity',
+    //   0.8
+    // );
     var tileString = `${env.API_V2}/map/occurrence/adhoc/{z}/{x}/{y}.mvt?style=scaled.circles&mode=GEO_CENTROID&srs=EPSG%3A3857&squareSize=256&predicateHash=${this.props.predicateHash}&${this.props.q ? `&q=${this.props.q} ` : ''}`;
     this.map.addLayer(
       getLayerConfig({ tileString, theme: this.props.theme }),
@@ -97,13 +139,13 @@ class Map extends Component {
       // remember map position
       map.on('zoomend', function () {
         const center = map.getCenter();
-        sessionStorage.setItem('mapZoom', map.getZoom());
+        sessionStorage.setItem('mapZoom', map.getZoom() + 1);
         sessionStorage.setItem('mapLng', center.lng);
         sessionStorage.setItem('mapLat', center.lat);
       });
       map.on('moveend', function () {
         const center = map.getCenter();
-        sessionStorage.setItem('mapZoom', map.getZoom());
+        sessionStorage.setItem('mapZoom', map.getZoom() + 1);
         sessionStorage.setItem('mapLng', center.lng);
         sessionStorage.setItem('mapLat', center.lat);
       });

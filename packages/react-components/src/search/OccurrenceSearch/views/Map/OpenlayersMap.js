@@ -6,6 +6,8 @@ import { projections } from './openlayers/projections';
 import OlMap from 'ol/Map';
 import { defaults as olControlDefaults } from 'ol/control';
 import * as olInteraction from 'ol/interaction';
+import { transform } from 'ol/proj';
+import View from 'ol/View';
 
 var interactions = olInteraction.defaults({ altShiftDragRotate: false, pinchRotate: false, mouseWheelZoom: true });
 
@@ -37,10 +39,13 @@ class Map extends Component {
     const currentProjection = projections[this.props.projection || 'EPSG_3031'];
     const baseLayer = currentProjection.getBaseLayer();
 
+    const mapPos = this.getStoredMapPosition();
+
     this.map = new OlMap({
       target: this.myRef.current,
       layers: [baseLayer],
-      view: currentProjection.getView(0, 0, 1),//x,x,zoom
+      // view: currentProjection.getView(0, 0, 1),//x,x,zoom
+      view: currentProjection.getView(mapPos.lat, mapPos.lng, mapPos.zoom),//x,x,zoom
       controls: olControlDefaults({ zoom: false, attribution: false }),
       interactions,
       // logo: false,
@@ -51,7 +56,9 @@ class Map extends Component {
 
   componentWillUnmount() {
     // https://github.com/openlayers/openlayers/issues/9556#issuecomment-493190400
-    this.map.setTarget(null);
+    if (this.map) {
+      this.map.setTarget(null);
+    }
   }
 
   componentDidUpdate(prevProps) {
@@ -85,6 +92,25 @@ class Map extends Component {
     // }
   }
 
+  getStoredMapPosition() {
+    const currentProjection = projections[this.props.projection || 'EPSG_3031'];
+
+    let zoom = sessionStorage.getItem('mapZoom') || this.props.defaultMapSettings?.zoom || 0;
+    zoom = Math.min(Math.max(0, zoom), 20);
+
+    let lng = sessionStorage.getItem('mapLng') || this.props.defaultMapSettings?.lng || 0;
+    lng = Math.min(Math.max(-180, lng), 180);
+
+    let lat = sessionStorage.getItem('mapLat') || this.props.defaultMapSettings?.lat || 0;
+    lat = Math.min(Math.max(-90, lat), 90);
+    // const reprojectedCenter = transform([lng, lat], 'EPSG:4326', currentProjection.srs);
+    return {
+      lat,//: reprojectedCenter[1], 
+      lng,//: reprojectedCenter[0], 
+      zoom
+    };
+  }
+
   zoomIn() {
     var view = this.map.getView();
     view.setZoom(view.getZoom() + 1);
@@ -107,10 +133,13 @@ class Map extends Component {
     this.map.getLayers().clear()
     const currentProjection = projections[this.props.projection || 'EPSG_3031'];
     const baseLayer = currentProjection.getBaseLayer();
-    this.map.setView(currentProjection.getView(0, 0, 1));
-    if (currentProjection.fitExtent) {
-      this.map.getView().fit(currentProjection.fitExtent, { constrainResolution: false, maxZoom: 12, minZoom: 0 });
-    }
+
+    const mapPos = this.getStoredMapPosition();
+    // this.map.setView(currentProjection.getView(0, 0, 1));
+    this.map.setView(currentProjection.getView(mapPos.lat, mapPos.lng, mapPos.zoom));
+    // if (currentProjection.fitExtent) {
+    //   this.map.getView().fit(currentProjection.fitExtent, { constrainResolution: false, maxZoom: 12, minZoom: 0 });
+    // }
     this.map.addLayer(baseLayer);
     this.addLayer();
   }
@@ -147,9 +176,12 @@ class Map extends Component {
 
     map.on('moveend', function (e) {
       const { center, zoom } = map.getView().getState();
+      const reprojectedCenter = transform(center, currentProjection.srs, 'EPSG:4326');
       sessionStorage.setItem('mapZoom', zoom);
-      sessionStorage.setItem('mapLng', center[0]);
-      sessionStorage.setItem('mapLat', center[1]);
+      sessionStorage.setItem('mapLng', reprojectedCenter[0]);
+      sessionStorage.setItem('mapLat', reprojectedCenter[1]);
+      console.log('move center', center);
+      console.log('move reproj', reprojectedCenter);
     });
 
     // TODO: find a way to store current extent in a way it can be reused. Should ideallky be the same format as for mapbox: center, zoom

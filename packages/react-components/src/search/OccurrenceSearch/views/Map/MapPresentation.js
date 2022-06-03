@@ -13,10 +13,52 @@ import MapComponentOL from './OpenlayersMap';
 import * as css from './map.styles';
 import values from 'lodash/values';
 
+const basemapOptions = {
+  ol_antarctic: {
+    name: 'ol_antarctic',
+    projection: 'EPSG_3031',
+    component: MapComponentOL
+  },
+  ol_arctic: {
+    name: 'ol_arctic',
+    projection: 'EPSG_3575',
+    component: MapComponentOL
+  },
+  ol_mercator: {
+    name: 'ol_mercator',
+    projection: 'EPSG_3857',
+    component: MapComponentOL
+  },
+  ol_platee_caree: {
+    name: 'ol_platee_caree',
+    projection: 'EPSG_4326',
+    component: MapComponentOL
+  },
+  mb_mercator_terrain: {
+    name: 'mb_mercator_terrain',
+    projection: 'EPSG_3857',
+    component: MapComponentMB,
+    basemap: {
+      url: 'https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg',
+      attribution: 'Map tiles by <a target="_top" rel="noopener" href="http://stamen.com">Stamen Design</a>'
+    }
+  },
+  mb_mercator_satellite: {
+    name: 'mb_mercator_satellite',
+    projection: 'EPSG_3857',
+    component: MapComponentMB,
+    basemap: {
+      url: 'https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=Xvg05zabkgUuQMSKiq2s',
+      attribution: 'Map tiles by someone else'
+    }
+  }
+};
+
 function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading, total, predicateHash, registerPredicate, loadPointData, defaultMapSettings, ...props }) {
   const dialog = useDialogState({ animated: true, modal: false });
   const theme = useContext(ThemeContext);
   const [projection, setProjection] = useState('EPSG_3857');
+  const [basemap, setaBasemap] = useState(basemapOptions.OL_MERCATOR);
   const [latestEvent, broadcastEvent] = useState();
   const [view, setView] = useState();
   const [activeId, setActive] = useState();
@@ -39,42 +81,15 @@ function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading,
     setActive(Math.max(0, activeId - 1));
   }, [items, activeId]);
 
-  const basemapOptions = {
-    OL_ANTARCTIC: {
-      name: 'ol_antarctic',
-      projection: 'EPSG_3031',
-      component: MapComponentOL
-    },
-    OL_ARCTIC: {
-      name: 'ol_arctic',
-      projection: 'EPSG_3575',
-      component: MapComponentOL
-    },
-    OL_MERCATOR: {
-      name: 'ol_mercator',
-      projection: 'EPSG_3857',
-      component: MapComponentOL
-    },
-    OL_PLATE_CAREE: {
-      name: 'ol_platee_caree',
-      projection: 'EPSG_4326',
-      component: MapComponentOL
-    },
-    MB_MERCATOR: {
-      name: 'mb_mercator',
-      projection: 'EPSG_3857',
-      component: MapComponentMB
-    }
-  };
-
   const menuOptions = menuState => values(basemapOptions).map(x => <MenuAction key={x.name} onClick={() => {
     setProjection(x.projection); 
     setMapComponent({ component: x.component });
+    setaBasemap(basemapOptions[x.name]);
     menuState.hide();
   }}>
     {x.name}
   </MenuAction>);
-
+console.log(basemap);
   return <>
     <DetailsDrawer href={`https://www.gbif.org/occurrence/${activeItem?.key}`} dialog={dialog} nextItem={nextItem} previousItem={previousItem}>
       <OccurrenceSidebar id={activeItem?.key} defaultTab='details' style={{ maxWidth: '100%', width: 700, height: '100%' }} onCloseRequest={() => dialog.setVisible(false)} />
@@ -98,7 +113,7 @@ function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading,
             items={menuOptions}
           />
         </div>
-        <MapComponent.component latestEvent={latestEvent} view={view} projection={projection} defaultMapSettings={defaultMapSettings} predicateHash={predicateHash} q={q} css={css.mapComponent({ theme })} theme={theme} query={query} onMapClick={e => showList(false)} onPointClick={data => { showList(true); loadPointData(data) }} registerPredicate={registerPredicate} />
+        <MapComponent.component basemap={basemap} latestEvent={latestEvent} view={view} projection={projection} defaultMapSettings={defaultMapSettings} predicateHash={predicateHash} q={q} css={css.mapComponent({ theme })} theme={theme} query={query} onMapClick={e => showList(false)} onPointClick={data => { showList(true); loadPointData(data) }} registerPredicate={registerPredicate} />
       </div>
     </div>
   </>;
