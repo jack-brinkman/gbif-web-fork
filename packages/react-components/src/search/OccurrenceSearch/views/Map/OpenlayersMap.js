@@ -8,7 +8,10 @@ import { defaults as olControlDefaults } from 'ol/control';
 import * as olInteraction from 'ol/interaction';
 import { transform } from 'ol/proj';
 import View from 'ol/View';
-
+import { applyStyle, applyBackground } from 'ol-mapbox-style';
+// import mapboxBright from './openlayers/styles/positron.json';
+import mapboxBright from './openlayers/styles/mapboxBright.json';
+const token = 'pk.eyJ1IjoiZ2JpZiIsImEiOiJja3VmZm50Z3kxcm1vMnBtdnBmeGd5cm9hIn0.M2z2n9QP9fRHZUCw9vbgOA';
 var interactions = olInteraction.defaults({ altShiftDragRotate: false, pinchRotate: false, mouseWheelZoom: true });
 
 class Map extends Component {
@@ -38,6 +41,13 @@ class Map extends Component {
     // TODO: handle controls, set zoom, center from storage/defaults and generate style from theme
     const currentProjection = projections[this.props.projection || 'EPSG_3031'];
     const baseLayer = currentProjection.getBaseLayer();
+
+    const resolutions = baseLayer.getSource().getTileGrid().getResolutions();
+    applyBackground(baseLayer, mapboxBright, undefined)
+    
+    applyStyle(baseLayer, mapboxBright, undefined, undefined, resolutions);
+    
+
 
     const mapPos = this.getStoredMapPosition();
 
@@ -133,6 +143,9 @@ class Map extends Component {
     this.map.getLayers().clear()
     const currentProjection = projections[this.props.projection || 'EPSG_3031'];
     const baseLayer = currentProjection.getBaseLayer();
+    const resolutions = baseLayer.getSource().getTileGrid().getResolutions();
+    applyBackground(baseLayer, mapboxBright, 'openmaptiles');
+    applyStyle(baseLayer, mapboxBright, 'openmaptiles', undefined, resolutions);
 
     const mapPos = this.getStoredMapPosition();
     // this.map.setView(currentProjection.getView(0, 0, 1));
@@ -180,8 +193,8 @@ class Map extends Component {
       sessionStorage.setItem('mapZoom', zoom);
       sessionStorage.setItem('mapLng', reprojectedCenter[0]);
       sessionStorage.setItem('mapLat', reprojectedCenter[1]);
-      console.log('move center', center);
-      console.log('move reproj', reprojectedCenter);
+      // console.log('move center', center);
+      // console.log('move reproj', reprojectedCenter);
     });
 
     // TODO: find a way to store current extent in a way it can be reused. Should ideallky be the same format as for mapbox: center, zoom

@@ -1,4 +1,13 @@
+/*
+Map options
+it would be nice to be able to support overlays at some point. With an opacity setting I imagine
+Other than that we need 4 projections
+satellite map (hp participants will have to register to get a token themselves - to avoid overloading the service)
+mercator maps will support both OL and MB
+and some default styles for OL and MB to choose from, possibly an option to add ones own.
+And probably the point overlays will have to be dependent on the basemap as well?
 
+*/
 import { jsx } from '@emotion/react';
 import React, { useContext, useState, useEffect, useCallback } from "react";
 import { DetailsDrawer, Menu, MenuAction, Button } from '../../../../components';
@@ -57,8 +66,8 @@ const basemapOptions = {
 function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading, total, predicateHash, registerPredicate, loadPointData, defaultMapSettings, ...props }) {
   const dialog = useDialogState({ animated: true, modal: false });
   const theme = useContext(ThemeContext);
-  const [projection, setProjection] = useState('EPSG_3857');
-  const [basemap, setaBasemap] = useState(basemapOptions.OL_MERCATOR);
+  const [projection, setProjection] = useState('EPSG_4326');
+  const [basemap, setaBasemap] = useState(basemapOptions.ol_platee_caree);
   const [latestEvent, broadcastEvent] = useState();
   const [view, setView] = useState();
   const [activeId, setActive] = useState();
@@ -89,7 +98,7 @@ function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading,
   }}>
     {x.name}
   </MenuAction>);
-console.log(basemap);
+
   return <>
     <DetailsDrawer href={`https://www.gbif.org/occurrence/${activeItem?.key}`} dialog={dialog} nextItem={nextItem} previousItem={previousItem}>
       <OccurrenceSidebar id={activeItem?.key} defaultTab='details' style={{ maxWidth: '100%', width: 700, height: '100%' }} onCloseRequest={() => dialog.setVisible(false)} />

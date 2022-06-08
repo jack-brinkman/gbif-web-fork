@@ -2,7 +2,8 @@ import proj4 from 'proj4';
 import env from '../../../../../../.env.json';
 import queryString from 'query-string';
 import { basemaps } from './basemaps';
-import createBasicBaseMapStyle from './styles/basicBaseMap';
+import createBasicBaseMapStyle from './styles/basicBaseMap2';
+// import createBasicBaseMapStyle from './styles/basicBaseMap';
 import densityPoints from './styles/densityPoints';
 import { Style, Fill, Stroke, Icon, Text, Circle } from 'ol/style';
 import { VectorTile as VectorTileLayer } from 'ol/layer';
@@ -11,8 +12,8 @@ import TileGrid from 'ol/tilegrid/TileGrid';
 import { MVT as MVTFormat } from 'ol/format';
 import { register } from 'ol/proj/proj4';
 import * as olProj from 'ol/proj';
-import { createXYZ } from 'ol/tilegrid';
 import View from 'ol/View';
+import { createXYZ } from 'ol/tilegrid';
 import { transform } from 'ol/proj';
 
 proj4.defs('EPSG:4326', '+proj=longlat +ellps=WGS84 +datum=WGS84 +units=degrees');
@@ -23,7 +24,8 @@ register(proj4);
 // set up projections and shared variables
 var halfWidth = Math.sqrt(2) * 6371007.2;
 var tileSize = 512;
-var maxZoom = 18;
+var maxZoom = 13;
+var maxZoomView = 18;
 var pixelRatio = parseInt(window.devicePixelRatio) || 1;
 
 function get4326() {
@@ -39,14 +41,25 @@ function get4326() {
     resolutions: resolutions,
     tileSize: tileSize
   });
+
+  // var tileGrid14 = new TileGrid({
+  //   extent: olProj.get('EPSG:4326').getExtent(),
+  //   minZoom: 0,
+  //   maxZoom: maxZoom,
+  //   resolutions: resolutions,
+  //   tileSize: tileSize,
+  // });
+
   return {
     name: 'EPSG_4326',
     wrapX: true,
     srs: 'EPSG:4326',
     projection: 'EPSG:4326',
     epsg: 4326,
+    tilePixelRatio: 1,
     tileGrid: tileGrid16,
     resolutions: resolutions,
+    extent: olProj.get('EPSG:4326').getExtent(),
     fitExtent: [-179, -1, 179, 1],
     getView: function (lat, lon, zoom) {
       console.log(lat, lon);
@@ -54,7 +67,7 @@ function get4326() {
       lon = lon || 0;
       zoom = zoom || 0;
       return new View({
-        maxZoom: maxZoom,
+        maxZoom: maxZoomView,
         minZoom: 0,
         center: [lon, lat],
         zoom: zoom,
@@ -101,7 +114,7 @@ function get3857() {
       lon = lon || 0;
       zoom = zoom || 0;
       return new View({
-        maxZoom: maxZoom,
+        maxZoom: maxZoomView,
         minZoom: 0,
         center: [lon, lat],
         zoom: zoom,
@@ -159,7 +172,7 @@ function get3575() {
       lon = lon || 0;
       zoom = zoom || 0;
       return new View({
-        maxZoom: maxZoom,
+        maxZoom: maxZoomView,
         minZoom: 0,
         center: [lon, lat],
         zoom: zoom,
@@ -221,7 +234,7 @@ function get3031() {
       lon = lon || 0;
       zoom = zoom || 0;
       return new View({
-        maxZoom: maxZoom,
+        maxZoom: maxZoomView,
         minZoom: 0,
         center: [lon, lat],
         zoom: zoom,
@@ -254,7 +267,6 @@ function getLayer(baseUrl, proj, params, name) {
     tilePixelRatio: pixelRatio,
     url: baseUrl + queryString.stringify(params),
     wrapX: proj.wrapX,
-    maxZoom: 14,
   });
 
   if (progress) {
@@ -270,14 +282,16 @@ function getLayer(baseUrl, proj, params, name) {
     });
   }
 
-  return new VectorTileLayer({
+  let layer = new VectorTileLayer({
     extent: proj.extent,
     source: source,
     useInterimTilesOnError: false,
     visible: true,
     name: name,
+    declutter: true,
     style: createBasicBaseMapStyle(Style, Fill, Stroke, Icon, Text)
   });
+  return layer;
 }
 
 
