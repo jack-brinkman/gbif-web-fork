@@ -78,7 +78,7 @@ class Map extends Component {
   getStyle() {
     // this.map.setStyle();
     // return 'http://localhost:3001/map/styles/hybrid.json';//mapStyle;
-    return 'http://localhost:3001/map/styles/hillshade.json';//mapStyle;
+    // return 'http://localhost:3001/map/styles/hillshade.json';//mapStyle;
     return {
       'version': 8,
       'sources': {

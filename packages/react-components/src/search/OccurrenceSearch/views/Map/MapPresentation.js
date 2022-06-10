@@ -80,25 +80,25 @@ const basemapOptions = {
       attribution: 'Map tiles by <a target="_top" rel="noopener" href="http://stamen.com">Stamen Design</a>'
     }
   },
-  // mb_arcgisonline_topo: {
-  //   name: 'mb_arcgisonline_topo',
-  //   projection: 'EPSG_3857',
-  //   component: MapComponentMB,
-  //   basemap: {
-  //     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
-  //     // url: 'https://geoportalp-files.s3-us-east-2.amazonaws.com/vtiles/venezuela/{z}/{x}/{y}.pbf',
-  //     attribution: 'Map tiles by <a target="_top" rel="noopener" href="http://stamen.com">Stamen Design</a>'
-  //   }
-  // },
-  // mb_mercator_satellite: {
-  //   name: 'mb_mercator_satellite',
-  //   projection: 'EPSG_3857',
-  //   component: MapComponentMB,
-  //   basemap: {
-  //     url: 'https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=Xvg05zabkgUuQMSKiq2s',
-  //     attribution: 'Map tiles by someone else'
-  //   }
-  // }
+  mb_arcgisonline_topo: {
+    name: 'mb_arcgisonline_topo',
+    projection: 'EPSG_3857',
+    component: MapComponentMB,
+    basemap: {
+      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+      // url: 'https://geoportalp-files.s3-us-east-2.amazonaws.com/vtiles/venezuela/{z}/{x}/{y}.pbf',
+      attribution: 'Map tiles by <a target="_top" rel="noopener" href="http://stamen.com">Stamen Design</a>'
+    }
+  },
+  mb_mercator_satellite: {
+    name: 'mb_mercator_satellite',
+    projection: 'EPSG_3857',
+    component: MapComponentMB,
+    basemap: {
+      url: 'https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=Xvg05zabkgUuQMSKiq2s',
+      attribution: 'Map tiles by someone else'
+    }
+  }
 };
 
 function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading, total, predicateHash, registerPredicate, loadPointData, defaultMapSettings, ...props }) {
