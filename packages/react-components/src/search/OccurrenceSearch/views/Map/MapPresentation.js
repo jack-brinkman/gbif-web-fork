@@ -42,7 +42,7 @@ const basemapOptions = {
     component: MapComponentOL,
     basemap: {
       // style: 'http://localhost:3001/map/styles/test.json'
-      style: 'http://localhost:3001/map/styles/hybrid.json'
+      style: 'https://hp-search.gbif-uat.org/map/styles/hybrid.json'
     }
   },
   ol_mercator_hillshade: {
@@ -50,7 +50,7 @@ const basemapOptions = {
     projection: 'EPSG_3857',
     component: MapComponentOL,
     basemap: {
-      style: 'http://localhost:3001/map/styles/hillshade.json'
+      style: 'https://hp-search.gbif-uat.org/map/styles/hillshade.json'
     }
   },
   ol_platee_caree: {

@@ -150,7 +150,7 @@ class Map extends Component {
       applyStyle(baseLayer, layerStyle, 'openmaptiles', undefined, resolutions);
       this.map.addLayer(baseLayer);
     } else {
-      await apply(this.map, this.props.basemap?.basemap?.style || 'http://localhost:3001/map/styles/darkMatter.json');
+      await apply(this.map, this.props.basemap?.basemap?.style || 'http://localhost:4001/map/styles/darkMatter.json');
     }
     this.addLayer();
   }
