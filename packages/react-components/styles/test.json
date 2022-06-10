@@ -1,0 +1,45 @@
+{
+    "version": 8,
+    "name": "learning",
+    "sources": {
+        "topo": {
+            "type": "raster",
+            "tiles": [
+                "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
+            ],
+            "tileSize": 256,
+            "attribution": "Tiles © Esri — Source: <a href=\"https://www.arcgis.com/home/item.html?id=30e5fe3149c34df1ba922e6f5bbf808f\">ArcGIS World Topographic Map</a>",
+            "maxzoom": 19
+        },
+        "venezuela": {
+            "type": "vector",
+            "maxzoom": 10,
+            "tiles": [
+                "https://geoportalp-files.s3-us-east-2.amazonaws.com/vtiles/venezuela/{z}/{x}/{y}.pbf"
+            ],
+            "attribution": "IGVSB"
+        }
+    },
+    "layers": [
+        {
+            "id": "1",
+            "type": "raster",
+            "source": "topo"
+        },
+        {
+            "id": "2",
+            "type": "line",
+            "source": "venezuela",
+            "source-layer": "venezuela",
+            "paint": {
+                "line-color": "#ff0000",
+                "line-dasharray": [
+                    2,
+                    3
+                ],
+                "line-width": 2
+            }
+        }
+    ],
+    "id": "learning"
+}

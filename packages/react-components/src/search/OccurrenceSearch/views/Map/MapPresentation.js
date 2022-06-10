@@ -31,20 +31,48 @@ const basemapOptions = {
   ol_arctic: {
     name: 'ol_arctic',
     projection: 'EPSG_3575',
-    component: MapComponentOL
+    component: MapComponentOL,
+    basemap: {
+      style: 'positron'
+    }
   },
   ol_mercator: {
     name: 'ol_mercator',
     projection: 'EPSG_3857',
-    component: MapComponentOL
+    component: MapComponentOL,
+    basemap: {
+      // style: 'http://localhost:3001/map/styles/test.json'
+      style: 'http://localhost:3001/map/styles/hybrid.json'
+    }
+  },
+  ol_mercator_hillshade: {
+    name: 'ol_mercator_hillshade',
+    projection: 'EPSG_3857',
+    component: MapComponentOL,
+    basemap: {
+      style: 'http://localhost:3001/map/styles/hillshade.json'
+    }
   },
   ol_platee_caree: {
     name: 'ol_platee_caree',
     projection: 'EPSG_4326',
-    component: MapComponentOL
+    component: MapComponentOL,
+    basemap: {
+      style: 'klokantech'
+      // style: 'mapboxBright'
+    }
   },
-  mb_mercator_terrain: {
-    name: 'mb_mercator_terrain',
+  // mb_mercator_terrain: {
+  //   name: 'mb_mercator_terrain',
+  //   projection: 'EPSG_3857',
+  //   component: MapComponentMB,
+  //   basemap: {
+  //     url: 'https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg',
+  //     attribution: 'Map tiles by <a target="_top" rel="noopener" href="http://stamen.com">Stamen Design</a>'
+  //   }
+  // },
+  mb_hillshade: {
+    name: 'mb_hillshade',
     projection: 'EPSG_3857',
     component: MapComponentMB,
     basemap: {
@@ -52,24 +80,33 @@ const basemapOptions = {
       attribution: 'Map tiles by <a target="_top" rel="noopener" href="http://stamen.com">Stamen Design</a>'
     }
   },
-  mb_mercator_satellite: {
-    name: 'mb_mercator_satellite',
-    projection: 'EPSG_3857',
-    component: MapComponentMB,
-    basemap: {
-      url: 'https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=Xvg05zabkgUuQMSKiq2s',
-      attribution: 'Map tiles by someone else'
-    }
-  }
+  // mb_arcgisonline_topo: {
+  //   name: 'mb_arcgisonline_topo',
+  //   projection: 'EPSG_3857',
+  //   component: MapComponentMB,
+  //   basemap: {
+  //     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+  //     // url: 'https://geoportalp-files.s3-us-east-2.amazonaws.com/vtiles/venezuela/{z}/{x}/{y}.pbf',
+  //     attribution: 'Map tiles by <a target="_top" rel="noopener" href="http://stamen.com">Stamen Design</a>'
+  //   }
+  // },
+  // mb_mercator_satellite: {
+  //   name: 'mb_mercator_satellite',
+  //   projection: 'EPSG_3857',
+  //   component: MapComponentMB,
+  //   basemap: {
+  //     url: 'https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=Xvg05zabkgUuQMSKiq2s',
+  //     attribution: 'Map tiles by someone else'
+  //   }
+  // }
 };
 
 function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading, total, predicateHash, registerPredicate, loadPointData, defaultMapSettings, ...props }) {
   const dialog = useDialogState({ animated: true, modal: false });
   const theme = useContext(ThemeContext);
-  const [projection, setProjection] = useState('EPSG_4326');
-  const [basemap, setaBasemap] = useState(basemapOptions.ol_platee_caree);
+  const [projection, setProjection] = useState('EPSG_3857');
+  const [basemap, setaBasemap] = useState(basemapOptions.ol_mercator);
   const [latestEvent, broadcastEvent] = useState();
-  const [view, setView] = useState();
   const [activeId, setActive] = useState();
   const [activeItem, setActiveItem] = useState();
   const [listVisible, showList] = useState(false);
@@ -122,7 +159,7 @@ function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading,
             items={menuOptions}
           />
         </div>
-        <MapComponent.component basemap={basemap} latestEvent={latestEvent} view={view} projection={projection} defaultMapSettings={defaultMapSettings} predicateHash={predicateHash} q={q} css={css.mapComponent({ theme })} theme={theme} query={query} onMapClick={e => showList(false)} onPointClick={data => { showList(true); loadPointData(data) }} registerPredicate={registerPredicate} />
+        <MapComponent.component basemap={basemap} latestEvent={latestEvent} projection={projection} defaultMapSettings={defaultMapSettings} predicateHash={predicateHash} q={q} css={css.mapComponent({ theme })} theme={theme} query={query} onMapClick={e => showList(false)} onPointClick={data => { showList(true); loadPointData(data) }} registerPredicate={registerPredicate} />
       </div>
     </div>
   </>;

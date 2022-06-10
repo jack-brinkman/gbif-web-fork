@@ -1,22 +1,23 @@
 {
     "version": 8,
     "name": "Klokantech Basic",
-    "metadata": {
-        "mapbox:autocomposite": false,
-        "mapbox:type": "template",
-        "maputnik:renderer": "mbgljs",
-        "openmaptiles:version": "3.x",
-        "openmaptiles:mapbox:owner": "openmaptiles",
-        "openmaptiles:mapbox:source:url": "mapbox://openmaptiles.4qljc88t"
-    },
     "sources": {
         "openmaptiles": {
             "type": "vector",
-            "url": "https://maps.tilehosting.com/data/v3.json?key=SymbVzXrAD6Jmqe6yBOS"
+            "tiles": [
+                "https://tile.gbif.org/4326/omt/{z}/{x}/{y}.pbf"
+            ]
+        },
+        "satellite": {
+            "type": "raster",
+            "tiles": [
+                "https://wi.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+            ],
+            "tileSize": 256
         }
     },
-    "sprite": "https://labs.gbif.org/klokantech-basic-gl-style/sprite",
-    "glyphs": "https://maps.tilehosting.com/fonts/{fontstack}/{range}.pbf?key=SymbVzXrAD6Jmqe6yBOS",
+    "sprite": "https://api.maptiler.com/maps/streets/sprite",
+    "glyphs": "http://localhost:3000/{fontstack}/{range}.pbf?key=SymbVzXrAD6Jmqe6yBOS",
     "layers": [
         {
             "id": "background",
@@ -638,6 +639,16 @@
             "source-layer": "transportation",
             "type": "line"
         },
+        {
+            "id": "satellite-layer",
+            "type": "raster",
+            "source": "satellite",
+            "paint": {
+                "raster-opacity": 0.8
+            }
+        },
+
+
         {
             "filter": [
                 "all",

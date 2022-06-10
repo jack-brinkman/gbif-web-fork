@@ -99,14 +99,14 @@ const filters = {
 const rootPredicate = {
   "type": "equals",
   "key": "country",
-  "value": "DK"
+  "value": "VE"
 };
 const config = { 
   // rootPredicate, 
   // rootPredicate: {
   //   type: 'equals',
   //   key: 'year',
-  //   value: '1200'
+  //   value: '12000'
   // }, 
   labels, 
   getSuggests, 

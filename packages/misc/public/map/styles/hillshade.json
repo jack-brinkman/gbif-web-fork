@@ -1,18 +1,41 @@
 {
     "version": 8,
-    "name": "Klokantech Basic",
-    "metadata": {
-        "mapbox:autocomposite": false,
-        "mapbox:type": "template",
-        "maputnik:renderer": "mbgljs",
-        "openmaptiles:version": "3.x",
-        "openmaptiles:mapbox:owner": "openmaptiles",
-        "openmaptiles:mapbox:source:url": "mapbox://openmaptiles.4qljc88t"
-    },
+    "name": "learning",
     "sources": {
         "openmaptiles": {
             "type": "vector",
-            "url": "https://maps.tilehosting.com/data/v3.json?key=SymbVzXrAD6Jmqe6yBOS"
+            "tiles": [
+                "https://tile.gbif.org/3857/omt/{z}/{x}/{y}.pbf"
+            ]
+        },
+        "usgeo": {
+            "type": "raster",
+            "tiles": [
+                "https://mrdata.usgs.gov/mapcache/wmts/?layer=sgmc2&style=default&tilematrixset=GoogleMapsCompatible&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix={z}&TileCol={x}&TileRow={y}"
+            ],
+            "tileSize": 256
+        },
+        "hillshade": {
+            "type": "raster",
+            "tiles": [
+                "https://server.arcgisonline.com/arcgis/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}"
+            ],
+            "tileSize": 256
+        },
+        "countours": {
+            "type": "vector",
+            "tiles": [
+                "https://basemaps.arcgis.com/arcgis/rest/services/World_Contours_v2/VectorTileServer/tile/{z}/{y}/{x}.pbf"
+            ],
+            "attribution": "IGVSB"
+        },
+        "venezuela": {
+            "type": "vector",
+            "maxzoom": 10,
+            "tiles": [
+                "https://geoportalp-files.s3-us-east-2.amazonaws.com/vtiles/venezuela/{z}/{x}/{y}.pbf"
+            ],
+            "attribution": "IGVSB"
         }
     },
     "sprite": "https://labs.gbif.org/klokantech-basic-gl-style/sprite",
@@ -356,6 +379,46 @@
             "source": "openmaptiles",
             "source-layer": "transportation",
             "type": "line"
+        },
+        {
+            "id": "wms-test-layer",
+            "type": "raster",
+            "source": "usgeo",
+            "paint": {
+                "raster-opacity": 0.8
+            }
+        },
+        {
+            "id": "hillshade-layer",
+            "type": "raster",
+            "source": "hillshade",
+            "paint": {
+                "raster-opacity": 0.3
+            }
+        },
+        {
+            "id": "countor-layer",
+            "type": "line",
+            "source": "countours",
+            "source-layer": "Contour",
+            "paint": {
+                "line-color": "#aaa",
+                "line-width": 1
+            }
+        },
+        {
+            "id": "venezuela-ourline",
+            "type": "line",
+            "source": "venezuela",
+            "source-layer": "venezuela",
+            "paint": {
+                "line-color": "#ff0000",
+                "line-dasharray": [
+                    2,
+                    3
+                ],
+                "line-width": 2
+            }
         },
         {
             "id": "building",
@@ -1720,5 +1783,5 @@
             "type": "symbol"
         }
     ],
-    "id": "klokantech-basic"
+    "id": "learning"
 }

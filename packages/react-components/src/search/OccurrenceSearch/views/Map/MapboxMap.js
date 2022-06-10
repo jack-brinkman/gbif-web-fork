@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import mapboxgl from 'mapbox-gl';
 import { getLayerConfig } from './getLayerConfig';
 import env from '../../../../../.env.json';
+import mapStyle from './openlayers/styles/klokantech2.json';
 
 class Map extends Component {
   constructor(props) {
@@ -76,6 +77,8 @@ class Map extends Component {
 
   getStyle() {
     // this.map.setStyle();
+    // return 'http://localhost:3001/map/styles/hybrid.json';//mapStyle;
+    return 'http://localhost:3001/map/styles/hillshade.json';//mapStyle;
     return {
       'version': 8,
       'sources': {
@@ -128,6 +131,42 @@ class Map extends Component {
     //   'raster-opacity',
     //   0.8
     // );
+
+
+
+
+
+    // this.map.addSource("venezuela", {
+    //   type: "vector",
+    //   maxzoom: 10,
+    //   tiles: ["https://geoportalp-files.s3-us-east-2.amazonaws.com/vtiles/venezuela/{z}/{x}/{y}.pbf"],
+    //   attribution: "IGVSB"
+    // });
+    // this.map.addLayer({
+    //   id: "venezuela",
+    //   type: "line",
+    //   source: "venezuela",
+    //   "source-layer": "venezuela",
+    //   paint: {
+    //     "line-color": "#ff0000",
+    //     "line-dasharray": [2, 3],
+    //     "line-width": 2
+    //   }
+    // });
+
+    // this.map.addLayer({
+    //   id: "esequibo-layer",
+    //   type: "fill",
+    //   source: "venezuela",
+    //   "source-layer": "venezuela",
+    //   layout: {},
+    //   filter: ["==", "NAME", "Territorio Esequibo"],
+    //   paint: {
+    //     "fill-pattern": "pattern",
+    //     "fill-opacity": .3
+    //   }
+    // });
+
     var tileString = `${env.API_V2}/map/occurrence/adhoc/{z}/{x}/{y}.mvt?style=scaled.circles&mode=GEO_CENTROID&srs=EPSG%3A3857&squareSize=256&predicateHash=${this.props.predicateHash}&${this.props.q ? `&q=${this.props.q} ` : ''}`;
     this.map.addLayer(
       getLayerConfig({ tileString, theme: this.props.theme }),

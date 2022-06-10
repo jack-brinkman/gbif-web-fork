@@ -8,12 +8,21 @@ import { defaults as olControlDefaults } from 'ol/control';
 import * as olInteraction from 'ol/interaction';
 import { transform } from 'ol/proj';
 import View from 'ol/View';
-import { applyStyle, applyBackground } from 'ol-mapbox-style';
-// import mapboxBright from './openlayers/styles/positron.json';
+import { applyStyle, applyBackground, apply } from 'ol-mapbox-style';
+import positron from './openlayers/styles/positron.json';
+import darkMatter from './openlayers/styles/darkMatter.json';
 import mapboxBright from './openlayers/styles/mapboxBright.json';
+import klokantech from './openlayers/styles/klokantech.json';
+// import mapboxBright from './openlayers/styles/klokantech2.json';
 const token = 'pk.eyJ1IjoiZ2JpZiIsImEiOiJja3VmZm50Z3kxcm1vMnBtdnBmeGd5cm9hIn0.M2z2n9QP9fRHZUCw9vbgOA';
 var interactions = olInteraction.defaults({ altShiftDragRotate: false, pinchRotate: false, mouseWheelZoom: true });
 
+const mapStyles = {
+  positron,
+  darkMatter,
+  mapboxBright,
+  klokantech
+}
 class Map extends Component {
   constructor(props) {
     super(props);
@@ -40,26 +49,17 @@ class Map extends Component {
 
     // TODO: handle controls, set zoom, center from storage/defaults and generate style from theme
     const currentProjection = projections[this.props.projection || 'EPSG_3031'];
-    const baseLayer = currentProjection.getBaseLayer();
-
-    const resolutions = baseLayer.getSource().getTileGrid().getResolutions();
-    applyBackground(baseLayer, mapboxBright, undefined)
-    
-    applyStyle(baseLayer, mapboxBright, undefined, undefined, resolutions);
-    
-
 
     const mapPos = this.getStoredMapPosition();
 
-    this.map = new OlMap({
+    let mapConfig = {
       target: this.myRef.current,
-      layers: [baseLayer],
-      // view: currentProjection.getView(0, 0, 1),//x,x,zoom
-      view: currentProjection.getView(mapPos.lat, mapPos.lng, mapPos.zoom),//x,x,zoom
-      controls: olControlDefaults({ zoom: false, attribution: false }),
+      view: currentProjection.getView(mapPos.lat, mapPos.lng, mapPos.zoom),
+      controls: olControlDefaults({ zoom: false, attribution: true }),
       interactions,
-      // logo: false,
-    });
+    };
+    this.map = new OlMap(mapConfig);
+    this.setBaseMap();
     this.mapLoaded = true;
     this.addLayer();
   }
@@ -76,12 +76,12 @@ class Map extends Component {
       this.updateLayer();
     }
 
-    if (prevProps.projection !== this.props.projection && this.mapLoaded) {
-      this.updateProjection();
-    }
+    // if (prevProps.projection !== this.props.projection && this.mapLoaded) {
+    //   this.updateProjection();
+    // }
 
-    if (prevProps.view !== this.props.view && this.mapLoaded) {
-      this.updateProjection();
+    if (prevProps.basemap !== this.props.basemap && this.mapLoaded) {
+      this.setBaseMap();
     }
 
     if (prevProps.latestEvent !== this.props.latestEvent && this.mapLoaded) {
@@ -137,24 +137,34 @@ class Map extends Component {
       .forEach(layer => this.map.removeLayer(layer));
   }
 
-  updateProjection() {
-    // this.removeLayer('baseLayer');
-    // this.removeLayer('occurrences');
-    this.map.getLayers().clear()
+  async setBaseMap() {
+    this.map.getLayers().clear();
+    this.updateProjection();
     const currentProjection = projections[this.props.projection || 'EPSG_3031'];
-    const baseLayer = currentProjection.getBaseLayer();
-    const resolutions = baseLayer.getSource().getTileGrid().getResolutions();
-    applyBackground(baseLayer, mapboxBright, 'openmaptiles');
-    applyStyle(baseLayer, mapboxBright, 'openmaptiles', undefined, resolutions);
+    const basemapStyle = this.props.basemap?.basemap?.style || 'klokantech';
+    const layerStyle = mapStyles[basemapStyle];
+    if (layerStyle) {
+      const baseLayer = currentProjection.getBaseLayer();
+      const resolutions = baseLayer.getSource().getTileGrid().getResolutions();
+      applyBackground(baseLayer, layerStyle, 'openmaptiles');
+      applyStyle(baseLayer, layerStyle, 'openmaptiles', undefined, resolutions);
+      this.map.addLayer(baseLayer);
+    } else {
+      await apply(this.map, this.props.basemap?.basemap?.style || 'http://localhost:3001/map/styles/darkMatter.json');
+    }
+    this.addLayer();
+  }
+  
+  async updateProjection() {
+    const currentProjection = projections[this.props.projection || 'EPSG_3031'];
 
     const mapPos = this.getStoredMapPosition();
-    // this.map.setView(currentProjection.getView(0, 0, 1));
-    this.map.setView(currentProjection.getView(mapPos.lat, mapPos.lng, mapPos.zoom));
-    // if (currentProjection.fitExtent) {
-    //   this.map.getView().fit(currentProjection.fitExtent, { constrainResolution: false, maxZoom: 12, minZoom: 0 });
-    // }
-    this.map.addLayer(baseLayer);
-    this.addLayer();
+    const newView = currentProjection.getView(mapPos.lat, mapPos.lng, mapPos.zoom);
+    this.map.setView(newView);
+
+    // await this.setBaseMap();
+
+    // this.addLayer();
   }
 
   updateLayer() {
@@ -188,6 +198,8 @@ class Map extends Component {
     const map = this.map
 
     map.on('moveend', function (e) {
+      if (this.refreshingView) return;
+      console.log('move');
       const { center, zoom } = map.getView().getState();
       const reprojectedCenter = transform(center, currentProjection.srs, 'EPSG:4326');
       sessionStorage.setItem('mapZoom', zoom);

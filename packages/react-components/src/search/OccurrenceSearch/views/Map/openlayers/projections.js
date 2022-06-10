@@ -2,8 +2,7 @@ import proj4 from 'proj4';
 import env from '../../../../../../.env.json';
 import queryString from 'query-string';
 import { basemaps } from './basemaps';
-import createBasicBaseMapStyle from './styles/basicBaseMap2';
-// import createBasicBaseMapStyle from './styles/basicBaseMap';
+import createBasicBaseMapStyle from './styles/basicBaseMap';
 import densityPoints from './styles/densityPoints';
 import { Style, Fill, Stroke, Icon, Text, Circle } from 'ol/style';
 import { VectorTile as VectorTileLayer } from 'ol/layer';
@@ -22,7 +21,6 @@ proj4.defs('EPSG:3031', '+proj=stere +lat_0=-90 +lat_ts=-71 +lon_0=0 +k=1 +x_0=0
 register(proj4);
 
 // set up projections and shared variables
-var halfWidth = Math.sqrt(2) * 6371007.2;
 var tileSize = 512;
 var maxZoom = 13;
 var maxZoomView = 18;
@@ -59,7 +57,7 @@ function get4326() {
     tilePixelRatio: 1,
     tileGrid: tileGrid16,
     resolutions: resolutions,
-    extent: olProj.get('EPSG:4326').getExtent(),
+    // extent: olProj.get('EPSG:4326').getExtent(),
     fitExtent: [-179, -1, 179, 1],
     getView: function (lat, lon, zoom) {
       console.log(lat, lon);
@@ -134,7 +132,7 @@ function get3857() {
 }
 
 function get3575() {
-  var halfWidth = 12367396.2185; // To the Equator
+  const halfWidth = Math.sqrt(2) * 6371007.2;
   var extent = [-halfWidth, -halfWidth, halfWidth, halfWidth];
   olProj.get('EPSG:3575').setExtent(extent);
   var resolutions = Array.from(new Array(maxZoom + 1), function (x, i) {
@@ -142,7 +140,7 @@ function get3575() {
   });
 
   var tileGrid16 = new TileGrid({
-    extent: extent,
+    extent: olProj.get("EPSG:3575").getExtent(),
     origin: [-halfWidth, halfWidth],
     minZoom: 0,
     maxZoom: maxZoom,
@@ -162,7 +160,7 @@ function get3575() {
     fitExtent: extent,
     getView: function (lat, lon, zoom) {
       console.log(lat, lon);
-      if (lat < 0) {
+      if (lat < 45) {
         lat = 90;
         lon = 0;
         zoom = 1;
@@ -209,10 +207,6 @@ function get3031() {
     tileSize: tileSize
   });
 
-  var getCenter = function () {
-    return olProj.fromLonLat([0, -89], 'EPSG:3031');
-  };
-
   return {
     name: 'EPSG_3031',
     wrapX: false,
@@ -224,7 +218,7 @@ function get3031() {
     fitExtent: extent,
     getView: function (lat, lon, zoom) {
       console.log(lat, lon);
-      if (lat > 0) {
+      if (lat > -60) {
         lat = -90;
         lon = 0;
         zoom = 1;
