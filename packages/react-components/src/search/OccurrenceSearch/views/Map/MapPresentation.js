@@ -15,51 +15,54 @@ import { OccurrenceSidebar } from '../../../../entities';
 import ThemeContext from '../../../../style/themes/ThemeContext';
 import { useDialogState } from "reakit/Dialog";
 import ListBox from './ListBox';
-import { MdMoreVert, MdZoomIn, MdZoomOut } from 'react-icons/md'
+import { MdOutlineLayers, MdZoomIn, MdZoomOut } from 'react-icons/md'
 import { ViewHeader } from '../ViewHeader';
 import MapComponentMB from './MapboxMap';
 import MapComponentOL from './OpenlayersMap';
 import * as css from './map.styles';
 import values from 'lodash/values';
+import env from '../../../../../.env.json';
 
 const basemapOptions = {
   ol_antarctic: {
     name: 'ol_antarctic',
-    projection: 'EPSG_3031',
-    component: MapComponentOL
+    component: MapComponentOL,
+    mapConfig: {
+      basemapStyle: `${env.MAP_STYLES}/3031.json`,
+      projection: 'EPSG_3031'
+    }
   },
   ol_arctic: {
     name: 'ol_arctic',
-    projection: 'EPSG_3575',
     component: MapComponentOL,
-    basemap: {
-      style: 'positron'
+    mapConfig: {
+      basemapStyle: `positron`,
+      projection: 'EPSG_3575'
     }
   },
   ol_mercator: {
     name: 'ol_mercator',
-    projection: 'EPSG_3857',
     component: MapComponentOL,
-    basemap: {
-      // style: 'http://localhost:3001/map/styles/test.json'
-      style: 'https://hp-search.gbif-uat.org/map/styles/hybrid.json'
+    mapConfig: {
+      basemapStyle: `https://api.maptiler.com/maps/basic-2154/style.json?key=Xvg05zabkgUuQMSKiq2s`,
+      projection: 'EPSG_3857'
     }
   },
   ol_mercator_hillshade: {
     name: 'ol_mercator_hillshade',
-    projection: 'EPSG_3857',
     component: MapComponentOL,
-    basemap: {
-      style: 'https://hp-search.gbif-uat.org/map/styles/hillshade.json'
+    mapConfig: {
+      // basemapStyle: `${env.MAP_STYLES}/hillshade.json`,
+      basemapStyle: `https://api.mapbox.com/styles/v1/mapbox/light-v9?access_token=pk.eyJ1IjoiZ2JpZiIsImEiOiJja3VmZm50Z3kxcm1vMnBtdnBmeGd5cm9hIn0.M2z2n9QP9fRHZUCw9vbgOA`,
+      projection: 'EPSG_3857'
     }
   },
   ol_platee_caree: {
     name: 'ol_platee_caree',
-    projection: 'EPSG_4326',
     component: MapComponentOL,
-    basemap: {
-      style: 'klokantech'
-      // style: 'mapboxBright'
+    mapConfig: {
+      basemapStyle: `${env.MAP_STYLES}/4326.json`,
+      projection: 'EPSG_4326'
     }
   },
   // mb_mercator_terrain: {
@@ -73,30 +76,41 @@ const basemapOptions = {
   // },
   mb_hillshade: {
     name: 'mb_hillshade',
-    projection: 'EPSG_3857',
     component: MapComponentMB,
-    basemap: {
-      url: 'https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg',
-      attribution: 'Map tiles by <a target="_top" rel="noopener" href="http://stamen.com">Stamen Design</a>'
+    // basemap: {
+    //   url: 'https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg',
+    //   attribution: 'Map tiles by <a target="_top" rel="noopener" href="http://stamen.com">Stamen Design</a>'
+    // },
+    mapConfig: {
+      basemapStyle: `${env.MAP_STYLES}/hillshade.json`,
+      projection: 'EPSG_3857'
     }
   },
-  mb_arcgisonline_topo: {
-    name: 'mb_arcgisonline_topo',
-    projection: 'EPSG_3857',
+  mb_darkMatter: {
+    name: 'mb_darkMatter',
     component: MapComponentMB,
-    basemap: {
-      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
-      // url: 'https://geoportalp-files.s3-us-east-2.amazonaws.com/vtiles/venezuela/{z}/{x}/{y}.pbf',
-      attribution: 'Map tiles by <a target="_top" rel="noopener" href="http://stamen.com">Stamen Design</a>'
+    // basemap: {
+    //   url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+    //   // url: 'https://geoportalp-files.s3-us-east-2.amazonaws.com/vtiles/venezuela/{z}/{x}/{y}.pbf',
+    //   attribution: 'Map tiles by <a target="_top" rel="noopener" href="http://stamen.com">Stamen Design</a>'
+    // },
+    mapConfig: {
+      basemapStyle: `https://api.mapbox.com/styles/v1/mapbox/light-v9?access_token=pk.eyJ1IjoiZ2JpZiIsImEiOiJja3VmZm50Z3kxcm1vMnBtdnBmeGd5cm9hIn0.M2z2n9QP9fRHZUCw9vbgOA`,
+      // basemapStyle: `${env.MAP_STYLES}/darkMatter.json`,
+      projection: 'EPSG_3857'
     }
   },
-  mb_mercator_satellite: {
-    name: 'mb_mercator_satellite',
+  mb_satellite: {
+    name: 'mb_satellite',
     projection: 'EPSG_3857',
     component: MapComponentMB,
     basemap: {
       url: 'https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=Xvg05zabkgUuQMSKiq2s',
       attribution: 'Map tiles by someone else'
+    },
+    mapConfig: {
+      basemapStyle: `${env.MAP_STYLES}/bingSatellite.json`,
+      projection: 'EPSG_3857'
     }
   }
 };
@@ -104,8 +118,8 @@ const basemapOptions = {
 function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading, total, predicateHash, registerPredicate, loadPointData, defaultMapSettings, ...props }) {
   const dialog = useDialogState({ animated: true, modal: false });
   const theme = useContext(ThemeContext);
-  const [projection, setProjection] = useState('EPSG_3857');
-  const [basemap, setaBasemap] = useState(basemapOptions.ol_mercator);
+  const [projection, setProjection] = useState('EPSG_3031');
+  const [config, setConfig] = useState(basemapOptions.ol_antarctic);
   const [latestEvent, broadcastEvent] = useState();
   const [activeId, setActive] = useState();
   const [activeItem, setActiveItem] = useState();
@@ -128,9 +142,9 @@ function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading,
   }, [items, activeId]);
 
   const menuOptions = menuState => values(basemapOptions).map(x => <MenuAction key={x.name} onClick={() => {
-    setProjection(x.projection); 
+    setProjection(x.projection);
     setMapComponent({ component: x.component });
-    setaBasemap(basemapOptions[x.name]);
+    setConfig(x);
     menuState.hide();
   }}>
     {x.name}
@@ -155,11 +169,11 @@ function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading,
           <Button appearance="text" onClick={() => broadcastEvent({ type: 'ZOOM_OUT' })}><MdZoomOut /></Button>
           <Menu style={{ display: 'inline-block' }}
             aria-label="Custom menu"
-            trigger={<Button appearance="text"><MdMoreVert /></Button>}
+            trigger={<Button appearance="text"><MdOutlineLayers /></Button>}
             items={menuOptions}
           />
         </div>
-        <MapComponent.component basemap={basemap} latestEvent={latestEvent} projection={projection} defaultMapSettings={defaultMapSettings} predicateHash={predicateHash} q={q} css={css.mapComponent({ theme })} theme={theme} query={query} onMapClick={e => showList(false)} onPointClick={data => { showList(true); loadPointData(data) }} registerPredicate={registerPredicate} />
+        <MapComponent.component mapConfig={config.mapConfig} latestEvent={latestEvent} projection={projection} defaultMapSettings={defaultMapSettings} predicateHash={predicateHash} q={q} css={css.mapComponent({ theme })} theme={theme} query={query} onMapClick={e => showList(false)} onPointClick={data => { showList(true); loadPointData(data) }} registerPredicate={registerPredicate} />
       </div>
     </div>
   </>;

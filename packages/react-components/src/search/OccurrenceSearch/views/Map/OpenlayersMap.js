@@ -8,7 +8,9 @@ import { defaults as olControlDefaults } from 'ol/control';
 import * as olInteraction from 'ol/interaction';
 import { transform } from 'ol/proj';
 import View from 'ol/View';
-import { applyStyle, applyBackground, apply } from 'ol-mapbox-style';
+import { applyStyle, applyBackground, apply, stylefunction } from 'ol-mapbox-style';
+import { VectorTile as VectorTileSource } from 'ol/source';
+import { MVT as MVTFormat } from 'ol/format';
 import positron from './openlayers/styles/positron.json';
 import darkMatter from './openlayers/styles/darkMatter.json';
 import mapboxBright from './openlayers/styles/mapboxBright.json';
@@ -48,7 +50,7 @@ class Map extends Component {
 
 
     // TODO: handle controls, set zoom, center from storage/defaults and generate style from theme
-    const currentProjection = projections[this.props.projection || 'EPSG_3031'];
+    const currentProjection = projections[this.props.mapConfig?.projection || 'EPSG_3031'];
 
     const mapPos = this.getStoredMapPosition();
 
@@ -59,7 +61,7 @@ class Map extends Component {
       interactions,
     };
     this.map = new OlMap(mapConfig);
-    this.setBaseMap();
+    this.updateMapLayers();
     this.mapLoaded = true;
     this.addLayer();
   }
@@ -76,12 +78,8 @@ class Map extends Component {
       this.updateLayer();
     }
 
-    // if (prevProps.projection !== this.props.projection && this.mapLoaded) {
-    //   this.updateProjection();
-    // }
-
-    if (prevProps.basemap !== this.props.basemap && this.mapLoaded) {
-      this.setBaseMap();
+    if (prevProps.mapConfig !== this.props.mapConfig && this.mapLoaded) {
+      this.updateMapLayers();
     }
 
     if (prevProps.latestEvent !== this.props.latestEvent && this.mapLoaded) {
@@ -103,7 +101,7 @@ class Map extends Component {
   }
 
   getStoredMapPosition() {
-    const currentProjection = projections[this.props.projection || 'EPSG_3031'];
+    const currentProjection = projections[this.props.mapConfig?.projection || 'EPSG_3031'];
 
     let zoom = sessionStorage.getItem('mapZoom') || this.props.defaultMapSettings?.zoom || 0;
     zoom = Math.min(Math.max(0, zoom), 20);
@@ -137,11 +135,21 @@ class Map extends Component {
       .forEach(layer => this.map.removeLayer(layer));
   }
 
-  async setBaseMap() {
+  async updateMapLayers() {
+    const epsg = this.props.mapConfig?.projection || 'EPSG_3031';
+    const currentProjection = projections[epsg];
+    this.setState({epsg})
+
     this.map.getLayers().clear();
-    this.updateProjection();
-    const currentProjection = projections[this.props.projection || 'EPSG_3031'];
-    const basemapStyle = this.props.basemap?.basemap?.style || 'klokantech';
+    // this.updateProjection();
+
+    // update projection
+    const mapPos = this.getStoredMapPosition();
+    const newView = currentProjection.getView(mapPos.lat, mapPos.lng, mapPos.zoom);
+    this.map.setView(newView);
+
+    
+    const basemapStyle = this.props.mapConfig?.basemapStyle || 'klokantech';
     const layerStyle = mapStyles[basemapStyle];
     if (layerStyle) {
       const baseLayer = currentProjection.getBaseLayer();
@@ -149,23 +157,29 @@ class Map extends Component {
       applyBackground(baseLayer, layerStyle, 'openmaptiles');
       applyStyle(baseLayer, layerStyle, 'openmaptiles', undefined, resolutions);
       this.map.addLayer(baseLayer);
+    } else if(epsg !== 'EPSG_3857') {
+      const styleResponse = await fetch(this.props.mapConfig?.basemapStyle).then(response => response.json());
+      const baseLayer = currentProjection.getBaseLayer();
+      const resolutions = baseLayer.getSource().getTileGrid().getResolutions();
+      applyBackground(baseLayer, styleResponse, 'openmaptiles');
+      stylefunction(baseLayer, styleResponse, 'openmaptiles', resolutions);
+      // applyStyle(baseLayer, styleResponse, undefined, undefined, resolutions);
+      this.map.addLayer(baseLayer);
     } else {
-      await apply(this.map, this.props.basemap?.basemap?.style || 'http://localhost:4001/map/styles/darkMatter.json');
+      await apply(this.map, this.props.mapConfig?.basemapStyle || 'http://localhost:3001/map/styles/darkMatter.json');
     }
+
     this.addLayer();
   }
-  
-  async updateProjection() {
-    const currentProjection = projections[this.props.projection || 'EPSG_3031'];
 
-    const mapPos = this.getStoredMapPosition();
-    const newView = currentProjection.getView(mapPos.lat, mapPos.lng, mapPos.zoom);
-    this.map.setView(newView);
+  // async updateProjection() {
+  //   const epsg = this.props.mapConfig?.projection || 'EPSG_3031';
+  //   const currentProjection = projections[epsg];
 
-    // await this.setBaseMap();
-
-    // this.addLayer();
-  }
+  //   const mapPos = this.getStoredMapPosition();
+  //   const newView = currentProjection.getView(mapPos.lat, mapPos.lng, mapPos.zoom);
+  //   this.map.setView(newView);
+  // }
 
   updateLayer() {
     this.map.getLayers().getArray()
@@ -179,7 +193,7 @@ class Map extends Component {
   }
 
   addLayer() {
-    const currentProjection = projections[this.props.projection || 'EPSG_3031'];
+    const currentProjection = projections[this.props.mapConfig?.projection || 'EPSG_3031'];
     const occurrenceLayer = currentProjection.getAdhocLayer({
       style: 'scaled.circles',
       mode: 'GEO_CENTROID',
@@ -199,14 +213,11 @@ class Map extends Component {
 
     map.on('moveend', function (e) {
       if (this.refreshingView) return;
-      console.log('move');
       const { center, zoom } = map.getView().getState();
       const reprojectedCenter = transform(center, currentProjection.srs, 'EPSG:4326');
       sessionStorage.setItem('mapZoom', zoom);
       sessionStorage.setItem('mapLng', reprojectedCenter[0]);
       sessionStorage.setItem('mapLat', reprojectedCenter[1]);
-      // console.log('move center', center);
-      // console.log('move reproj', reprojectedCenter);
     });
 
     // TODO: find a way to store current extent in a way it can be reused. Should ideallky be the same format as for mapbox: center, zoom

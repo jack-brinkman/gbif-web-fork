@@ -5,7 +5,7 @@ import { basemaps } from './basemaps';
 import createBasicBaseMapStyle from './styles/basicBaseMap';
 import densityPoints from './styles/densityPoints';
 import { Style, Fill, Stroke, Icon, Text, Circle } from 'ol/style';
-import { VectorTile as VectorTileLayer } from 'ol/layer';
+import { VectorTile as VectorTileLayer, Tile as TileLayer } from 'ol/layer';
 import { VectorTile as VectorTileSource } from 'ol/source';
 import TileGrid from 'ol/tilegrid/TileGrid';
 import { MVT as MVTFormat } from 'ol/format';
@@ -28,7 +28,7 @@ var pixelRatio = parseInt(window.devicePixelRatio) || 1;
 
 function get4326() {
   var extent = 180.0;
-  var resolutions = Array(maxZoom + 1).fill().map(function (_, i) {
+  var resolutions = Array(maxZoom + 1).fill().map(function (x, i) {
     return extent / tileSize / Math.pow(2, i);
   });
 
@@ -60,7 +60,6 @@ function get4326() {
     // extent: olProj.get('EPSG:4326').getExtent(),
     fitExtent: [-179, -1, 179, 1],
     getView: function (lat, lon, zoom) {
-      console.log(lat, lon);
       lat = lat || 0;
       lon = lon || 0;
       zoom = zoom || 0;
@@ -101,7 +100,6 @@ function get3857() {
     // resolutions: resolutions,
     fitExtent: olProj.transformExtent([-90, -75, 90, 75], 'EPSG:4326', 'EPSG:3857'),
     getView: function (lat, lon, zoom) {
-      console.log(lat, lon);
       if (Math.abs(lat) > 85) {
         lat = 0;
         lon = 0;
@@ -159,7 +157,6 @@ function get3575() {
     resolutions: resolutions,
     fitExtent: extent,
     getView: function (lat, lon, zoom) {
-      console.log(lat, lon);
       if (lat < 45) {
         lat = 90;
         lon = 0;
@@ -217,7 +214,6 @@ function get3031() {
     resolutions: resolutions,
     fitExtent: extent,
     getView: function (lat, lon, zoom) {
-      console.log(lat, lon);
       if (lat > -60) {
         lat = -90;
         lon = 0;
@@ -247,7 +243,6 @@ function get3031() {
   };
 }
 
-
 function getLayer(baseUrl, proj, params, name) {
   params = params || {};
   params.srs = proj.srs;
@@ -261,6 +256,7 @@ function getLayer(baseUrl, proj, params, name) {
     tilePixelRatio: pixelRatio,
     url: baseUrl + queryString.stringify(params),
     wrapX: proj.wrapX,
+    attributions: ['© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors', '© <a href="https://openmaptiles.org/" class="inherit">OpenMapTiles</a>', '<a href="https://www.gbif.org/citation-guidelines">GBIF</a>'],
   });
 
   if (progress) {
