@@ -694,6 +694,7 @@
   "download.download": "Herunterladen",
   "download.redirectNotice": "Zum Herunterladen der Daten werden Sie auf GBIF.org weitergeleitet. {br}{br} Dafür ist ein Account notwendig, der dort erstellt werden kann.",
   "download.continueToGBIF": "Weiter",
+  "map.styles.satellite_mb": "Satellite",
   "enums.basisOfRecord.PRESERVED_SPECIMEN": "Konserviertes Sammlungsobjekt",
   "enums.basisOfRecord.FOSSIL_SPECIMEN": "Fossiles Sammlungsobjekt",
   "enums.basisOfRecord.LIVING_SPECIMEN": "Lebendes Exemplar",

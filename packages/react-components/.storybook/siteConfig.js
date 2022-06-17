@@ -92,5 +92,10 @@ export const siteConfig = {
   literature: {},
   institution: {},
   collection: {},
-  publisher: {}
+  publisher: {},
+  tokens: {
+    mapboxApiKey: 'MAPBOX_TOKEN',
+    bingApiKey: 'tester'
+  },
+  mapStyles: ['SATELLITE_MB']
 };

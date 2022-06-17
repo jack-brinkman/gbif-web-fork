@@ -22,6 +22,8 @@ import MapComponentOL from './OpenlayersMap';
 import * as css from './map.styles';
 import values from 'lodash/values';
 import env from '../../../../../.env.json';
+import SiteContext from '../../../../dataManagement/SiteContext';
+import { FormattedMessage } from 'react-intl';
 
 const basemapOptions = {
   ol_antarctic: {
@@ -42,9 +44,10 @@ const basemapOptions = {
   },
   ol_mercator: {
     name: 'ol_mercator',
-    component: MapComponentOL,
+    component: MapComponentMB,
     mapConfig: {
-      basemapStyle: `https://api.maptiler.com/maps/basic-2154/style.json?key=Xvg05zabkgUuQMSKiq2s`,
+      basemapStyle: `https://api.maptiler.com/maps/outdoor/style.json?key=UJU7UFepBgtT7yjp3PKO`,
+      // basemapStyle: `https://api.maptiler.com/maps/basic/style.json?key=UJU7UFepBgtT7yjp3PKO`,
       projection: 'EPSG_3857'
     }
   },
@@ -52,7 +55,6 @@ const basemapOptions = {
     name: 'ol_mercator_hillshade',
     component: MapComponentOL,
     mapConfig: {
-      // basemapStyle: `${env.MAP_STYLES}/hillshade.json`,
       basemapStyle: `https://api.mapbox.com/styles/v1/mapbox/light-v9?access_token=pk.eyJ1IjoiZ2JpZiIsImEiOiJja3VmZm50Z3kxcm1vMnBtdnBmeGd5cm9hIn0.M2z2n9QP9fRHZUCw9vbgOA`,
       projection: 'EPSG_3857'
     }
@@ -65,22 +67,9 @@ const basemapOptions = {
       projection: 'EPSG_4326'
     }
   },
-  // mb_mercator_terrain: {
-  //   name: 'mb_mercator_terrain',
-  //   projection: 'EPSG_3857',
-  //   component: MapComponentMB,
-  //   basemap: {
-  //     url: 'https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg',
-  //     attribution: 'Map tiles by <a target="_top" rel="noopener" href="http://stamen.com">Stamen Design</a>'
-  //   }
-  // },
   mb_hillshade: {
     name: 'mb_hillshade',
     component: MapComponentMB,
-    // basemap: {
-    //   url: 'https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg',
-    //   attribution: 'Map tiles by <a target="_top" rel="noopener" href="http://stamen.com">Stamen Design</a>'
-    // },
     mapConfig: {
       basemapStyle: `${env.MAP_STYLES}/hillshade.json`,
       projection: 'EPSG_3857'
@@ -89,25 +78,16 @@ const basemapOptions = {
   mb_darkMatter: {
     name: 'mb_darkMatter',
     component: MapComponentMB,
-    // basemap: {
-    //   url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
-    //   // url: 'https://geoportalp-files.s3-us-east-2.amazonaws.com/vtiles/venezuela/{z}/{x}/{y}.pbf',
-    //   attribution: 'Map tiles by <a target="_top" rel="noopener" href="http://stamen.com">Stamen Design</a>'
-    // },
     mapConfig: {
       basemapStyle: `https://api.mapbox.com/styles/v1/mapbox/light-v9?access_token=pk.eyJ1IjoiZ2JpZiIsImEiOiJja3VmZm50Z3kxcm1vMnBtdnBmeGd5cm9hIn0.M2z2n9QP9fRHZUCw9vbgOA`,
-      // basemapStyle: `${env.MAP_STYLES}/darkMatter.json`,
       projection: 'EPSG_3857'
     }
   },
-  mb_satellite: {
-    name: 'mb_satellite',
+  SATELLITE_BING_MB: {
+    name: 'SATELLITE_MB',
+    labelTranslation: 'map.styles.satellite_mb',
     projection: 'EPSG_3857',
     component: MapComponentMB,
-    basemap: {
-      url: 'https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=Xvg05zabkgUuQMSKiq2s',
-      attribution: 'Map tiles by someone else'
-    },
     mapConfig: {
       basemapStyle: `${env.MAP_STYLES}/bingSatellite.json`,
       projection: 'EPSG_3857'
@@ -118,8 +98,8 @@ const basemapOptions = {
 function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading, total, predicateHash, registerPredicate, loadPointData, defaultMapSettings, ...props }) {
   const dialog = useDialogState({ animated: true, modal: false });
   const theme = useContext(ThemeContext);
-  const [projection, setProjection] = useState('EPSG_3031');
-  const [config, setConfig] = useState(basemapOptions.ol_antarctic);
+  const siteContext = useContext(SiteContext);
+  const [config, setConfig] = useState(basemapOptions.SATELLITE_BING_MB);
   const [latestEvent, broadcastEvent] = useState();
   const [activeId, setActive] = useState();
   const [activeItem, setActiveItem] = useState();
@@ -127,7 +107,7 @@ function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading,
 
   const items = pointData?.occurrenceSearch?.documents?.results || [];
 
-  const [MapComponent, setMapComponent] = useState({ component: MapComponentOL });
+  const [MapComponent, setMapComponent] = useState(config);
 
   useEffect(() => {
     setActiveItem(items[activeId]);
@@ -142,12 +122,11 @@ function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading,
   }, [items, activeId]);
 
   const menuOptions = menuState => values(basemapOptions).map(x => <MenuAction key={x.name} onClick={() => {
-    setProjection(x.projection);
     setMapComponent({ component: x.component });
     setConfig(x);
     menuState.hide();
   }}>
-    {x.name}
+    <FormattedMessage id={x.labelTranslation || 'unknown'} defaultMessage={x.name} />
   </MenuAction>);
 
   return <>
@@ -173,7 +152,7 @@ function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading,
             items={menuOptions}
           />
         </div>
-        <MapComponent.component mapConfig={config.mapConfig} latestEvent={latestEvent} projection={projection} defaultMapSettings={defaultMapSettings} predicateHash={predicateHash} q={q} css={css.mapComponent({ theme })} theme={theme} query={query} onMapClick={e => showList(false)} onPointClick={data => { showList(true); loadPointData(data) }} registerPredicate={registerPredicate} />
+        <MapComponent.component mapConfig={config.mapConfig} latestEvent={latestEvent} defaultMapSettings={defaultMapSettings} predicateHash={predicateHash} q={q} css={css.mapComponent({ theme })} theme={theme} query={query} onMapClick={e => showList(false)} onPointClick={data => { showList(true); loadPointData(data) }} registerPredicate={registerPredicate} />
       </div>
     </div>
   </>;

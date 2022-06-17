@@ -63,10 +63,9 @@ class Map extends Component {
       }
     }
     if (prevProps.mapConfig !== this.props.mapConfig && this.mapLoaded) {
-      var layer = this.map.getSource("simple-tiles");
-       // seems we do not need to remove the sources when we load the style this way
+      // seems we do not need to remove the sources when we load the style this way
       this.map.setStyle(this.getStyle());
-      this.addLayer();
+      setTimeout(x => this.updateLayer(), 500);// apparently we risk adding the occurrence layer below the layers if we do not wait
     }
   }
 
@@ -75,7 +74,7 @@ class Map extends Component {
   }
 
   updateLayer() {
-    var layer = this.map.getSource("occurrences");
+    const layer = this.map.getLayer('occurrences');
     if (layer) {
       this.map.removeLayer("occurrences");
       this.map.removeSource("occurrences");
@@ -83,6 +82,7 @@ class Map extends Component {
     } else {
       this.addLayer();
     }
+    // this.addLayer();
   }
 
   onPointClick(pointData) {
@@ -90,7 +90,13 @@ class Map extends Component {
   }
 
   addLayer() {
+
+    // const source = this.map.getSource('occurrences');
+    // source.setTiles([`${env.API_V2}/map/occurrence/adhoc/{z}/{x}/{y}.mvt?style=scaled.circles&mode=GEO_CENTROID&srs=EPSG%3A3857&squareSize=256&predicateHash=${this.props.predicateHash}&${this.props.q ? `&q=${this.props.q} ` : ''}`])
+    
+
     var tileString = `${env.API_V2}/map/occurrence/adhoc/{z}/{x}/{y}.mvt?style=scaled.circles&mode=GEO_CENTROID&srs=EPSG%3A3857&squareSize=256&predicateHash=${this.props.predicateHash}&${this.props.q ? `&q=${this.props.q} ` : ''}`;
+    
     this.map.addLayer(
       getLayerConfig({ tileString, theme: this.props.theme }),
       // "poi-scalerank2"

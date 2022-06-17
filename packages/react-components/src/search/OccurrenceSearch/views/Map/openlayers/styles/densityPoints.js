@@ -21,17 +21,21 @@ const densityPoints = [
     image: new Circle({
       fill: new Fill({ color: densityColours[0] }),
       stroke: new Stroke({
-        color: densityColours[1],
+        color: densityColours[2],
         width: 1,
       }),
-      radius: 2,
+      radius: 4,
     }),
     fill: new Fill({ color: densityColours[0] }),
   }),
   new Style({
     image: new Circle({
       fill: new Fill({ color: densityColours[1] }),
-      radius: 3,
+      stroke: new Stroke({
+        color: densityColours[2],
+        width: 1,
+      }),
+      radius: 4,
     }),
     fill: new Fill({ color: densityColours[1] }),
   }),
