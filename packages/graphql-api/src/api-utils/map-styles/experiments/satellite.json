@@ -34,7 +34,7 @@
         20037508.342789244
     ],
     "tiles": [
-        "https://api.maptiler.com/tiles/satellite-v2/{z}/{x}/{y}.jpg?key=Xvg05zabkgUuQMSKiq2s"
+        "https://api.maptiler.com/tiles/satellite-v2/{z}/{x}/{y}.jpg?key={{maptilerApiKey}}"
     ],
     "logo": "https://api.maptiler.com/resources/logo.svg"
 }

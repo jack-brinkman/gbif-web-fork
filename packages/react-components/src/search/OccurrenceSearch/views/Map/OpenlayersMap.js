@@ -24,7 +24,8 @@ const mapStyles = {
   darkMatter,
   mapboxBright,
   klokantech
-}
+};
+
 class Map extends Component {
   constructor(props) {
     super(props);
@@ -193,6 +194,7 @@ class Map extends Component {
   }
 
   addLayer() {
+    
     const currentProjection = projections[this.props.mapConfig?.projection || 'EPSG_3031'];
     const occurrenceLayer = currentProjection.getAdhocLayer({
       style: 'scaled.circles',
@@ -206,8 +208,12 @@ class Map extends Component {
         }
       }
     });
+
+    // how to add a layer below e.g. labels on the basemap? // you can insert at specific indices, but the problem is that the basemap are collapsed into one layer
+    // occurrenceLayer.setZIndex(0);
+    console.log(this.map.getLayers());
     this.map.addLayer(occurrenceLayer);
-    // how to add a layer below e.g. labels on the basemap?
+    
 
     const map = this.map
 

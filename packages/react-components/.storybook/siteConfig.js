@@ -1,3 +1,5 @@
+import env from '../.env.json';
+
 const routeConfig = {
   occurrenceSearch: {
     url: ({queryString}) => {
@@ -93,9 +95,10 @@ export const siteConfig = {
   institution: {},
   collection: {},
   publisher: {},
-  tokens: {
-    mapboxApiKey: 'MAPBOX_TOKEN',
-    bingApiKey: 'tester'
+  apiKeys: {
+    mapboxApiKey: env._FOR_DEVELOPMENT_ONLY.apiKeys.mapbox,
+    bingApiKey: 'need to make a call to register',
+    maptilerApiKey: env._FOR_DEVELOPMENT_ONLY.apiKeys.maptiler
   },
   mapStyles: ['SATELLITE_MB']
 };

@@ -25,72 +25,103 @@ import env from '../../../../../.env.json';
 import SiteContext from '../../../../dataManagement/SiteContext';
 import { FormattedMessage } from 'react-intl';
 
-const basemapOptions = {
-  ol_antarctic: {
-    name: 'ol_antarctic',
-    component: MapComponentOL,
-    mapConfig: {
-      basemapStyle: `${env.MAP_STYLES}/3031.json`,
-      projection: 'EPSG_3031'
-    }
-  },
-  ol_arctic: {
-    name: 'ol_arctic',
-    component: MapComponentOL,
-    mapConfig: {
-      basemapStyle: `positron`,
-      projection: 'EPSG_3575'
-    }
-  },
-  ol_mercator: {
-    name: 'ol_mercator',
-    component: MapComponentMB,
-    mapConfig: {
-      basemapStyle: `https://api.maptiler.com/maps/outdoor/style.json?key=UJU7UFepBgtT7yjp3PKO`,
-      // basemapStyle: `https://api.maptiler.com/maps/basic/style.json?key=UJU7UFepBgtT7yjp3PKO`,
-      projection: 'EPSG_3857'
-    }
-  },
-  ol_mercator_hillshade: {
-    name: 'ol_mercator_hillshade',
-    component: MapComponentOL,
-    mapConfig: {
-      basemapStyle: `https://api.mapbox.com/styles/v1/mapbox/light-v9?access_token=pk.eyJ1IjoiZ2JpZiIsImEiOiJja3VmZm50Z3kxcm1vMnBtdnBmeGd5cm9hIn0.M2z2n9QP9fRHZUCw9vbgOA`,
-      projection: 'EPSG_3857'
-    }
-  },
-  ol_platee_caree: {
-    name: 'ol_platee_caree',
-    component: MapComponentOL,
-    mapConfig: {
-      basemapStyle: `${env.MAP_STYLES}/4326.json`,
-      projection: 'EPSG_4326'
-    }
-  },
-  mb_hillshade: {
-    name: 'mb_hillshade',
-    component: MapComponentMB,
-    mapConfig: {
-      basemapStyle: `${env.MAP_STYLES}/hillshade.json`,
-      projection: 'EPSG_3857'
-    }
-  },
-  mb_darkMatter: {
-    name: 'mb_darkMatter',
-    component: MapComponentMB,
-    mapConfig: {
-      basemapStyle: `https://api.mapbox.com/styles/v1/mapbox/light-v9?access_token=pk.eyJ1IjoiZ2JpZiIsImEiOiJja3VmZm50Z3kxcm1vMnBtdnBmeGd5cm9hIn0.M2z2n9QP9fRHZUCw9vbgOA`,
-      projection: 'EPSG_3857'
-    }
-  },
-  SATELLITE_BING_MB: {
-    name: 'SATELLITE_MB',
-    labelTranslation: 'map.styles.satellite_mb',
-    projection: 'EPSG_3857',
-    component: MapComponentMB,
-    mapConfig: {
-      basemapStyle: `${env.MAP_STYLES}/bingSatellite.json`,
-      projection: 'EPSG_3857'
+function getMapLayers({ apiKeys }) {
+  return {
+    ol_antarctic: {
+      name: 'ol_antarctic',
+      component: MapComponentOL,
+      mapConfig: {
+        basemapStyle: `positron`,
+        projection: 'EPSG_3031'
+      }
+    },
+    ol_arctic: {
+      name: 'ol_arctic',
+      component: MapComponentOL,
+      mapConfig: {
+        basemapStyle: `positron`,
+        projection: 'EPSG_3575'
+      }
+    },
+    ol_mercator: {
+      name: 'ol_mercator',
+      component: MapComponentMB,
+      mapConfig: {
+        basemapStyle: `https://api.maptiler.com/maps/outdoor/style.json?key=${apiKeys.maptilerApiKey}`,
+        // basemapStyle: `https://api.maptiler.com/maps/basic/style.json?key=sdf`,
+        projection: 'EPSG_3857'
+      }
+    },
+    ol_positron: {
+      name: 'ol_positron',
+      component: MapComponentOL,
+      mapConfig: {
+        basemapStyle: `positron`,
+        projection: 'EPSG_3857'
+      }
+    },
+    mb_positron: {
+      name: 'mb_positron',
+      component: MapComponentMB,
+      mapConfig: {
+        basemapStyle: `positron`,
+        projection: 'EPSG_3857'
+      }
+    },
+    ol_mercator_hillshade: {
+      name: 'ol_mercator_hillshade',
+      component: MapComponentOL,
+      mapConfig: {
+        // basemapStyle: `https://api.mapbox.com/styles/v1/mapbox/light-v9?access_token=${apiKeys.mapboxApiKey}`,
+        basemapStyle: `${env.MAP_STYLES}/hillshade`,
+        projection: 'EPSG_3857'
+      }
+    },
+    ol_platee_caree: {
+      name: 'ol_platee_caree',
+      component: MapComponentOL,
+      mapConfig: {
+        basemapStyle: `${env.MAP_STYLES}/4326`,
+        projection: 'EPSG_4326'
+      }
+    },
+    mb_hillshade: {
+      name: 'mb_hillshade',
+      component: MapComponentMB,
+      mapConfig: {
+        basemapStyle: `${env.MAP_STYLES}/hillshade`,
+        projection: 'EPSG_3857'
+      }
+    },
+    mb_darkMatter: {
+      name: 'mb_darkMatter',
+      component: MapComponentMB,
+      mapConfig: {
+        basemapStyle: `https://api.mapbox.com/styles/v1/mapbox/light-v9?access_token=${apiKeys.mapboxApiKey}`,
+        projection: 'EPSG_3857'
+      }
+    },
+    SATELLITE_BING_MB: {
+      name: 'SATELLITE_MB',
+      labelTranslation: 'map.styles.satellite_mb',
+      projection: 'EPSG_3857',
+      component: MapComponentMB,
+      mapConfig: {
+        // basemapStyle: `${env.MAP_STYLES}/bingSatellite.json`,
+        basemapStyle: `${env.MAP_STYLES}/bing-satellite?maptilerApiKey=${apiKeys.maptilerApiKey}`,
+        projection: 'EPSG_3857'
+      }
+    },
+    SATELLITE_MAPTILER_MB: {
+      name: 'SATELLITE_MB',
+      labelTranslation: 'map.styles.satellite_maptiler_mb',
+      projection: 'EPSG_3857',
+      component: MapComponentMB,
+      mapConfig: {
+        // basemapStyle: `${env.MAP_STYLES}/bingSatellite.json`,
+        basemapStyle: `${env.MAP_STYLES}/maptiler-satellite?maptilerApiKey=${apiKeys.maptilerApiKey}`,
+        projection: 'EPSG_3857'
+      }
     }
   }
 };
@@ -99,8 +130,9 @@ function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading,
   const dialog = useDialogState({ animated: true, modal: false });
   const theme = useContext(ThemeContext);
   const siteContext = useContext(SiteContext);
-  const [config, setConfig] = useState(basemapOptions.SATELLITE_BING_MB);
+  const [config, setConfig] = useState();
   const [latestEvent, broadcastEvent] = useState();
+  const [basemapOptions, setBasemapOptions] = useState();
   const [activeId, setActive] = useState();
   const [activeItem, setActiveItem] = useState();
   const [listVisible, showList] = useState(false);
@@ -108,6 +140,16 @@ function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading,
   const items = pointData?.occurrenceSearch?.documents?.results || [];
 
   const [MapComponent, setMapComponent] = useState(config);
+
+  useEffect(() => {
+    const mapOptions = getMapLayers({apiKeys: siteContext.apiKeys});
+    console.log(mapOptions);
+    setBasemapOptions(mapOptions);
+    setConfig(mapOptions.SATELLITE_BING_MB);
+    setMapComponent(mapOptions.SATELLITE_BING_MB);
+  },
+    [siteContext],
+  );
 
   useEffect(() => {
     setActiveItem(items[activeId]);
@@ -128,6 +170,10 @@ function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading,
   }}>
     <FormattedMessage id={x.labelTranslation || 'unknown'} defaultMessage={x.name} />
   </MenuAction>);
+  
+  console.log('test');
+  if (!basemapOptions || !MapComponent || !config) return null;
+  console.log('after test');
 
   return <>
     <DetailsDrawer href={`https://www.gbif.org/occurrence/${activeItem?.key}`} dialog={dialog} nextItem={nextItem} previousItem={previousItem}>

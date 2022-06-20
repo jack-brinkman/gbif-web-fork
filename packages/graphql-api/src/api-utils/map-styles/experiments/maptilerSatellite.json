@@ -10,17 +10,11 @@
         },
         "satellite": {
             "type": "raster",
-            "tiles": [
-                "http://ecn.t0.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=12356",
-                "http://ecn.t1.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=12356",
-                "http://ecn.t2.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=12356",
-                "http://ecn.t3.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=12356"
-            ],
-            "tileSize": 256
+            "url": "https://api.maptiler.com/tiles/satellite-v2/tiles.json?key={{maptilerApiKey}}"
         }
     },
     "sprite": "https://labs.gbif.org/klokantech-basic-gl-style/sprite",
-    "glyphs": "https://maps.tilehosting.com/fonts/{fontstack}/{range}.pbf?key=SymbVzXrAD6Jmqe6yBOS",
+    "glyphs": "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key={{maptilerApiKey}}",
     "layers": [
         {
             "id": "background",

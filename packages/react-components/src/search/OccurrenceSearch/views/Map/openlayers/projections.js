@@ -345,7 +345,9 @@ function getAdhocLayer(baseUrl, proj, params, name = 'occurrences') {
     useInterimTilesOnError: false,
     visible: true,
     name: name,
-    style: densityPoints
+    style: densityPoints,
+    // className: 'occurrenceLayer'
+    zIndex: 1000
   });
 }
 

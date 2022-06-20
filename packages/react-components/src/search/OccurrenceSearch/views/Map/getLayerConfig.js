@@ -24,7 +24,6 @@ export function getLayerConfig({tileString, theme}) {
       "circle-opacity": {
         property: "total",
         type: "interval",
-        // stops: theme.darkTheme ? [[0, .6], [10, 0.7], [100, 0.8], [1000, 0.8], [10000, 0.9]] : [[0, 1], [10, 0.8], [100, 0.7], [1000, 0.6], [10000, 0.6]]
         stops: [[0, 1], [10, 0.8], [100, 0.8], [1000, 0.7], [10000, 0.7]]
       },
       "circle-stroke-color": theme.mapDensityColors[2],
@@ -32,7 +31,7 @@ export function getLayerConfig({tileString, theme}) {
         property: "total",
         type: "interval",
         // stops: [[0, 1], [10, 0]]
-        stops: [[0, 1], [100, 0]]
+        stops: [[0, 1], [10, 1.5], [100, 0]]
       }
     }
   };

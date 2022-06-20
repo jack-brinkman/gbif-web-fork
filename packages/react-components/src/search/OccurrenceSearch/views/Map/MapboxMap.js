@@ -2,7 +2,17 @@ import React, { Component } from "react";
 import mapboxgl from 'mapbox-gl';
 import { getLayerConfig } from './getLayerConfig';
 import env from '../../../../../.env.json';
-import mapStyle from './openlayers/styles/klokantech2.json';
+import positron from './openlayers/styles/positron.json';
+import darkMatter from './openlayers/styles/darkMatter.json';
+import mapboxBright from './openlayers/styles/mapboxBright.json';
+import klokantech from './openlayers/styles/klokantech.json';
+
+const mapStyles = {
+  positron,
+  darkMatter,
+  mapboxBright,
+  klokantech
+};
 
 class Map extends Component {
   constructor(props) {
@@ -70,7 +80,9 @@ class Map extends Component {
   }
 
   getStyle() {
-    return this.props.mapConfig?.basemapStyle;
+    const basemapStyle = this.props.mapConfig?.basemapStyle || 'klokantech';
+    const layerStyle = mapStyles[basemapStyle];
+    return layerStyle || this.props.mapConfig?.basemapStyle;
   }
 
   updateLayer() {
@@ -97,9 +109,12 @@ class Map extends Component {
 
     var tileString = `${env.API_V2}/map/occurrence/adhoc/{z}/{x}/{y}.mvt?style=scaled.circles&mode=GEO_CENTROID&srs=EPSG%3A3857&squareSize=256&predicateHash=${this.props.predicateHash}&${this.props.q ? `&q=${this.props.q} ` : ''}`;
     
+    const insertAfterThisLayer = this.map.getLayer('boundary_country_z0-4');
+    console.log(insertAfterThisLayer);
     this.map.addLayer(
       getLayerConfig({ tileString, theme: this.props.theme }),
       // "poi-scalerank2"
+      insertAfterThisLayer ? 'boundary_country_z0-4' : undefined
     );
 
     const map = this.map
