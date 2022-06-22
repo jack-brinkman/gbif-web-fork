@@ -139,4 +139,4 @@ Example.story = {
 };
 
 
-export const StandaloneExample = () => <Standalone routerContext={{basename: 'la'}} locale="en" style={{height: 'calc(100vh - 20px)'}}></Standalone>;
+export const StandaloneExample = () => <Standalone xsiteConfig={{apiKeys: { mapboxApiKey: 'test', maptilerApiKey: 'test' },}} routerContext={{basename: 'la'}} locale="en" style={{height: 'calc(100vh - 20px)'}}></Standalone>;

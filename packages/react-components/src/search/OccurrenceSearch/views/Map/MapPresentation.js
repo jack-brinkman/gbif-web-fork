@@ -25,7 +25,7 @@ import env from '../../../../../.env.json';
 import SiteContext from '../../../../dataManagement/SiteContext';
 import { FormattedMessage } from 'react-intl';
 
-function getMapLayers({ apiKeys }) {
+function getMapLayers({ apiKeys = {} }) {
   return {
     ol_antarctic: {
       name: 'Antarctica',
