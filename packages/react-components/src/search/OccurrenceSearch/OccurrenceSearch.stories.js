@@ -103,11 +103,11 @@ const rootPredicate = {
 };
 const config = { 
   // rootPredicate, 
-  // rootPredicate: {
-  //   type: 'equals',
-  //   key: 'year',
-  //   value: '12000'
-  // }, 
+  rootPredicate: {
+    type: 'equals',
+    key: 'year',
+    value: '1790'
+  }, 
   labels, 
   getSuggests, 
   filters, 

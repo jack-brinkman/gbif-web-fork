@@ -21,7 +21,7 @@ export const Menu = React.memo(({ trigger, placement, items, style, ...props }) 
         {disclosureProps => React.cloneElement(trigger, disclosureProps)}
       </MenuButton>
       <BaseMenu {...menu} {...props} css={focus(theme)} style={{ zIndex: 999 }}>
-        <div css={menuContainer({ theme })}>
+        <div css={menuContainer({ theme })} className="gb-menuContainer">
           {(typeof items === 'function' ? items(menu) : items).map((item, i) => (
             <MenuItem {...menu} {...item.props} key={i}>
               {itemProps => React.cloneElement(item, itemProps)}

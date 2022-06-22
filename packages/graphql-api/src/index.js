@@ -62,7 +62,8 @@ async function initializeServer() {
   app.use(compression());
   app.use(cors({
     methods: 'GET,POST,OPTIONS',
-  }))
+  }));
+  app.use(express.static('public'))
   app.use(bodyParser.json());
 
   // extract query and variables from store if a hash is provided instead of a query or variable
@@ -84,7 +85,7 @@ async function initializeServer() {
   });
 
   app.get('/health', health);
-
+  
   // add various supportive endpoints
   // require('./api-utils/config')(app);
   let controllers = glob.sync(__dirname + '/api-utils/**/*.ctrl.js');

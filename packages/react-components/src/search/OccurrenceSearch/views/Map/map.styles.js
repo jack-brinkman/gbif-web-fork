@@ -50,5 +50,13 @@ export const mapControls = ({ theme }) => css`
     flex: 1 1 auto;
     font-size: 24px;
     color: ${theme.color800};
+    text-align: left;
+    white-space: nowrap;
+  }
+  .gb-menuContainer {
+    /* width: 250px; */
+    button {
+      text-align: initial;
+    }
   }
 `;

@@ -1,0 +1,81 @@
+{
+    "version": 8,
+    "name": "Positron",
+    "metadata": {
+        "mapbox:autocomposite": false,
+        "mapbox:groups": {
+            "101da9f13b64a08fa4b6ac1168e89e5f": {
+                "collapsed": false,
+                "name": "Places"
+            },
+            "a14c9607bc7954ba1df7205bf660433f": {
+                "name": "Boundaries"
+            },
+            "b6371a3f2f5a9932464fa3867530a2e5": {
+                "collapsed": false,
+                "name": "Transportation"
+            }
+        },
+        "mapbox:type": "template",
+        "openmaptiles:mapbox:owner": "openmaptiles",
+        "openmaptiles:mapbox:source:url": "mapbox://openmaptiles.4qljc88t",
+        "openmaptiles:version": "3.x",
+        "gb:reproject": true
+    },
+    "sources": {
+        "wms-imagery": {
+            "type": "raster",
+            "tiles": [
+                "https://tile.gbif.org/4326/omt/{z}/{x}/{y}@2x.png?style=gbif-natural-en&srs=EPSG%3A4326"
+            ],
+            "tileSize": 512,
+            "projection": "EPSG:4326",
+            "wrapX": true,
+            "maxZoom": 18,
+            "tilegridOptions": {
+                "extent": [
+                    -180,
+                    -90,
+                    180,
+                    90
+                ],
+                "minZoom": 0,
+                "maxZoom": 13,
+                "resolutions": [
+                    0.3515625,
+                    0.17578125,
+                    0.087890625,
+                    0.0439453125,
+                    0.02197265625,
+                    0.010986328125,
+                    0.0054931640625,
+                    0.00274658203125,
+                    0.001373291015625,
+                    0.0006866455078125,
+                    0.00034332275390625,
+                    0.000171661376953125,
+                    0.0000858306884765625,
+                    0.00004291534423828125
+                ],
+                "tileSize": 512
+            }
+        }
+    },
+    "sprite": "https://openmaptiles.github.io/positron-gl-style/sprite",
+    "glyphs": "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key={{maptilerApiKey}}",
+    "layers": [
+        {
+            "id": "background",
+            "type": "background",
+            "paint": {
+                "background-color": "rgb(242,243,240)"
+            }
+        },
+        {
+            "id": "raster-layer",
+            "type": "raster",
+            "source": "wms-imagery"
+        }
+    ],
+    "id": "positron"
+}

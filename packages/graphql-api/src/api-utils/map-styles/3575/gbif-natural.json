@@ -1,0 +1,28 @@
+{
+    "version": 8,
+    "name": "gbif-natural-3575",
+    "sources": {
+        "openmaptiles": {
+            "type": "raster",
+            "tiles": [
+                "https://tile.gbif.org/3575/omt/{z}/{x}/{y}@{{pixelRatio}}x.png?style=gbif-natural-{{language}}"
+            ],
+            "tileSize": 512
+        }
+    },
+    "layers": [
+        {
+            "id": "background",
+            "paint": {
+                "background-color": "hsl(47, 26%, 88%)"
+            },
+            "type": "background"
+        },
+        {
+            "id": "base-layer",
+            "type": "raster",
+            "source": "openmaptiles"
+        }
+    ],
+    "id": "gbif-natural-3575"
+}

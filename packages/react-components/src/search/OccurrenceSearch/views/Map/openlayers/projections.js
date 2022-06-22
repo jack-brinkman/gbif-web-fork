@@ -32,13 +32,14 @@ function get4326() {
     return extent / tileSize / Math.pow(2, i);
   });
 
-  var tileGrid16 = new TileGrid({
+  const tileGridOptions = {
     extent: olProj.get('EPSG:4326').getExtent(),
     minZoom: 0,
     maxZoom: maxZoom,
     resolutions: resolutions,
     tileSize: tileSize
-  });
+  };
+  var tileGrid = new TileGrid(tileGridOptions);
 
   // var tileGrid14 = new TileGrid({
   //   extent: olProj.get('EPSG:4326').getExtent(),
@@ -55,7 +56,7 @@ function get4326() {
     projection: 'EPSG:4326',
     epsg: 4326,
     tilePixelRatio: 1,
-    tileGrid: tileGrid16,
+    tileGrid: tileGrid,
     resolutions: resolutions,
     // extent: olProj.get('EPSG:4326').getExtent(),
     fitExtent: [-179, -1, 179, 1],
@@ -195,14 +196,17 @@ function get3031() {
     return halfWidth / (tileSize * Math.pow(2, i - 1));
   });
 
-  var tileGrid16 = new TileGrid({
+  const tileGridOptions = {
     extent: extent,
     origin: [-halfWidth, halfWidth],
     minZoom: 0,
     maxZoom: maxZoom,
     resolutions: resolutions,
     tileSize: tileSize
-  });
+  };
+  console.log(tileGridOptions);
+
+  var tileGrid16 = new TileGrid(tileGridOptions);
 
   return {
     name: 'EPSG_3031',
@@ -214,7 +218,7 @@ function get3031() {
     resolutions: resolutions,
     fitExtent: extent,
     getView: function (lat, lon, zoom) {
-      if (lat > -60) {
+      if (lat > 0) {
         lat = -90;
         lon = 0;
         zoom = 1;

@@ -2,6 +2,10 @@
     "version": 8,
     "name": "learning",
     "sources": {
+        "outline": {
+            "type": "geojson",
+            "data": "http://localhost:4000/map/test.json"
+        },
         "openmaptiles": {
             "type": "vector",
             "tiles": [
@@ -1782,6 +1786,15 @@
             "source": "openmaptiles",
             "source-layer": "place",
             "type": "symbol"
+        },
+        {
+            "id": "geojson-layer",
+            "type": "line",
+            "source": "outline",
+            "paint": {
+                "line-color": "#f00",
+                "line-width": 3
+            }
         }
     ],
     "id": "learning"

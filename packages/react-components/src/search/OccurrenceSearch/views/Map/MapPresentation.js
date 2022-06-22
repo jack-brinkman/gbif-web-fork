@@ -28,23 +28,23 @@ import { FormattedMessage } from 'react-intl';
 function getMapLayers({ apiKeys }) {
   return {
     ol_antarctic: {
-      name: 'ol_antarctic',
+      name: 'Antarctica',
       component: MapComponentOL,
       mapConfig: {
-        basemapStyle: `positron`,
+        basemapStyle: `${env.MAP_STYLES}/positron-3031`,
         projection: 'EPSG_3031'
       }
     },
     ol_arctic: {
-      name: 'ol_arctic',
+      name: 'Arctic',
       component: MapComponentOL,
       mapConfig: {
-        basemapStyle: `positron`,
+        basemapStyle: `${env.MAP_STYLES}/positron`,
         projection: 'EPSG_3575'
       }
     },
     ol_mercator: {
-      name: 'ol_mercator',
+      name: 'Outdoor',
       component: MapComponentMB,
       mapConfig: {
         basemapStyle: `https://api.maptiler.com/maps/outdoor/style.json?key=${apiKeys.maptilerApiKey}`,
@@ -53,7 +53,7 @@ function getMapLayers({ apiKeys }) {
       }
     },
     ol_positron: {
-      name: 'ol_positron',
+      name: 'Mercator light (Openlayers)',
       component: MapComponentOL,
       mapConfig: {
         basemapStyle: `positron`,
@@ -61,15 +61,15 @@ function getMapLayers({ apiKeys }) {
       }
     },
     mb_positron: {
-      name: 'mb_positron',
+      name: 'Mercator light (Mapbox)',
       component: MapComponentMB,
       mapConfig: {
-        basemapStyle: `positron`,
+        basemapStyle: `${env.MAP_STYLES}/positron-mercator?maptilerApiKey=${apiKeys.maptilerApiKey}`,
         projection: 'EPSG_3857'
       }
     },
     ol_mercator_hillshade: {
-      name: 'ol_mercator_hillshade',
+      name: 'Hillshade + US geologic',
       component: MapComponentOL,
       mapConfig: {
         // basemapStyle: `https://api.mapbox.com/styles/v1/mapbox/light-v9?access_token=${apiKeys.mapboxApiKey}`,
@@ -81,7 +81,8 @@ function getMapLayers({ apiKeys }) {
       name: 'ol_platee_caree',
       component: MapComponentOL,
       mapConfig: {
-        basemapStyle: `${env.MAP_STYLES}/4326`,
+        // basemapStyle: `${env.MAP_STYLES}/4326`,
+        basemapStyle: `${env.MAP_STYLES}/positron-4326?maptilerApiKey=${apiKeys.maptilerApiKey}`,
         projection: 'EPSG_4326'
       }
     },
@@ -102,7 +103,7 @@ function getMapLayers({ apiKeys }) {
       }
     },
     SATELLITE_BING_MB: {
-      name: 'SATELLITE_MB',
+      name: 'Satellite',
       labelTranslation: 'map.styles.satellite_mb',
       projection: 'EPSG_3857',
       component: MapComponentMB,
@@ -113,7 +114,7 @@ function getMapLayers({ apiKeys }) {
       }
     },
     SATELLITE_MAPTILER_MB: {
-      name: 'SATELLITE_MB',
+      name: 'Satellite',
       labelTranslation: 'map.styles.satellite_maptiler_mb',
       projection: 'EPSG_3857',
       component: MapComponentMB,
@@ -121,6 +122,17 @@ function getMapLayers({ apiKeys }) {
         // basemapStyle: `${env.MAP_STYLES}/bingSatellite.json`,
         basemapStyle: `${env.MAP_STYLES}/maptiler-satellite?maptilerApiKey=${apiKeys.maptilerApiKey}`,
         projection: 'EPSG_3857'
+      }
+    },
+    GBIF_NATURAL_3575: {
+      name: 'GBIF Natural Arctic',
+      labelTranslation: 'map.styles.gbif_natural_3575',
+      projection: 'EPSG_3575',
+      component: MapComponentOL,
+      mapConfig: {
+        // basemapStyle: `${env.MAP_STYLES}/bingSatellite.json`,
+        basemapStyle: `${env.MAP_STYLES}/3575/gbif-natural?language=es&pixelRatio=2`,
+        projection: 'EPSG_3575'
       }
     }
   }
@@ -143,10 +155,9 @@ function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading,
 
   useEffect(() => {
     const mapOptions = getMapLayers({apiKeys: siteContext.apiKeys});
-    console.log(mapOptions);
     setBasemapOptions(mapOptions);
-    setConfig(mapOptions.SATELLITE_BING_MB);
-    setMapComponent(mapOptions.SATELLITE_BING_MB);
+    setConfig(mapOptions.ol_antarctic);
+    setMapComponent(mapOptions.ol_antarctic);
   },
     [siteContext],
   );
@@ -163,12 +174,12 @@ function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading,
     setActive(Math.max(0, activeId - 1));
   }, [items, activeId]);
 
-  const menuOptions = menuState => values(basemapOptions).map(x => <MenuAction key={x.name} onClick={() => {
+  const menuOptions = menuState => values(basemapOptions).map((x, i) => <MenuAction key={i} onClick={() => {
     setMapComponent({ component: x.component });
     setConfig(x);
     menuState.hide();
   }}>
-    <FormattedMessage id={x.labelTranslation || 'unknown'} defaultMessage={x.name} />
+    <FormattedMessage id={x.labelTranslation || 'unknown'} defaultMessage={x.name || 'unknown'} />
   </MenuAction>);
   
   console.log('test');

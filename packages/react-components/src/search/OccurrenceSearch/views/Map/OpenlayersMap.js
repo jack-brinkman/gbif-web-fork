@@ -10,7 +10,16 @@ import { transform } from 'ol/proj';
 import View from 'ol/View';
 import { applyStyle, applyBackground, apply, stylefunction } from 'ol-mapbox-style';
 import { VectorTile as VectorTileSource } from 'ol/source';
+import { TileImage as TileImageSource } from 'ol/source';
+import WMTSSource from 'ol/source/WMTS';
+
+import { Tile as TileLayer } from 'ol/layer';
 import { MVT as MVTFormat } from 'ol/format';
+import TileGrid from 'ol/tilegrid/TileGrid';
+import TileWMS from 'ol/source/TileWMS';
+import WMTSTileGrid from 'ol/tilegrid/WMTS';
+
+
 import positron from './openlayers/styles/positron.json';
 import darkMatter from './openlayers/styles/darkMatter.json';
 import mapboxBright from './openlayers/styles/mapboxBright.json';
@@ -139,17 +148,17 @@ class Map extends Component {
   async updateMapLayers() {
     const epsg = this.props.mapConfig?.projection || 'EPSG_3031';
     const currentProjection = projections[epsg];
-    this.setState({epsg})
+    this.setState({ epsg })
 
     this.map.getLayers().clear();
     // this.updateProjection();
 
     // update projection
-    const mapPos = this.getStoredMapPosition();
-    const newView = currentProjection.getView(mapPos.lat, mapPos.lng, mapPos.zoom);
-    this.map.setView(newView);
+    // const mapPos = this.getStoredMapPosition();
+    // const newView = currentProjection.getView(mapPos.lat, mapPos.lng, mapPos.zoom);
+    // this.map.setView(newView);
 
-    
+
     const basemapStyle = this.props.mapConfig?.basemapStyle || 'klokantech';
     const layerStyle = mapStyles[basemapStyle];
     if (layerStyle) {
@@ -158,17 +167,81 @@ class Map extends Component {
       applyBackground(baseLayer, layerStyle, 'openmaptiles');
       applyStyle(baseLayer, layerStyle, 'openmaptiles', undefined, resolutions);
       this.map.addLayer(baseLayer);
-    } else if(epsg !== 'EPSG_3857') {
+    } else if (epsg !== 'EPSG_3857') {
+
       const styleResponse = await fetch(this.props.mapConfig?.basemapStyle).then(response => response.json());
-      const baseLayer = currentProjection.getBaseLayer();
-      const resolutions = baseLayer.getSource().getTileGrid().getResolutions();
-      applyBackground(baseLayer, styleResponse, 'openmaptiles');
-      stylefunction(baseLayer, styleResponse, 'openmaptiles', resolutions);
-      // applyStyle(baseLayer, styleResponse, undefined, undefined, resolutions);
-      this.map.addLayer(baseLayer);
+
+      if (!styleResponse.metadata['gb:reproject']) {
+        const baseLayer = currentProjection.getBaseLayer();
+        const resolutions = baseLayer.getSource().getTileGrid().getResolutions();
+        applyBackground(baseLayer, styleResponse, 'openmaptiles');
+        stylefunction(baseLayer, styleResponse, 'openmaptiles', resolutions);
+        this.map.addLayer(baseLayer);
+      } else {
+        // if this map style is intended to be reprojected then continue
+        await apply(this.map, styleResponse);
+
+        const mapPos = this.getStoredMapPosition();
+        const map = this.map;
+
+        const mapboxStyle = this.map.get('mapbox-style');
+        this.map.getLayers().forEach(function (layer) {
+          const mapboxSource = layer.get('mapbox-source');
+          if (mapboxSource) {
+            const sourceConfig = mapboxStyle.sources[mapboxSource];
+            if (sourceConfig.type === 'vector') {
+              const source = layer.getSource();
+              const sourceConfig = mapboxStyle.sources[mapboxSource];
+              layer.setSource(
+                new VectorTileSource({
+                  format: new MVTFormat(),
+                  projection: sourceConfig.projection,
+                  urls: source.getUrls(),
+                  tileGrid: new TileGrid(sourceConfig.tilegridOptions),
+                  wrapX: sourceConfig.wrapX,
+                  attributions: sourceConfig.attributions
+                })
+              );
+
+              stylefunction(layer, styleResponse, mapboxSource, sourceConfig.tilegridOptions.resolutions);
+
+              // update the view projection to match the data projection
+              const newView = currentProjection.getView(mapPos.lat, mapPos.lng, mapPos.zoom);
+              map.setView(newView);
+            }
+            if (sourceConfig.type === 'raster') {
+              const source = layer.getSource();
+              layer.setSource(
+                new TileImageSource({
+                  projection: sourceConfig.projection,
+                  urls: sourceConfig.tiles,
+                  tileGrid: new TileGrid(sourceConfig.tilegridOptions),
+                  tilePixelRatio: 2,
+                  wrapX: sourceConfig.wrapX,
+                  maxZoom: sourceConfig.maxZoom,
+                  attributions: sourceConfig.attributions
+                })
+              );
+              if (sourceConfig.extent) {
+                layer.setExtent(sourceConfig.extent);
+              }
+
+              // update the view projection to match the data projection
+              const newView = currentProjection.getView(mapPos.lat, mapPos.lng, mapPos.zoom);
+              map.setView(newView);
+            }
+          }
+        });
+      }
+
     } else {
       await apply(this.map, this.props.mapConfig?.basemapStyle || 'http://localhost:3001/map/styles/darkMatter.json');
     }
+
+    // update projection
+    const mapPos = this.getStoredMapPosition();
+    const newView = currentProjection.getView(mapPos.lat, mapPos.lng, mapPos.zoom);
+    this.map.setView(newView);
 
     this.addLayer();
   }
@@ -194,7 +267,7 @@ class Map extends Component {
   }
 
   addLayer() {
-    
+
     const currentProjection = projections[this.props.mapConfig?.projection || 'EPSG_3031'];
     const occurrenceLayer = currentProjection.getAdhocLayer({
       style: 'scaled.circles',
@@ -211,9 +284,7 @@ class Map extends Component {
 
     // how to add a layer below e.g. labels on the basemap? // you can insert at specific indices, but the problem is that the basemap are collapsed into one layer
     // occurrenceLayer.setZIndex(0);
-    console.log(this.map.getLayers());
     this.map.addLayer(occurrenceLayer);
-    
 
     const map = this.map
 
