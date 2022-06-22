@@ -171,7 +171,7 @@ class Map extends Component {
 
       const styleResponse = await fetch(this.props.mapConfig?.basemapStyle).then(response => response.json());
 
-      if (!styleResponse.metadata['gb:reproject']) {
+      if (!styleResponse?.metadata?.['gb:reproject']) {
         const baseLayer = currentProjection.getBaseLayer();
         const resolutions = baseLayer.getSource().getTileGrid().getResolutions();
         applyBackground(baseLayer, styleResponse, 'openmaptiles');

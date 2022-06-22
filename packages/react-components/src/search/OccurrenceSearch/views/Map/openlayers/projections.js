@@ -138,14 +138,16 @@ function get3575() {
     return halfWidth / (tileSize * Math.pow(2, i - 1));
   });
 
-  var tileGrid16 = new TileGrid({
+  const tileGridOptions = {
     extent: olProj.get("EPSG:3575").getExtent(),
     origin: [-halfWidth, halfWidth],
     minZoom: 0,
     maxZoom: maxZoom,
     resolutions: resolutions,
     tileSize: tileSize
-  });
+  };
+
+  var tileGrid16 = new TileGrid(tileGridOptions);
 
   return {
     name: 'EPSG_3575',
@@ -204,7 +206,6 @@ function get3031() {
     resolutions: resolutions,
     tileSize: tileSize
   };
-  console.log(tileGridOptions);
 
   var tileGrid16 = new TileGrid(tileGridOptions);
 
