@@ -5,7 +5,7 @@ import { addDecorator } from '@storybook/react';
 import { MemoryRouter as Router, Route } from "react-router-dom";
 import AddressBar from '../../StorybookAddressBar';
 import { QueryParamProvider } from 'use-query-params';
-
+import env from '../../../.env.json';
 import OccurrenceSearch from './OccurrenceSearch';
 import Standalone from './Standalone';
 // const BACKBONE_KEY = 'd7dddbf4-2cf0-4f39-9b2a-bb099caae36c';
@@ -139,4 +139,4 @@ Example.story = {
 };
 
 
-export const StandaloneExample = () => <Standalone xsiteConfig={{apiKeys: { mapboxApiKey: 'test', maptilerApiKey: 'test' },}} routerContext={{basename: 'la'}} locale="en" style={{height: 'calc(100vh - 20px)'}}></Standalone>;
+export const StandaloneExample = () => <Standalone siteConfig={{apiKeys: env._FOR_DEVELOPMENT_ONLY.apiKeys}} routerContext={{basename: 'la'}} locale="en" style={{height: 'calc(100vh - 20px)'}}></Standalone>;

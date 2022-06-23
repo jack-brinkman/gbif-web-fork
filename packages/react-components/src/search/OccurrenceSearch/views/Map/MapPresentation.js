@@ -47,7 +47,7 @@ function getMapLayers({ apiKeys = {} }) {
       name: 'Outdoor',
       component: MapComponentMB,
       mapConfig: {
-        basemapStyle: `https://api.maptiler.com/maps/outdoor/style.json?key=${apiKeys.maptilerApiKey}`,
+        basemapStyle: `https://api.maptiler.com/maps/outdoor/style.json?key=${apiKeys.maptiler}`,
         // basemapStyle: `https://api.maptiler.com/maps/basic/style.json?key=sdf`,
         projection: 'EPSG_3857'
       }
@@ -64,7 +64,7 @@ function getMapLayers({ apiKeys = {} }) {
       name: 'Mercator light (Mapbox)',
       component: MapComponentMB,
       mapConfig: {
-        basemapStyle: `${env.MAP_STYLES}/positron-mercator?maptilerApiKey=${apiKeys.maptilerApiKey}`,
+        basemapStyle: `${env.MAP_STYLES}/positron-mercator?maptilerApiKey=${apiKeys.maptiler}`,
         projection: 'EPSG_3857'
       }
     },
@@ -72,7 +72,7 @@ function getMapLayers({ apiKeys = {} }) {
       name: 'Hillshade + US geologic',
       component: MapComponentOL,
       mapConfig: {
-        // basemapStyle: `https://api.mapbox.com/styles/v1/mapbox/light-v9?access_token=${apiKeys.mapboxApiKey}`,
+        // basemapStyle: `https://api.mapbox.com/styles/v1/mapbox/light-v9?access_token=${apiKeys.ApiKey}`,
         basemapStyle: `${env.MAP_STYLES}/hillshade`,
         projection: 'EPSG_3857'
       }
@@ -82,7 +82,7 @@ function getMapLayers({ apiKeys = {} }) {
       component: MapComponentOL,
       mapConfig: {
         // basemapStyle: `${env.MAP_STYLES}/4326`,
-        basemapStyle: `${env.MAP_STYLES}/positron-4326?maptilerApiKey=${apiKeys.maptilerApiKey}`,
+        basemapStyle: `${env.MAP_STYLES}/positron-4326?maptilerApiKey=${apiKeys.maptiler}`,
         projection: 'EPSG_4326'
       }
     },
@@ -98,7 +98,7 @@ function getMapLayers({ apiKeys = {} }) {
       name: 'mb_darkMatter',
       component: MapComponentMB,
       mapConfig: {
-        basemapStyle: `https://api.mapbox.com/styles/v1/mapbox/light-v9?access_token=${apiKeys.mapboxApiKey}`,
+        basemapStyle: `https://api.mapbox.com/styles/v1/mapbox/light-v9?access_token=${apiKeys.mapbox}`,
         projection: 'EPSG_3857'
       }
     },
@@ -109,7 +109,7 @@ function getMapLayers({ apiKeys = {} }) {
       component: MapComponentMB,
       mapConfig: {
         // basemapStyle: `${env.MAP_STYLES}/bingSatellite.json`,
-        basemapStyle: `${env.MAP_STYLES}/bing-satellite?maptilerApiKey=${apiKeys.maptilerApiKey}`,
+        basemapStyle: `${env.MAP_STYLES}/bing-satellite?maptilerApiKey=${apiKeys.maptiler}`,
         projection: 'EPSG_3857'
       }
     },
@@ -120,7 +120,7 @@ function getMapLayers({ apiKeys = {} }) {
       component: MapComponentMB,
       mapConfig: {
         // basemapStyle: `${env.MAP_STYLES}/bingSatellite.json`,
-        basemapStyle: `${env.MAP_STYLES}/maptiler-satellite?maptilerApiKey=${apiKeys.maptilerApiKey}`,
+        basemapStyle: `${env.MAP_STYLES}/maptiler-satellite?maptilerApiKey=${apiKeys.maptiler}`,
         projection: 'EPSG_3857'
       }
     },
