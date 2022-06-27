@@ -219,7 +219,7 @@ function get3031() {
     resolutions: resolutions,
     fitExtent: extent,
     getView: function (lat, lon, zoom) {
-      if (lat > 0) {
+      if (lat > -20) {
         lat = -90;
         lon = 0;
         zoom = 1;

@@ -199,7 +199,7 @@ class Map extends Component {
                   urls: source.getUrls(),
                   tileGrid: new TileGrid(sourceConfig.tilegridOptions),
                   wrapX: sourceConfig.wrapX,
-                  attributions: sourceConfig.attributions
+                  attributions: [sourceConfig.attribution]
                 })
               );
 
@@ -219,7 +219,7 @@ class Map extends Component {
                   tilePixelRatio: 2,
                   wrapX: sourceConfig.wrapX,
                   maxZoom: sourceConfig.maxZoom,
-                  attributions: sourceConfig.attributions
+                  attributions: [sourceConfig.attribution]
                 })
               );
               if (sourceConfig.extent) {

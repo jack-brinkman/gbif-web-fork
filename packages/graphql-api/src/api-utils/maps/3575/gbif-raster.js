@@ -1,6 +1,7 @@
-{
+const gbifTileAttribution = require('../gbif-tile-attribution');
+module.exports = {
     "version": 8,
-    "name": "gbif-natural-3575",
+    "name": "gbif-{{styleName}}-3575",
     "metadata": {
         "gb:reproject": true
     },
@@ -8,12 +9,12 @@
         "openmaptiles": {
             "type": "raster",
             "tiles": [
-                "https://tile.gbif.org/3575/omt/{z}/{x}/{y}@{{pixelRatio}}x.png?style=gbif-natural-{{language}}"
+                "https://tile.gbif.org/3575/omt/{z}/{x}/{y}@{{pixelRatio}}x.png?style=gbif-{{styleName}}-{{language}}"
             ],
             "projection": "EPSG:3575",
             "wrapX": false,
             "maxZoom": 17,
-            "attributions": ["GBIF OSM"],
+            "attribution": gbifTileAttribution,
             "tileSize": 512,
             "tilegridOptions": {
                 "extent": [
@@ -58,7 +59,7 @@
         {
             "id": "background",
             "paint": {
-                "background-color": "hsl(47, 26%, 88%)"
+                "background-color": "{{background}}"
             },
             "type": "background"
         },
@@ -68,5 +69,5 @@
             "source": "openmaptiles"
         }
     ],
-    "id": "gbif-natural-3575"
+    "id": "gbif-{{styleName}}-3575"
 }

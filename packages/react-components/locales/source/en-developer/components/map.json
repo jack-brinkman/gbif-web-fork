@@ -1,5 +1,15 @@
 {
     "styles": {
-        "satellite_mb": "Satellite" 
+        "satellite": "Satellite",
+        "gbif_natural": "Natural",
+        "gbif_light": "Bright",
+        "gbif_dark": "Dark",
+        "outdoor": "Outdoor"
+    },
+    "projections": {
+        "ARCTIC": "Arctic",
+        "MERCATOR": "Mercator",
+        "ANTARCTIC": "Antarctic",
+        "PLATE_CAREE": "Plate Carrée"
     }
 }

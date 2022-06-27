@@ -1,33 +1,17 @@
-{
+const gbifTileAttribution = require('../gbif-tile-attribution');
+module.exports = {
     "version": 8,
-    "name": "Positron",
+    "name": "gbif-{{styleName}}-4326",
     "metadata": {
-        "mapbox:autocomposite": false,
-        "mapbox:groups": {
-            "101da9f13b64a08fa4b6ac1168e89e5f": {
-                "collapsed": false,
-                "name": "Places"
-            },
-            "a14c9607bc7954ba1df7205bf660433f": {
-                "name": "Boundaries"
-            },
-            "b6371a3f2f5a9932464fa3867530a2e5": {
-                "collapsed": false,
-                "name": "Transportation"
-            }
-        },
-        "mapbox:type": "template",
-        "openmaptiles:mapbox:owner": "openmaptiles",
-        "openmaptiles:mapbox:source:url": "mapbox://openmaptiles.4qljc88t",
-        "openmaptiles:version": "3.x",
         "gb:reproject": true
     },
     "sources": {
-        "wms-imagery": {
+        "openmaptiles": {
             "type": "raster",
             "tiles": [
-                "https://tile.gbif.org/4326/omt/{z}/{x}/{y}@2x.png?style=gbif-natural-en&srs=EPSG%3A4326"
+                "https://tile.gbif.org/4326/omt/{z}/{x}/{y}@{{pixelRatio}}x.png?style=gbif-{{styleName}}-{{language}}"
             ],
+            "attribution": gbifTileAttribution,
             "tileSize": 512,
             "projection": "EPSG:4326",
             "wrapX": true,
@@ -58,24 +42,28 @@
                     0.00004291534423828125
                 ],
                 "tileSize": 512
-            }
+            },
+            "extent": [
+                -180,
+                -90,
+                180,
+                90
+            ],
         }
     },
-    "sprite": "https://openmaptiles.github.io/positron-gl-style/sprite",
-    "glyphs": "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key={{maptilerApiKey}}",
     "layers": [
         {
             "id": "background",
-            "type": "background",
             "paint": {
-                "background-color": "rgb(242,243,240)"
-            }
+                "background-color": "hsl(47, 26%, 88%)"
+            },
+            "type": "background"
         },
         {
-            "id": "raster-layer",
+            "id": "base-layer",
             "type": "raster",
-            "source": "wms-imagery"
+            "source": "openmaptiles"
         }
     ],
-    "id": "positron"
+    "id": "gbif-{{styleName}}-4326"
 }
