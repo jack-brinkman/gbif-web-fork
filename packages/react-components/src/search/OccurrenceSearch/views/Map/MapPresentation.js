@@ -23,167 +23,32 @@ import * as css from './map.styles';
 import env from '../../../../../.env.json';
 import SiteContext from '../../../../dataManagement/SiteContext';
 import { FormattedMessage } from 'react-intl';
+import { getMapStyles } from './standardMapStyles';
+const pixelRatio = parseInt(window.devicePixelRatio) || 1;
 
-function getMapStyles({ apiKeys = {}, language = 'en' }) {
-  const natural = `styleName=natural&background=${encodeURIComponent('#e5e9cd')}&language=${language}&pixelRatio=2`;
-  const light = `styleName=geyser&background=${encodeURIComponent('#f3f3f1')}&language=${language}&pixelRatio=2`;
-  const dark = `styleName=tuatara&background=${encodeURIComponent('#363332')}&language=${language}&pixelRatio=2`;
-  return {
-    ARCTIC: {
-      GBIF_NATURAL: {
-        labelKey: 'map.styles.gbif_natural',
-        component: MapComponentOL,
-        mapConfig: {
-          basemapStyle: `${env.MAP_STYLES}/3575/gbif-raster?${natural}`,
-          projection: 'EPSG_3575'
-        }
-      },
-      GBIF_LIGHT: {
-        labelKey: 'map.styles.gbif_light',
-        component: MapComponentOL,
-        mapConfig: {
-          basemapStyle: `${env.MAP_STYLES}/3575/gbif-raster?${light}`,
-          projection: 'EPSG_3575'
-        }
-      },
-      GBIF_DARK: {
-        labelKey: 'map.styles.gbif_dark',
-        component: MapComponentOL,
-        mapConfig: {
-          basemapStyle: `${env.MAP_STYLES}/3575/gbif-raster?${dark}`,
-          projection: 'EPSG_3575'
-        }
-      },
-    },
-    PLATE_CAREE: {
-      GBIF_NATURAL: {
-        labelKey: 'map.styles.gbif_natural',
-        component: MapComponentOL,
-        mapConfig: {
-          basemapStyle: `${env.MAP_STYLES}/4326/gbif-raster?${natural}`,
-          projection: 'EPSG_4326'
-        }
-      },
-      GBIF_LIGHT: {
-        labelKey: 'map.styles.gbif_light',
-        component: MapComponentOL,
-        mapConfig: {
-          basemapStyle: `${env.MAP_STYLES}/4326/gbif-raster?${light}`,
-          projection: 'EPSG_4326'
-        }
-      },
-      GBIF_DARK: {
-        labelKey: 'map.styles.gbif_dark',
-        component: MapComponentOL,
-        mapConfig: {
-          basemapStyle: `${env.MAP_STYLES}/4326/gbif-raster?${dark}`,
-          projection: 'EPSG_4326'
-        }
-      }
-    },
-    MERCATOR: {
-      SATELLITE: {
-        labelKey: 'map.styles.satellite',
-        component: MapComponentMB,
-        mapConfig: {
-          basemapStyle: `${env.MAP_STYLES}/3857/satellite_maptiler?maptilerApiKey=${apiKeys.maptiler}`,
-          projection: 'EPSG_3857'
-        }
-      },
-      GBIF_NATURAL2: {
-        labelKey: 'map.styles.gbif_natural',
-        component: MapComponentMB,
-        mapConfig: {
-          basemapStyle: `${env.MAP_STYLES}/3857/gbif-raster?${natural}`,
-          projection: 'EPSG_3857'
-        }
-      },
-      GBIF_NATURAL: {
-        labelKey: 'map.styles.gbif_natural',
-        component: MapComponentMB,
-        mapConfig: {
-          basemapStyle: `${env.MAP_STYLES}/3857/gbif-raster-hillshade?${natural}&maptilerApiKey=${apiKeys.maptiler}`,
-          projection: 'EPSG_3857'
-        }
-      },
-      GBIF_LIGHT: {
-        labelKey: 'map.styles.gbif_light',
-        component: MapComponentMB,
-        mapConfig: {
-          basemapStyle: `${env.MAP_STYLES}/3857/gbif-raster?${light}`,
-          projection: 'EPSG_3857'
-        }
-      },
-      GBIF_DARK: {
-        labelKey: 'map.styles.gbif_dark',
-        component: MapComponentMB,
-        mapConfig: {
-          basemapStyle: `${env.MAP_STYLES}/3857/gbif-raster?${dark}`,
-          projection: 'EPSG_3857'
-        }
-      },
-      MAPTILER_OUTDOOR: {
-        labelKey: 'map.styles.outdoor',
-        component: MapComponentMB,
-        mapConfig: {
-          basemapStyle: `https://api.maptiler.com/maps/outdoor/style.json?key=${apiKeys.maptiler}`,
-          projection: 'EPSG_3857'
-        } 
-      },
-      MAPBOX_BRIGHT: {
-        labelKey: 'map.styles.gbif_light',
-        alternative: 'GBIF_LIGHT',
-        component: MapComponentMB,
-        mapConfig: {
-          basemapStyle: `https://api.mapbox.com/styles/v1/mapbox/light-v9?access_token=${apiKeys.mapbox}`,
-          projection: 'EPSG_3857'
-        } 
-      }
-    },
-    ANTARCTIC: {
-      GBIF_NATURAL: {
-        labelKey: 'map.styles.gbif_natural',
-        component: MapComponentOL,
-        mapConfig: {
-          basemapStyle: `${env.MAP_STYLES}/3031/gbif-raster?${natural}`,
-          projection: 'EPSG_3031'
-        }
-      },
-      GBIF_LIGHT: {
-        alternative: 'MAPBOX_BRIGHT',
-        labelKey: 'map.styles.gbif_light',
-        component: MapComponentOL,
-        mapConfig: {
-          basemapStyle: `${env.MAP_STYLES}/3031/gbif-raster?${light}`,
-          projection: 'EPSG_3031'
-        }
-      },
-      GBIF_DARK: {
-        labelKey: 'map.styles.gbif_dark',
-        component: MapComponentOL,
-        mapConfig: {
-          basemapStyle: `${env.MAP_STYLES}/3031/gbif-raster?${dark}`,
-          projection: 'EPSG_3031'
-        }
-      }
-    }
-  }
-}
-
-const defaultProjectionOptions = ['MERCATOR'];
 const defaultLayerOptions = {
-  ARCTIC: ['GBIF_NATURAL', 'GBIF_LIGHT', 'GBIF_DARK'],
-  PLATE_CAREE: ['GBIF_NATURAL', 'GBIF_LIGHT', 'GBIF_DARK'],
-  MERCATOR: ['GBIF_LIGHT', 'GBIF_DARK'],
-  ANTARCTIC: ['GBIF_NATURAL', 'GBIF_LIGHT', 'GBIF_DARK']
+  // ARCTIC: ['NATURAL', 'BRIGHT', 'DARK'],
+  // PLATE_CAREE: ['NATURAL', 'BRIGHT', 'DARK'],
+  MERCATOR: ['BRIGHT', 'NATURAL'],
+  // ANTARCTIC: ['NATURAL', 'BRIGHT', 'DARK']
 };
+
+function getStyle({ styles = {}, projection, type, lookup = {}, layerOptions }) {
+  const styleKey = lookup?.[projection]?.[type] || `${type}_${projection}`;
+  const fallbackType = layerOptions?.[projection]?.[0];
+  let style = styles[styleKey] || styles[fallbackType];
+  return style;
+}
 
 function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading, total, predicateHash, registerPredicate, loadPointData, defaultMapSettings, ...props }) {
   const dialog = useDialogState({ animated: true, modal: false });
   const theme = useContext(ThemeContext);
   const siteContext = useContext(SiteContext);
-  
-  const supportedProjections = siteContext?.maps?.supportedProjections || defaultProjectionOptions;
+
+  const styleLookup = siteContext?.maps?.styleLookup || {};
+
+  const mapStyles = siteContext?.maps?.mapStyles || defaultLayerOptions;
+  const supportedProjections = Object.keys(mapStyles);
   const [projectionOptions, setProjectionOptions] = useState(supportedProjections);
   let defaultProjection = sessionStorage.getItem('defaultOccurrenceProjection') || siteContext?.maps?.defaultProjection || supportedProjections[0];
   if (!supportedProjections.includes(defaultProjection)) {
@@ -191,12 +56,11 @@ function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading,
   }
   const [projection, setProjection] = useState(defaultProjection);
 
-  const mapStyles = siteContext?.maps?.mapStyles || defaultLayerOptions;
-  let defaultStyle = sessionStorage.getItem('defaultOccurrenceLayer') || siteContext?.maps?.defaultMapStyle || 'GBIF_LIGHT';
+  let defaultStyle = sessionStorage.getItem('defaultOccurrenceLayer') || siteContext?.maps?.defaultMapStyle || 'BRIGHT';
   if (!mapStyles?.[defaultProjection]?.includes(defaultStyle)) {
     defaultStyle = mapStyles?.[defaultProjection]?.[0];
   }
-  
+
   const [layerOptions, setLayerOptions] = useState(mapStyles);
   const [layerId, setLayerId] = useState(defaultStyle);
   const [latestEvent, broadcastEvent] = useState();
@@ -208,8 +72,21 @@ function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading,
   const items = pointData?.occurrenceSearch?.documents?.results || [];
 
   useEffect(() => {
-    const mapStyles = getMapStyles({ apiKeys: siteContext.apiKeys });
-    setBasemapOptions(mapStyles);
+    const mapStyles = getMapStyles({ apiKeys: siteContext.apiKeys, language: siteContext?.maps?.locale || 'en', });
+    let mapStyleOverwrites = {};
+    if (siteContext?.maps?.getMapStyles) {
+      mapStyleOverwrites = siteContext.maps.addMapStyles({
+        apiKeys: siteContext.apiKeys,
+        mapStyleServer: env.MAP_STYLES,
+        pixelRatio,
+        language: siteContext?.maps?.locale || 'en',
+        mapComponents: {
+          OpenlayersMap: MapComponentOL,
+          MapboxMap: MapComponentMB,
+        }
+      });
+    }
+    setBasemapOptions(Object.assign({}, mapStyles, mapStyleOverwrites));
   },
     [siteContext],
   );
@@ -230,7 +107,7 @@ function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading,
     setLayerId(layerId);
     sessionStorage.setItem('defaultOccurrenceLayer', layerId);
   }}>
-    <FormattedMessage id={basemapOptions?.[projection]?.[layerId]?.labelKey || 'unknown'} defaultMessage={layerId.name || 'unknown'} />
+    <FormattedMessage id={getStyle({ styles: basemapOptions, projection, type: layerId, lookup: styleLookup }).labelKey || 'unknown'} defaultMessage={layerId.name || 'unknown'} />
   </MenuAction>);
 
   const projectionMenuOptions = menuState => projectionOptions.map((proj, i) => <MenuAction key={proj} onClick={() => {
@@ -240,8 +117,14 @@ function Map({ labelMap, query, q, pointData, pointError, pointLoading, loading,
     <FormattedMessage id={`map.projections.${proj}`} defaultMessage={proj} />
   </MenuAction>);
 
-  const fallbackLayer = layerOptions[projection][0];
-  const mapConfiguration = basemapOptions?.[projection]?.[layerId] || basemapOptions?.[projection]?.[fallbackLayer];
+  const mapConfiguration = getStyle({
+    styles: basemapOptions,
+    projection,
+    type: layerId,
+    lookup: styleLookup,
+    layerOptions
+  });
+  console.log(mapConfiguration);
 
   if (!basemapOptions || !mapConfiguration) return null;
   const MapComponent = mapConfiguration.component || MapComponentOL;

@@ -1,9 +1,9 @@
 {
     "styles": {
         "satellite": "Satellite",
-        "gbif_natural": "Natural",
-        "gbif_light": "Bright",
-        "gbif_dark": "Dark",
+        "natural": "Nature",
+        "bright": "Bright",
+        "dark": "Dark",
         "outdoor": "Outdoor"
     },
     "projections": {

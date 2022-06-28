@@ -101,14 +101,32 @@ export const siteConfig = {
     maptiler: env._FOR_DEVELOPMENT_ONLY.apiKeys.maptiler
   },
   maps: {
-    supportedProjections: ['ARCTIC', 'MERCATOR', 'PLATE_CAREE', 'ANTARCTIC'],
+    locale: 'ja',
     defaultProjection: 'MERCATOR',
+    defaultMapStyle: 'NATURAL',
     mapStyles: {
-      ARCTIC: ['GBIF_NATURAL', 'GBIF_LIGHT'],
-      PLATE_CAREE: ['GBIF_NATURAL', 'GBIF_LIGHT', 'GBIF_DARK'],
-      MERCATOR: ['GBIF_NATURAL', 'GBIF_LIGHT', 'SATELLITE', 'GBIF_DARK'],
-      ANTARCTIC: ['GBIF_NATURAL', 'GBIF_LIGHT', 'GBIF_DARK']
+      ARCTIC: ['NATURAL', 'BRIGHT'],
+      PLATE_CAREE: ['NATURAL', 'BRIGHT', 'DARK'],
+      MERCATOR: ['NATURAL', 'BRIGHT', 'SATELLITE', 'DARK'],
+      ANTARCTIC: ['NATURAL', 'BRIGHT', 'DARK']
     },
-    defaultMapStyle: 'GBIF_NATURAL'
+    // addMapStyles: function ({ mapStyleServer, language, pixelRatio, apiKeys, mapComponents }) {
+    //   return {
+    //     BRIGHT_MERCATOR: {
+    //       component: mapComponents.MapboxMap,
+    //       labelKey: 'My custom map',
+    //       mapConfig: {
+    //         basemapStyle: `${mapStyleServer}/3857/gbif-raster-hillshade?styleName=geyser&background=${encodeURIComponent('#e5e9cd')}&language=${language}&pixelRatio=${pixelRatio}&maptilerApiKey=${apiKeys.maptiler}`,
+    //         projection: 'EPSG_3031'
+    //       }
+    //     }
+    //   }
+    // },
+    styleLookup: {
+      MERCATOR: {
+        BRIGHT: 'BRIGHT_MAPBOX_MERCATOR',
+        NATURAL: 'NATURAL_HILLSHADE_MERCATOR'
+      }
+    }
   }
 };
