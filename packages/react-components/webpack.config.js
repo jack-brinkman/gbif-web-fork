@@ -3,15 +3,19 @@ const path = require('path');
 const createBuildConfig = (buildType) => ({
   entry: './src/index.js',
   output: {
-    path: path.resolve(__dirname, 'dist/lib'),
+    path: path.resolve(__dirname, `dist/lib/${buildType}`),
     filename: 'gbif-react-components.js',
     library: 'gbifReactComponents',
-    libraryTarget: 'var',
+    libraryTarget: buildType,
   },
   devtool: 'source-map',
   externals: {
-    react: 'React', // Case matters here
-    'react-dom': 'ReactDOM', // Case matters here
+    react: {
+      var: 'React',
+    },
+    'react-dom': {
+      var: 'ReactDOM',
+    },
   },
   module: {
     rules: [
