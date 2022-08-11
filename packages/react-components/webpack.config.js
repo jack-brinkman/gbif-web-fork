@@ -5,16 +5,20 @@ const createBuildConfig = (buildType) => ({
   output: {
     path: path.resolve(__dirname, `dist/lib/${buildType}`),
     filename: 'gbif-react-components.js',
-    library: 'gbifReactComponents',
-    libraryTarget: buildType,
+    library: {
+      name: buildType === 'var' ? 'gbifReactComponents' : undefined,
+      type: buildType,
+    },
   },
   devtool: 'source-map',
   externals: {
     react: {
       var: 'React',
+      module: 'React',
     },
     'react-dom': {
       var: 'ReactDOM',
+      module: 'ReactDOM',
     },
   },
   module: {
@@ -39,6 +43,11 @@ const createBuildConfig = (buildType) => ({
       },
     ],
   },
+  experiments: {
+    outputModule: true,
+  },
 });
 
-module.exports = ['var'].map((buildType) => createBuildConfig(buildType));
+module.exports = ['var', 'module'].map((buildType) =>
+  createBuildConfig(buildType)
+);
