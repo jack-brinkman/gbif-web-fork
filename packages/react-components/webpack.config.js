@@ -44,7 +44,7 @@ const createBuildConfig = (buildType) => ({
     ],
   },
   experiments: {
-    outputModule: true,
+    outputModule: buildType === 'module',
   },
 });
 
