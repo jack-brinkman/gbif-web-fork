@@ -10,7 +10,9 @@ function query(query, { variables, client }) {
   const headers = client?.headers;
   const queryId = hash(query);
   const queryParams = { queryId, strict: true };
-  const variablesTooLongForGET = variables && encodeURIComponent(JSON.stringify(variables)).length > maxGETLength;
+  const variablesTooLongForGET =
+    variables &&
+    encodeURIComponent(JSON.stringify(variables)).length > maxGETLength;
   // this is a bit silly. why serialize and then hash the object. would be cheaper to simply hash the serialized
   if (variablesTooLongForGET) {
     queryParams.variablesId = hash(variables);
@@ -18,48 +20,80 @@ function query(query, { variables, client }) {
     queryParams.variables = variables;
   }
 
+  if (queryParams.variables?.predicate) {
+    queryParams.variables.predicate = {
+      type: 'and',
+      predicates: [
+        queryParams.variables.predicate,
+        {
+          type: 'in',
+          key: 'datasetKey',
+          values: ['dr18527'],
+        },
+      ],
+    };
+  } else {
+    queryParams.variables = {
+      ...(queryParams.variables || {}),
+      predicate: {
+        type: 'in',
+        key: 'datasetKey',
+        values: ['dr18527'],
+      },
+    };
+  }
+
   let cancel;
   return {
     promise: new Promise((resolve, reject) => {
-      axios.get(graphqlEndpoint, {
-        params: queryParams,
-        headers,
-        cancelToken: new CancelToken(function executor(c) { cancel = c; })
-      })
-        .then(response => resolve(formatResponse(response.data)))
-        .catch(error => {
+      axios
+        .get(graphqlEndpoint, {
+          params: queryParams,
+          headers,
+          cancelToken: new CancelToken(function executor(c) {
+            cancel = c;
+          }),
+        })
+        .then((response) => resolve(formatResponse(response.data)))
+        .catch((error) => {
           const unknownQueryId = error?.response?.data?.unknownQueryId;
           const unknownVariablesId = error?.response?.data?.unknownVariablesId;
           if (axios.isCancel(error)) {
             resolve(canceledResponse(error.message));
           } else if (unknownQueryId || unknownVariablesId) {
-            axios.post(graphqlEndpoint, { query, variables },
-              {
-                headers,
-                cancelToken: new CancelToken(function executor(c) { cancel = c; })
-              })
-              .then(response => resolve(formatResponse(response.data)))
-              .catch(innerError => {
+            axios
+              .post(
+                graphqlEndpoint,
+                { query, variables },
+                {
+                  headers,
+                  cancelToken: new CancelToken(function executor(c) {
+                    cancel = c;
+                  }),
+                }
+              )
+              .then((response) => resolve(formatResponse(response.data)))
+              .catch((innerError) => {
                 if (axios.isCancel(innerError)) {
                   resolve(canceledResponse(innerError.message));
                 } else {
                   resolve(netWorkErrorResponse(innerError));
                 }
-              })
+              });
           } else {
             resolve(netWorkErrorResponse(error));
           }
-        })
+        });
     }),
-    cancel: reason => cancel(reason || 'CANCELED')
-  }
+    cancel: (reason) => cancel(reason || 'CANCELED'),
+  };
 }
 
 function formatResponse(response) {
   let { data, errors } = response;
   return {
     data,
-    error: errors ? new QueryError({ graphQLErrors: errors }) : void 0
+    error: errors ? new QueryError({ graphQLErrors: errors }) : void 0,
   };
 }
 
@@ -71,9 +105,9 @@ function netWorkErrorResponse(err) {
         message: err?.response?.statusText || 'Network error',
         statusCode: err?.response?.status,
         data: err?.response?.data,
-      }
-    })
-  }
+      },
+    }),
+  };
 }
 
 function canceledResponse(reason) {
@@ -82,9 +116,9 @@ function canceledResponse(reason) {
     error: new QueryError({
       message: 'Canceled',
       isCanceled: {
-        message: reason
-      }
-    })
+        message: reason,
+      },
+    }),
   };
 }
 
