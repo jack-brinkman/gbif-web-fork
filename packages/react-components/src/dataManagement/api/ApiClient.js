@@ -9,16 +9,23 @@ class ApiClient {
     this.request;
     this.graphs = {
       EVENT: config.gqlEvents,
-      DEFAULT: config.gql
+      DEFAULT: config.gql,
     };
+    this.hubConstrain = config.hubConstrain;
   }
 
   query({ query, variables, graph = 'DEFAULT' }) {
     const client = this.graphs[graph];
     if (!client) {
-      return console.error('No configuration has been provided to the GraphQLClient');
+      return console.error(
+        'No configuration has been provided to the GraphQLClient'
+      );
     }
-    return queryGraphQl(query, { variables, client });
+    return queryGraphQl(query, {
+      variables,
+      client,
+      hubConstrain: this.hubConstrain,
+    });
   }
 
   get(url, options) {

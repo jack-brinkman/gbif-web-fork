@@ -10,14 +10,15 @@ const client = new ApiClient({
     endpoint: env.EVENT_GRAPH_API,
   },
   v1: {
-    endpoint: env.API_V1
+    endpoint: env.API_V1,
   },
   esApi: {
-    endpoint: env.ES_WEB_API
+    endpoint: env.ES_WEB_API,
   },
   translations: {
-    endpoint: env.TRANSLATIONS
-  }
+    endpoint: env.TRANSLATIONS,
+  },
+  hubConstrain: env.HUB_CONSTRAIN,
 });
 
 // A context to share state for the full app/component

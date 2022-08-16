@@ -3,11 +3,19 @@ import { addDecorator } from '@storybook/react';
 import { select } from '@storybook/addon-knobs';
 import flatten from 'flat';
 
-import { LocaleProvider } from "../src/dataManagement/LocaleProvider";
+import { LocaleProvider } from '../src/dataManagement/LocaleProvider';
 
 import { Root } from '../src/components';
 
-import ThemeContext, { darkTheme, lightTheme, a11yTheme, vertnetTheme, rtlTheme, alaTheme, gbifTheme } from '../src/style/themes';
+import ThemeContext, {
+  darkTheme,
+  lightTheme,
+  a11yTheme,
+  vertnetTheme,
+  rtlTheme,
+  alaTheme,
+  gbifTheme,
+} from '../src/style/themes';
 import ThemeBuilder from '../src/style/themeBuilder';
 import { ApiContext, ApiClient } from '../src/dataManagement/api';
 import env from '../.env.json';
@@ -16,7 +24,7 @@ import SiteContext from '../src/dataManagement/SiteContext';
 import { siteConfig } from './siteConfig';
 
 const availableLocales = env.LOCALES || ['en-developer'];
-const locales = availableLocales.map(x => {
+const locales = availableLocales.map((x) => {
   if (x === 'en-developer') return 'en-DK';
   if (x === 'en-pseudo') return 'en-ZZ';
   return x;
@@ -25,29 +33,30 @@ const locales = availableLocales.map(x => {
 const customTheme = ThemeBuilder.extend({
   extendWith: {
     fontSize: '14px',
-    primary: '#2a7db1'
-  }
+    primary: '#2a7db1',
+  },
 });
 
 const client = new ApiClient({
   gql: {
-    endpoint: env.GRAPH_API
+    endpoint: env.GRAPH_API,
   },
   gqlEvents: {
-    endpoint: env.EVENT_GRAPH_API
+    endpoint: env.EVENT_GRAPH_API,
   },
   v1: {
-    endpoint: env.API_V1
+    endpoint: env.API_V1,
   },
   esApi: {
-    endpoint: env.ES_WEB_API
+    endpoint: env.ES_WEB_API,
   },
   translations: {
-    endpoint: env.TRANSLATIONS
-  }
+    endpoint: env.TRANSLATIONS,
+  },
+  hubConstrain: env.HUB_CONSTRAIN,
 });
 
-addDecorator(storyFn => {
+addDecorator((storyFn) => {
   const themeObjects = {
     dark: darkTheme,
     light: lightTheme,
@@ -56,49 +65,61 @@ addDecorator(storyFn => {
     rtl: rtlTheme,
     ala: alaTheme,
     gbif: gbifTheme,
-    custom: customTheme
-  }
+    custom: customTheme,
+  };
 
-  const chooseTheme = choice => {
-    const _theme = themeObjects[choice.toLowerCase()]
-    return _theme
-  }
+  const chooseTheme = (choice) => {
+    const _theme = themeObjects[choice.toLowerCase()];
+    return _theme;
+  };
 
-  const chooseRtl = choice => {
-    return choice
-  }
+  const chooseRtl = (choice) => {
+    return choice;
+  };
 
-  const chooseLocale = choice => {
-    return choice
-  }
+  const chooseLocale = (choice) => {
+    return choice;
+  };
 
   return (
     <div>
       <SiteContext.Provider value={siteConfig}>
         <ApiContext.Provider value={client}>
-          <LocaleProvider locale={chooseLocale(
-            select(
-              'Choose locale',
-              locales,
-              env.STORYBOOK_LOCALE || locales[0],
-            ),
-          )} >
+          <LocaleProvider
+            locale={chooseLocale(
+              select(
+                'Choose locale',
+                locales,
+                env.STORYBOOK_LOCALE || locales[0]
+              )
+            )}
+          >
             <ThemeContext.Provider
               value={chooseTheme(
                 select(
                   'Choose Theme',
-                  ['Dark', 'Light', 'A11y', 'Vertnet', 'RTL', 'GBIF', 'ALA', 'Custom'],
-                  'Light',
-                ),
+                  [
+                    'Dark',
+                    'Light',
+                    'A11y',
+                    'Vertnet',
+                    'RTL',
+                    'GBIF',
+                    'ALA',
+                    'Custom',
+                  ],
+                  'Light'
+                )
               )}
             >
-              <Root id="application" appRoot style={{padding: 0}} dir={chooseRtl(
-                select(
-                  'Choose Direction',
-                  ['ltr', 'rtl'],
-                  'ltr',
-                ),
-              )}>
+              <Root
+                id='application'
+                appRoot
+                style={{ padding: 0 }}
+                dir={chooseRtl(
+                  select('Choose Direction', ['ltr', 'rtl'], 'ltr')
+                )}
+              >
                 <RouteContext.Provider value={siteConfig.routeConfig}>
                   {storyFn()}
                 </RouteContext.Provider>
@@ -108,5 +129,5 @@ addDecorator(storyFn => {
         </ApiContext.Provider>
       </SiteContext.Provider>
     </div>
-  )
-})
+  );
+});

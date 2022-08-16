@@ -5,7 +5,7 @@ import { QueryError } from './QueryError';
 let CancelToken = axios.CancelToken;
 const maxGETLength = 1000;
 
-function query(query, { variables, client }) {
+function query(query, { variables, client, hubConstrain }) {
   const graphqlEndpoint = client?.endpoint;
   const headers = client?.headers;
   const queryId = hash(query);
@@ -20,27 +20,29 @@ function query(query, { variables, client }) {
     queryParams.variables = variables;
   }
 
-  if (queryParams.variables?.predicate) {
-    queryParams.variables.predicate = {
-      type: 'and',
-      predicates: [
-        queryParams.variables.predicate,
-        {
+  if (hubConstrain) {
+    if (queryParams.variables?.predicate) {
+      queryParams.variables.predicate = {
+        type: 'and',
+        predicates: [
+          queryParams.variables.predicate,
+          {
+            type: 'in',
+            key: 'datasetKey',
+            values: hubConstrain,
+          },
+        ],
+      };
+    } else {
+      queryParams.variables = {
+        ...(queryParams.variables || {}),
+        predicate: {
           type: 'in',
           key: 'datasetKey',
-          values: ['dr18527'],
+          values: hubConstrain,
         },
-      ],
-    };
-  } else {
-    queryParams.variables = {
-      ...(queryParams.variables || {}),
-      predicate: {
-        type: 'in',
-        key: 'datasetKey',
-        values: ['dr18527'],
-      },
-    };
+      };
+    }
   }
 
   let cancel;
