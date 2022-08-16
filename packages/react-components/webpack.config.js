@@ -48,6 +48,4 @@ const createBuildConfig = (buildType) => ({
   },
 });
 
-module.exports = ['var', 'module'].map((buildType) =>
-  createBuildConfig(buildType)
-);
+module.exports = ['var'].map((buildType) => createBuildConfig(buildType));
