@@ -32,6 +32,7 @@
     "materialSample": "MaterialSample",
     "geologicalContext": "Geological context",
     "other": "Other",
-    "measurementsOrFacts": "Measurements"
+    "measurementsOrFacts": "Measurements",
+    "overview": "Overview"
   }
 }

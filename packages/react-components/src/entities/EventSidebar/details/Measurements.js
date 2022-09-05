@@ -1,13 +1,8 @@
-import React, {useState} from 'react';
-import {DataTable, Properties, Row, TBody, Td, Th} from "../../../components";
+import React from 'react';
+import {DataTable, TBody, Td, Th} from "../../../components";
 import {Group} from "./Groups";
 
-const { Term: T, Value: V } = Properties;
-
 export function Measurements({ data }) {
-
-    const [fixedColumn, setFixed] = useState(true);
-
     let hasMeasurements = false;
     if (data.results.documents.results
         && data.results.documents.results.length > 0
@@ -16,9 +11,7 @@ export function Measurements({ data }) {
         hasMeasurements = true;
     }
 
-    if (!hasMeasurements){
-        return <></>
-    }
+    if (!hasMeasurements) return <></>;
 
     const results = data.results.documents.results[0].measurementOrFacts;
 
@@ -49,7 +42,7 @@ export function Measurements({ data }) {
     const total = results.length;
     return <>
         <Group label="eventDetails.groups.measurementsOrFacts">
-            <DataTable fixedColumn={fixedColumn} {...{ first, prev, next, size, from, total }} style={{ height: 300 }}>
+            <DataTable fixedColumn={true} {...{ first, prev, next, size, from, total }} style={{ height: 300 }}>
                 <thead>
                 <tr>{headers}</tr>
                 </thead>
