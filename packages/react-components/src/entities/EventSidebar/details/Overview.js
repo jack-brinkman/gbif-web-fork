@@ -1,5 +1,5 @@
 import React from 'react';
-import {DataTable, TBody, Td, Th} from "../../../components";
+import {DataTable, TBody, Td, Th, Button} from "../../../components";
 import {Group} from "./Groups";
 
 export function Overview ({ data }) {
@@ -14,6 +14,8 @@ export function Overview ({ data }) {
     if (!hasMeasurements){
         return <></>
     }
+
+    console.log(data)
 
     const results = data.results.documents.results[0].measurementOrFacts;
 
@@ -42,8 +44,7 @@ export function Overview ({ data }) {
     const size = 10;
     const from = 0;
     const total = results.length;
-    return <>
-        <Group label="eventDetails.groups.overview">
+    return <Group label="eventDetails.groups.overview">
             <DataTable fixedColumn={true} {...{ first, prev, next, size, from, total }} style={{ height: 300 }}>
                 <thead>
                 <tr>{headers}</tr>
@@ -52,6 +53,8 @@ export function Overview ({ data }) {
                     {getRows()}
                 </TBody>
             </DataTable>
+            {/* <Button look="primaryOutline" style={{ marginTop: '20px', fontSize: '11px' }}>
+          View events related to this thing
+        </Button> */}
         </Group>
-    </>
 }
