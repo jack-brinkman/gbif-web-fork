@@ -1,60 +1,51 @@
-import React from 'react';
-import {DataTable, TBody, Td, Th, Button} from "../../../components";
-import {Group} from "./Groups";
+import React, { useContext } from 'react';
+import * as css from '../styles';
+import { Properties, Button } from '../../../components';
+import { PlainTextField } from './properties';
+import { Group } from './Groups';
+import SiteContext from '../../../dataManagement/SiteContext';
 
-export function Overview ({ data }) {
-    let hasMeasurements = false;
-    if (data.results.documents.results
-        && data.results.documents.results.length > 0
-        && data.results.documents.results[0].measurementOrFacts
-        && data.results.documents.results[0].measurementOrFacts.length > 0) {
-        hasMeasurements = true;
-    }
+export function Overview({ data }) {
+  const siteConfig = useContext(SiteContext);
+  if (!Array.isArray(siteConfig.event.overviews)) return null;
 
-    if (!hasMeasurements){
-        return <></>
-    }
+  // Try and find an overview config for this event type
+  const { results } = data.results.documents;
+  const overview = siteConfig.event.overviews.find(
+    (config) =>
+      !Array.isArray(config.eventTypes) ||
+      config.eventTypes.includes(results[0].eventType.concept)
+  );
 
-    console.log(data)
+  // Ensure we have a valid overview config & have been provided with data
+  if (!overview || !(results && results.length > 0)) return null;
+  const measurementOrFacts = (results[0].measurementOrFacts || []).filter(
+    (mof) => (overview.mofs || []).includes(mof.measurementType)
+  );
 
-    const results = data.results.documents.results[0].measurementOrFacts;
-
-    const getRows = () => {
-        const rows = results.map(row => {
-            return <tr key={row}>
-                <Td key={`measurementType`}>{row.measurementType}</Td>
-                <Td key={`measurementValue`}>{row.measurementValue}{row.measurementUnit}</Td>
-            </tr>;
-        });
-        return rows;
-    }
-
-    const headers = [
-        <Th key='measurementType'>
-            Measurement
-        </Th>,
-        <Th key='measurementValue'>
-            value
-        </Th>
-    ];
-
-    const first = () => { };
-    const prev = () => { };
-    const next = () => { };
-    const size = 10;
-    const from = 0;
-    const total = results.length;
-    return <Group label="eventDetails.groups.overview">
-            <DataTable fixedColumn={true} {...{ first, prev, next, size, from, total }} style={{ height: 300 }}>
-                <thead>
-                <tr>{headers}</tr>
-                </thead>
-                <TBody columnCount={2}>
-                    {getRows()}
-                </TBody>
-            </DataTable>
-            {/* <Button look="primaryOutline" style={{ marginTop: '20px', fontSize: '11px' }}>
-          View events related to this thing
-        </Button> */}
-        </Group>
+  return (
+    <Group label='eventDetails.groups.overview'>
+      <Properties css={css.properties} breakpoint={800}>
+        {measurementOrFacts.map((mof) => (
+          <PlainTextField
+            term={{
+              simpleName: mof.measurementType,
+              value: mof.measurementValue,
+            }}
+          />
+        ))}
+      </Properties>
+      {(overview.links || []).map(({ title, action }) => (
+        <Button
+          look='primaryOutline'
+          style={{ marginTop: '20px', marginRight: '8px', fontSize: '11px' }}
+          onClick={() => {
+            if (action) action(data);
+          }}
+        >
+          {title}
+        </Button>
+      ))}
+    </Group>
+  );
 }

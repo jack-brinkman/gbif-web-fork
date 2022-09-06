@@ -26,7 +26,7 @@ export const FilterContent = ({ config = {}, translations, hide, onApply, onCanc
   const initialOptions = get(initFilter, `must.${filterHandle}`, []);
   const [options, setOptions] = useState(initialOptions.filter(x => x.type !== 'isNotNull'));
   const [inputValue, setValue] = useState('');
-  const [showSuggestions, setShowSuggestions] = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(true);
   const searchContext = useContext(SearchContext);
 
   useEffect(() => {

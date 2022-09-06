@@ -8,6 +8,7 @@ import {Group, Groups} from './Groups';
 import {Summaries} from "./Summaries";
 import Map from "../../SiteSidebar/details/Map/Map";
 import {useQuery} from "../../../dataManagement/api";
+import { Overview } from './Overview';
 
 export function Intro({
   data = {},
@@ -76,6 +77,7 @@ export function Intro({
   return <Row direction="column" wrap="nowrap" style={{ maxHeight: '100%', overflow: 'hidden' }}>
     <Col style={{ padding: '12px 0', paddingBottom: 50, overflow: 'auto' }} grow>
       <Header data={data} error={error} />
+      <Overview data={summaryData} />
       <Groups
           event={event}
           showAll={showAll}
