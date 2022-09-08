@@ -15,11 +15,21 @@ export function Measurements({ data }) {
 
     const results = data.results.documents.results[0].measurementOrFacts;
 
+    const hasField = (prop) => {
+        return results.filter((mof) => Boolean(mof[`measurement${prop}`])).length > 0;
+    };
+    const extraFields = ['Accuracy', 'Method', 'Remarks', 'DeterminedDate'].filter((field) => hasField(field));
+
     const getRows = () => {
         const rows = results.map(row => {
             return <tr key={row}>
                 <Td key={`measurementType`}>{row.measurementType}</Td>
-                <Td key={`measurementValue`}>{row.measurementValue}{row.measurementUnit}</Td>
+                <Td key={`measurementValue`}>{row.measurementValue}{row.measurementUnit === '%' ? '' : ' '}{row.measurementUnit}</Td>
+                {extraFields.map(field => (
+                    <Td key={`measurement${field}`}>
+                        {row[`measurement${field}`]}
+                    </Td>
+                ))}
             </tr>;
         });
         return rows;
@@ -30,8 +40,13 @@ export function Measurements({ data }) {
             Measurement
         </Th>,
         <Th key='measurementValue'>
-            value
-        </Th>
+            Value
+        </Th>,
+        ...extraFields.map(field => (
+            <Th key={`measurement${field}`}>
+                {field}
+            </Th>
+        ))
     ];
 
     const first = () => { };
@@ -46,7 +61,7 @@ export function Measurements({ data }) {
                 <thead>
                 <tr>{headers}</tr>
                 </thead>
-                <TBody columnCount={2}>
+                <TBody columnCount={2 + extraFields.length}>
                     {getRows()}
                 </TBody>
             </DataTable>

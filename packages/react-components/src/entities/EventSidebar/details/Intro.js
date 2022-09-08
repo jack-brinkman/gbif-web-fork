@@ -143,7 +143,12 @@ query list($predicate1: Predicate, $predicate2: Predicate, $offset: Int, $limit:
           measurementID
           measurementType
           measurementValue
+          measurementAccuracy
           measurementUnit
+          measurementDeterminedDate
+          measurementDeterminedBy
+          measurementMethod
+          measurementRemarks
         }        
       }
     }    
