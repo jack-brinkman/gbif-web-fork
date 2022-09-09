@@ -19,20 +19,26 @@ export function Overview({ data }) {
 
   // Ensure we have a valid overview config & have been provided with data
   if (!overview || !(results && results.length > 0)) return null;
-  const measurementOrFacts = (results[0].measurementOrFacts || []).filter(
-    (mof) => (overview.mofs || []).includes(mof.measurementType)
-  ).sort((a, b) => a.measurementType.localeCompare(b.measurementType));
+
+  // Map each MoF value to the provided config
+  const items = (results[0].measurementOrFacts || []);
+  const mofs = items.reduce((prev, cur) => {
+    const mof = (overview.mofs || []).find((item) => item.type === cur.measurementType);
+    return mof ? 
+    [
+      ...prev,
+      { simpleName: cur[mof.key].replace('% ', ''),
+        value:
+          `${cur[mof.value]}${mof.unit ? `${cur.measurementUnit !== '%' ? ' ' : ''}${cur.measurementUnit}` : ''}`
+      }
+    ] : prev;
+  }, []).sort((a, b) => a.simpleName.localeCompare(b.simpleName));
 
   return (
     <Group label='eventDetails.groups.overview'>
       <Properties css={css.properties} breakpoint={800}>
-        {measurementOrFacts.map((mof) => (
-          <PlainTextField
-            term={{
-              simpleName: mof.measurementType,
-              value: `${mof.measurementValue} ${mof.measurementUnit || ''}${mof.measurementMethod ? ` (${mof.measurementMethod.replaceAll('% ', '')})` : ''}`,
-            }}
-          />
+        {mofs.map((mof) => (
+          <PlainTextField term={mof} />
         ))}
       </Properties>
       {(overview.links || []).map(({ title, action }) => (

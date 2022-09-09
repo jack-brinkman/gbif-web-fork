@@ -224,10 +224,12 @@ export function Field({
   return (
     <React.Fragment>
       <T>
-        <FormattedMessage
-          id={fieldName}
-          defaultMessage={_.startCase(simpleName)}
-        />
+        <div style={{ paddingRight: 4 }}>
+          <FormattedMessage
+            id={fieldName}
+            defaultMessage={_.startCase(simpleName)}
+          />
+        </div>
       </T>
       <V style={{ position: 'relative' }}>
         <div

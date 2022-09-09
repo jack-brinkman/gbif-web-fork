@@ -108,7 +108,7 @@ function Event({ showAll, termMap, event, setActiveEvent, addToSearch }) {
   }, []);
 
   const addToSearchCallback = useCallback(() => {
-    addToSearch(termMap.eventID.value);
+    addToSearch(termMap.parentEventID.value || termMap.eventID.value);
   }, []);
 
   function viewRelative(id){
