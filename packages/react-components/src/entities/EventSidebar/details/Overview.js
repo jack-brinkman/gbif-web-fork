@@ -30,7 +30,7 @@ export function Overview({ data }) {
           <PlainTextField
             term={{
               simpleName: mof.measurementType,
-              value: `${mof.measurementValue} ${mof.measurementUnit}${mof.measurementMethod ? ` (${mof.measurementMethod.replaceAll('% ', '')})` : ''}`,
+              value: `${mof.measurementValue} ${mof.measurementUnit || ''}${mof.measurementMethod ? ` (${mof.measurementMethod.replaceAll('% ', '')})` : ''}`,
             }}
           />
         ))}
