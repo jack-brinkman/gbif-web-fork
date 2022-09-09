@@ -21,7 +21,7 @@ export function Overview({ data }) {
   if (!overview || !(results && results.length > 0)) return null;
   const measurementOrFacts = (results[0].measurementOrFacts || []).filter(
     (mof) => (overview.mofs || []).includes(mof.measurementType)
-  );
+  ).sort((a, b) => a.measurementType.localeCompare(b.measurementType));
 
   return (
     <Group label='eventDetails.groups.overview'>
@@ -30,7 +30,7 @@ export function Overview({ data }) {
           <PlainTextField
             term={{
               simpleName: mof.measurementType,
-              value: mof.measurementValue,
+              value: `${mof.measurementValue} ${mof.measurementUnit}${mof.measurementMethod ? ` (${mof.measurementMethod.replaceAll('% ', '')})` : ''}`,
             }}
           />
         ))}

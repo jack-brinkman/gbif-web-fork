@@ -21,7 +21,7 @@ export function Measurements({ data }) {
     const extraFields = ['Accuracy', 'Method', 'Remarks', 'DeterminedDate'].filter((field) => hasField(field));
 
     const getRows = () => {
-        const rows = results.map(row => {
+        const rows = results.sort((a, b) => a.measurementType.localeCompare(b.measurementType)).map(row => {
             return <tr key={row}>
                 <Td key={`measurementType`}>{row.measurementType}</Td>
                 <Td key={`measurementValue`}>{row.measurementValue}{row.measurementUnit === '%' ? '' : ' '}{row.measurementUnit}</Td>
