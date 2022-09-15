@@ -219,6 +219,10 @@ query list($predicate1: Predicate, $predicate2: Predicate, $offset: Int, $limit:
         count
         key
       }
+      catalogNumber {
+        count
+        key
+      }
       samplingProtocol {
         count
         key

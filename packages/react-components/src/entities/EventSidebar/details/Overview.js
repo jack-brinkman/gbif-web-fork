@@ -1,11 +1,21 @@
-import React, { useContext } from 'react';
-import * as css from '../styles';
+import React, { useContext, useState } from 'react';
+import { css } from '@emotion/react';
 import { Properties, Button } from '../../../components';
+import { MdInfoOutline } from 'react-icons/md'
 import { PlainTextField } from './properties';
 import { Group } from './Groups';
 import SiteContext from '../../../dataManagement/SiteContext';
 
+const info = css`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-top: 14px;
+`;
+
 export function Overview({ data }) {
+  const [error, setError] = useState(null);
+
   const siteConfig = useContext(SiteContext);
   if (!Array.isArray(siteConfig.event.overviews)) return null;
 
@@ -41,17 +51,31 @@ export function Overview({ data }) {
           <PlainTextField term={mof} />
         ))}
       </Properties>
-      {(overview.links || []).map(({ title, action }) => (
-        <Button
-          look='primaryOutline'
-          style={{ marginTop: '20px', marginRight: '8px', fontSize: '11px' }}
-          onClick={() => {
-            if (action) action(data);
-          }}
-        >
-          {title}
-        </Button>
-      ))}
+      {(overview.links || []).map((link) => {
+        const { title, visible, action } = link(data);
+        if (visible) {
+          return (
+            <Button
+              look='primaryOutline'
+              style={{ marginTop: '20px', marginRight: '8px', fontSize: '11px' }}
+              onClick={() => {
+                if (action) {
+                  setError(null);
+                  action(setError);
+                }
+              }}
+            >
+              {title}
+            </Button>
+          );
+        }
+      })}
+      {error && (
+        <div css={info}>
+          <MdInfoOutline size={20} style={{ marginRight: '8px' }} />
+          <p style={{ fontSize: '13px', margin: '0px' }}>{error}</p>
+        </div>
+      )}
     </Group>
   );
 }
