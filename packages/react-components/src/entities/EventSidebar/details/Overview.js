@@ -5,6 +5,7 @@ import { MdInfoOutline } from 'react-icons/md'
 import { PlainTextField } from './properties';
 import { Group } from './Groups';
 import SiteContext from '../../../dataManagement/SiteContext';
+import * as styles from '../styles';
 
 const info = css`
   display: flex;
@@ -46,7 +47,7 @@ export function Overview({ data }) {
 
   return (
     <Group label='eventDetails.groups.overview'>
-      <Properties css={css.properties} breakpoint={800}>
+      <Properties css={styles.properties} breakpoint={800}>
         {mofs.map((mof) => (
           <PlainTextField term={mof} />
         ))}

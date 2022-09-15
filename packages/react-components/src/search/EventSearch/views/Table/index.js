@@ -30,9 +30,12 @@ query list($predicate: Predicate, $offset: Int, $limit: Int){
         stateProvince
         countryCode
         measurementOrFactTypes
-        occurrenceCount
         speciesCount
         eventTypeHierarchyJoined
+        occurrences(size: 1) {
+          genus
+          species
+        }
       }
     }
   }
@@ -42,12 +45,20 @@ query list($predicate: Predicate, $offset: Int, $limit: Int){
 const defaultTableConfig = {
   columns: [
     {
-      trKey: 'filters.eventID.name',
+      trKey: 'tableHeaders.species',
       value: {
-        key: 'eventID',
+        key: 'occurrences',
+        formatter: (value, item) => value[0].species || value[0].genus,
         hideFalsy: true
       },
     },
+    // {
+    //   trKey: 'filters.eventID.name',
+    //   value: {
+    //     key: 'eventID',
+    //     hideFalsy: true
+    //   },
+    // },
     {
       trKey: 'filters.eventType.name',
       value: {
@@ -158,7 +169,7 @@ const defaultTableConfig = {
     },
     {
       name: 'speciesCount',
-      trKey: 'tableHeaders.species',
+      trKey: 'tableHeaders.speciesCount',
       value: {
         key: 'speciesCount',
         formatter: (value, item) => <FormattedNumber value={value} />,
