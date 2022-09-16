@@ -33,6 +33,7 @@ query list($predicate: Predicate, $offset: Int, $limit: Int){
         speciesCount
         eventTypeHierarchyJoined
         occurrences(size: 1) {
+          family
           genus
           species
         }
@@ -45,20 +46,12 @@ query list($predicate: Predicate, $offset: Int, $limit: Int){
 const defaultTableConfig = {
   columns: [
     {
-      trKey: 'tableHeaders.species',
+      trKey: 'filters.eventID.name',
       value: {
-        key: 'occurrences',
-        formatter: (value, item) => value[0].species || value[0].genus,
+        key: 'eventID',
         hideFalsy: true
       },
     },
-    // {
-    //   trKey: 'filters.eventID.name',
-    //   value: {
-    //     key: 'eventID',
-    //     hideFalsy: true
-    //   },
-    // },
     {
       trKey: 'filters.eventType.name',
       value: {
@@ -100,15 +93,15 @@ const defaultTableConfig = {
         hideFalsy: true
       }
     },
-    // {
-    //   trKey: 'filters.samplingProtocol.name',
-    //   filterKey: 'eventSamplingProtocol',
-    //   value: {
-    //     key: 'samplingProtocol',
-    //     formatter: (value, item) => item?.samplingProtocol[0],
-    //     hideFalsy: true
-    //   }
-    // },
+    {
+      trKey: 'filters.samplingProtocol.name',
+      filterKey: 'eventSamplingProtocol',
+      value: {
+        key: 'samplingProtocol',
+        formatter: (value, item) => item?.samplingProtocol[0],
+        hideFalsy: true
+      }
+    },
     {
       trKey: 'filters.locationID.name',
       filterKey: 'locationID',

@@ -10,6 +10,7 @@ import { useUpdateEffect } from "react-use";
 import { EventSidebar } from "../../../../entities/EventSidebar/EventSidebar";
 import env from '../../../../../.env.json';
 import { FilterContext } from "../../../../widgets/Filter/state";
+import SiteContext from '../../../../dataManagement/SiteContext';
 
 const fallbackTableConfig = {
   columns: [{
@@ -21,8 +22,34 @@ const fallbackTableConfig = {
   }]
 };
 
+const handleOverrides = (tableConfig, siteConfig) => {
+  let overrideColumns = siteConfig.event.table?.columns;
+  if (!siteConfig || !overrideColumns || overrideColumns.length < 1) {
+    return tableConfig;
+  } else {
+    // Override existing columns
+    let out = tableConfig.columns.reduce((prev, cur) => {
+      const match = overrideColumns.find((col) => col.trKey === cur.trKey);
+      if (match) {
+        overrideColumns = overrideColumns.filter(col => col.trKey !== cur.trKey);
+        return match.hidden ? prev : [...prev, match];
+      } else {
+        return [...prev, cur];
+      };
+    }, []);
+
+    // Insert new columns
+    overrideColumns.forEach(col => {
+      out = [...out.slice(0, col.insertAt || 0), col, ...out.slice(col.insertAt || 0)]
+    });
+
+    return { columns: out };
+  }
+};
+
 export const EventsTable = ({ first, prev, next, size, from, results, total, loading, defaultTableConfig = fallbackTableConfig, hideLock }) => {
   const currentFilterContext = useContext(FilterContext);
+  const siteConfig = useContext(SiteContext);
   const { filters, tableConfig = defaultTableConfig, labelMap } = useContext(SearchContext);
   const [fixedColumn, setFixed] = useState(true && !hideLock);
   const fixed = fixedColumn;
@@ -33,6 +60,9 @@ export const EventsTable = ({ first, prev, next, size, from, results, total, loa
   const [activeDatasetKey, setActiveDatasetKey] = useState(false);
 
   const dialog = useDialogState({ animated: true, modal: false });
+
+  // handle config overrides
+  const newTableConfig = handleOverrides(tableConfig, siteConfig);
 
   // current result set
   const items = results || [];
@@ -88,7 +118,7 @@ export const EventsTable = ({ first, prev, next, size, from, results, total, loa
     }
   }, [activeEventID, activeDatasetKey, items]);
 
-  const headers = tableConfig.columns.map((col, index) => {
+  const headers = newTableConfig.columns.map((col, index) => {
     const FilterPopover = col.filterKey ? filters[col.filterKey]?.Popover : null;
     return <Th key={col.trKey} width={col.width} >
       <Row wrap="nowrap">
@@ -131,7 +161,7 @@ export const EventsTable = ({ first, prev, next, size, from, results, total, loa
           <tr key={`EventsTableHeaders`}>{headers}</tr>
         </thead>
         <TBody rowCount={size} columnCount={13} loading={loading}>
-          {getRows({ tableConfig, labelMap, results, setActiveEventID, setActiveDatasetKey, dialog, currentFilterContext })}
+          {getRows({ tableConfig: newTableConfig, labelMap, results, setActiveEventID, setActiveDatasetKey, dialog, currentFilterContext })}
         </TBody>
       </DataTable>
     </div>

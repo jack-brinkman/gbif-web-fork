@@ -18,11 +18,11 @@ export function Overview({ data }) {
   const [error, setError] = useState(null);
 
   const siteConfig = useContext(SiteContext);
-  if (!Array.isArray(siteConfig.event.overviews)) return null;
+  if (!Array.isArray(siteConfig.event?.sidebar?.overviews)) return null;
 
   // Try and find an overview config for this event type
   const { results } = data.results.documents;
-  const overview = siteConfig.event.overviews.find(
+  const overview = siteConfig.event.sidebar.overviews.find(
     (config) =>
       !Array.isArray(config.eventTypes) ||
       config.eventTypes.includes(results[0].eventType.concept)
