@@ -36,6 +36,7 @@ query list($predicate: Predicate, $offset: Int, $limit: Int){
           family
           genus
           species
+          infraspecificEpithet
         }
       }
     }
