@@ -6,7 +6,7 @@ export const spinner = ({ theme }) => css`
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  border:8px solid;
+  border: 6px solid;
   border-color: #E4E4ED;
   border-right-color: ${theme.progressBar};
   animation: s2 0.8s infinite linear;
