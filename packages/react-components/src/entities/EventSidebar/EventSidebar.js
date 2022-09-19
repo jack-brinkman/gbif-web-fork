@@ -1,13 +1,13 @@
 import React, { useContext, useState, useEffect } from 'react';
 import ThemeContext from '../../style/themes/ThemeContext';
 import * as css from './styles';
-import { Row, Col, Tabs } from "../../components";
+import { Row, Col, Tabs, Spinner } from "../../components";
 import { useQuery } from '../../dataManagement/api';
 import { Intro } from './details/Intro';
 import {MdClose, MdInfo} from "react-icons/md";
 const { TabList, Tab, TapSeperator } = Tabs;
 
-const {  TabPanel } = Tabs;
+const { TabPanel } = Tabs;
 
 export function EventSidebar({
   onCloseRequest,
@@ -27,7 +27,40 @@ export function EventSidebar({
 
   useEffect(() => {
     if (typeof eventID !== 'undefined') {
-      load({ variables: { eventID: eventID, datasetKey: datasetKey } });
+      const predicate1 = {
+        type: 'and',
+        predicates: [
+          {
+            key: "eventHierarchy",
+            type: "equals",
+            value: eventID
+          }
+         ,{
+          key:  "datasetKey",
+          type: "equals",
+          value: datasetKey
+        }]
+      }
+
+      const predicate2 = {
+        type: 'and',
+        predicates: [
+          {
+            key: "eventHierarchy",
+            type: "equals",
+            value: eventID
+          },
+          {
+            key: "measurementOrFactTypes",
+            type: "isNotNull"
+          }
+          ,{
+            key:  "datasetKey",
+            type: "equals",
+            value: datasetKey
+          }]
+      }
+      load({ variables: { eventID, datasetKey, predicate1, predicate2, size: 0, from: 0 } });
     }
   }, [eventID, datasetKey]);
 
@@ -55,9 +88,11 @@ export function EventSidebar({
         </TabList>
       </Col>
       <Col shrink={false} grow={false} css={css.detailDrawerContent({ theme })} >
-        {isLoading && <Col style={{ padding: '12px', paddingBottom: 50, overflow: 'auto' }} grow>
-          <h2>{eventID} - Loading event information...</h2>
-        </Col>}
+        {isLoading && <div css={css.detailDrawerLoader({ theme })}>
+          <Spinner />
+          <h3 style={{ marginTop: 32, marginBottom: 0 }}>Loading event information</h3>
+          <p>ID: {eventID}</p>
+        </div>}
         {!isLoading &&
             <TabPanel tabId='details' style={{height: '100%'}}>
               <Intro
@@ -76,7 +111,7 @@ export function EventSidebar({
 };
 
 const EVENT = `
-query event($eventID: String, $datasetKey: String){
+query event($eventID: String, $datasetKey: String, $predicate1: Predicate, $predicate2: Predicate, $offset: Int, $limit: Int) {
   event(eventID: $eventID, datasetKey: $datasetKey) {
     eventID
     parentEventID
@@ -117,7 +152,174 @@ query event($eventID: String, $datasetKey: String){
     temporalCoverage {
       gte
       lte
+    }
+  }
+
+  mofResults: eventSearch(predicate: $predicate2){
+    facet {
+      eventTypeHierarchyJoined {
+        key
+        count
+      }  
+    }
+  }
+  
+  results: eventSearch(
+    predicate:$predicate1,
+    size: $limit, 
+    from: $offset
+    ) {
+    documents(size: 1) {
+      total
+      results {
+        eventID
+        parentEventID
+        eventType {
+          concept
+        }
+        eventName
+        coordinates
+        countryCode
+        datasetKey
+        datasetTitle
+        kingdoms
+        phyla
+        classes
+        orders
+        families
+        genera
+        year
+        month
+        occurrenceCount
+        measurementOrFactTypes
+        measurementOrFactCount
+        sampleSizeUnit
+        sampleSizeValue
+        samplingProtocol
+        eventTypeHierarchyJoined
+        eventHierarchyJoined
+        eventTypeHierarchy
+        eventHierarchy    
+        eventTypeHierarchy
+        eventHierarchy
+        decimalLatitude
+        decimalLongitude
+        locality
+        stateProvince
+        locationID
+        wktConvexHull
+        temporalCoverage {
+          gte
+          lte
+        }
+        measurementOrFacts {
+          measurementID
+          measurementType
+          measurementValue
+          measurementAccuracy
+          measurementUnit
+          measurementDeterminedDate
+          measurementDeterminedBy
+          measurementMethod
+          measurementRemarks
+        }    
+      }
     }    
+    facet {
+      eventHierarchy {
+        count
+        key
+      }
+      eventHierarchyJoined {
+        count
+        key
+      }
+      eventTypeHierarchy {
+        count
+        key
+      }
+      eventTypeHierarchyJoined {
+        count
+        key
+      }
+      samplingProtocol {
+        count
+        key
+      }
+      measurementOrFactTypes {
+        count
+        key
+      }
+    }       
+    occurrenceFacet {
+      basisOfRecord {
+        count
+        key
+      } 
+      month {
+        count
+        key
+      }  
+      year {
+        count
+        key
+      }                  
+      kingdom {
+        count
+        key
+      }
+      phylum {
+        count
+        key
+      }               
+      order {
+        count
+        key
+      }     
+      class {
+        count
+        key
+      }    
+      family {
+        count
+        key
+      }
+      genus {
+        count
+        key
+      }
+      species {
+        count
+        key
+      }
+      catalogNumber {
+        count
+        key
+      }
+      samplingProtocol {
+        count
+        key
+      }  
+      recordedBy {
+        count      
+        key
+      }
+      recordedById {
+        count
+        key
+      }
+      identifiedBy {
+        count
+        key
+      }
+      eventTypeHierarchy {
+        key
+      }  
+      eventTypeHierarchyJoined {
+        key
+        count
+      }                    
+    }
   }
 }
 `;

@@ -6,7 +6,6 @@ import ThemeContext from '../../../style/themes/ThemeContext';
 import * as css from '../styles';
 import { Row, Col, IconFeatures, Eyebrow } from "../../../components";
 import { Globe } from './Globe';
-import useBelow from '../../../utils/useBelow';
 
 export function Header({
   data,
@@ -15,7 +14,6 @@ export function Header({
   className,
   ...props
 }) {
-  const isBelow = useBelow(500);
   const theme = useContext(ThemeContext);
   const item = data?.event;
   return <Row wrap="no-wrap" css={css.header({ theme })} {...props}>

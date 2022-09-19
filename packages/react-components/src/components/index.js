@@ -23,6 +23,7 @@ export { MajorRanks } from './MajorRanks/MajorRanks';
 export { IconFeatures } from './IconFeatures/IconFeatures';
 export { HyperText } from './HyperText/HyperText';
 export { Progress } from './Progress/Progress';
+export { Spinner } from './Spinner/Spinner';
 export { Classification } from './Classification/Classification';
 export { Tag, Tags } from './Tag/Tag';
 export { GadmClassification } from './GadmClassification/GadmClassification';
