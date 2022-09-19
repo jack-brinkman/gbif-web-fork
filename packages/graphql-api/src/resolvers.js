@@ -1,28 +1,26 @@
 const _ = require("lodash");
-const { graphql } = require("../../../../gql-resolvers");
+const { gbif, ala } = require("gql-resolvers");
 
 const resolvers = _.merge(
-  require("./resources/scalars").resolver,
-  // require("./resources/dataset").resolver,
-  graphql.dataset.resolver,
-  require("./resources/organization").resolver,
-  require("./resources/taxon").resolver,
-  require("./resources/network").resolver,
-  require("./resources/installation").resolver,
-  require("./resources/node").resolver,
-  require("./resources/participant").resolver,
-  // require("./resources/occurrence").resolver,
-  graphql.occurrence.resolver,
-  require("./util/wikidata").resolver,
-  // require('./resources/collection').resolver,
-  graphql.collection.resolver,
-  require("./resources/institution").resolver,
-  require("./resources/staffMember").resolver,
-  require("./resources/external/orcid").resolver,
-  require("./resources/external/viaf").resolver,
-  require("./resources/external/person").resolver,
-  require("./resources/literature").resolver,
-  require("./resources/download").resolver
+  gbif.graphql.scalars.resolver,
+  gbif.graphql.dataset.resolver,
+  gbif.graphql.organization.resolver,
+  gbif.graphql.taxon.resolver,
+  gbif.graphql.network.resolver,
+  gbif.graphql.installation.resolver,
+  gbif.graphql.node.resolver,
+  gbif.graphql.participant.resolver,
+  // gbif.graphql.occurrence.resolver,
+  gbif.graphql.wikidata.resolver,
+  gbif.graphql.collection.resolver,
+  gbif.graphql.institution.resolver,
+  gbif.graphql.staffMember.resolver,
+  gbif.graphql.external.orcid.resolver,
+  gbif.graphql.external.viaf.resolver,
+  gbif.graphql.external.person.resolver,
+  gbif.graphql.literature.resolver,
+  gbif.graphql.download.resolver,
+  ala.graphql.event.resolver
   // -- Add imports above this line (required by plopfile.js) --
 );
 

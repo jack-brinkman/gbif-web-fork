@@ -1,7 +1,7 @@
 const { gql } = require("apollo-server");
 const _ = require("lodash");
 const { getEnumTypeDefs } = require("./enums");
-const { graphql } = require("../../../../gql-resolvers/lib");
+const { gbif, ala } = require("gql-resolvers");
 
 async function getSchema() {
   // create a string with all the enum options (loaded from the API)
@@ -21,34 +21,32 @@ async function getSchema() {
   const typeDefs = _.flatten([
     rootQuery,
     require("./input"),
-    require("./resources/misc/comment"),
-    require("./resources/misc/contact"),
-    require("./resources/misc/endpoint"),
-    require("./resources/misc/identifier"),
-    require("./resources/misc/machineTag"),
-    require("./resources/misc/tag"),
-    require("./resources/misc/address"),
-    // require("./resources/dataset").typeDef,
-    graphql.dataset.typeDef,
-    require("./resources/organization").typeDef,
-    require("./resources/scalars").typeDef,
-    require("./resources/taxon").typeDef,
-    require("./resources/network").typeDef,
-    require("./resources/installation").typeDef,
-    require("./resources/node").typeDef,
-    require("./resources/participant").typeDef,
-    // require("./resources/occurrence").typeDef,
-    graphql.occurrence.typeDef,
-    require("./util/wikidata").typeDef,
-    // require('./resources/collection').typeDef,
-    graphql.collection.typeDef,
-    require("./resources/institution").typeDef,
-    require("./resources/staffMember").typeDef,
-    require("./resources/external/orcid").typeDef,
-    require("./resources/external/viaf").typeDef,
-    require("./resources/external/person").typeDef,
-    require("./resources/literature").typeDef,
-    require("./resources/download").typeDef,
+    gbif.graphql.misc.comment,
+    gbif.graphql.misc.contact,
+    gbif.graphql.misc.endpoint,
+    gbif.graphql.misc.identifier,
+    gbif.graphql.misc.machineTag,
+    gbif.graphql.misc.tag,
+    gbif.graphql.misc.address,
+    gbif.graphql.dataset.typeDef,
+    gbif.graphql.organization.typeDef,
+    gbif.graphql.scalars.typeDef,
+    gbif.graphql.taxon.typeDef,
+    gbif.graphql.network.typeDef,
+    gbif.graphql.installation.typeDef,
+    gbif.graphql.node.typeDef,
+    gbif.graphql.participant.typeDef,
+    // gbif.graphql.occurrence.typeDef,
+    gbif.graphql.wikidata.typeDef,
+    gbif.graphql.collection.typeDef,
+    gbif.graphql.institution.typeDef,
+    gbif.graphql.staffMember.typeDef,
+    gbif.graphql.external.orcid.typeDef,
+    gbif.graphql.external.viaf.typeDef,
+    gbif.graphql.external.person.typeDef,
+    gbif.graphql.literature.typeDef,
+    gbif.graphql.download.typeDef,
+    ala.graphql.event.typeDef,
     // -- Add imports above this line (required by plopfile.js) --
   ]);
 

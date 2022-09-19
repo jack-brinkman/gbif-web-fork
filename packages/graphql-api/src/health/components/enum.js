@@ -1,8 +1,8 @@
 const got = require("got");
 const _ = require("lodash");
-const config = require("../../config");
+const { gbif: config } = require("../../config");
 const { gql } = require("apollo-server");
-const hash = require('object-hash');
+const hash = require("object-hash");
 const { getSchema } = require("../../enums");
 
 const API_V1 = config.apiv1;
@@ -31,7 +31,10 @@ async function getEnumData(url) {
 
 const getEnumDiffs = (current, prev, name) => {
   // First check if they are JSON identical before doing the expensive check
-  if (hash(current, { unorderedArrays: true }) === hash(prev, { unorderedArrays: true })) {
+  if (
+    hash(current, { unorderedArrays: true }) ===
+    hash(prev, { unorderedArrays: true })
+  ) {
     return [];
   } else {
     return [
@@ -45,7 +48,8 @@ function getChangeReport(currentVersionEnums) {
   const prevVersionEnums = require("../../enums/enums.json");
 
   if (
-    hash(currentVersionEnums, { unorderedArrays: true }) !== hash(prevVersionEnums, { unorderedArrays: true })
+    hash(currentVersionEnums, { unorderedArrays: true }) !==
+    hash(prevVersionEnums, { unorderedArrays: true })
   ) {
     const newEnums = _.difference(
       Object.keys(currentVersionEnums),
@@ -76,8 +80,8 @@ function getChangeReport(currentVersionEnums) {
         : "";
       const changedEnumsMessage = changedEnums.length
         ? `Changed enums: ${changedEnums
-          .map((e) => e.values.join(", "))
-          .join("; ")}`
+            .map((e) => e.values.join(", "))
+            .join("; ")}`
         : "";
       return [newEnumsMessage, missingEnumsMessage, changedEnumsMessage]
         .filter((v) => !!v)
@@ -115,17 +119,18 @@ async function update() {
       const validationReport = schemaIsValid(enumMap);
       status = {
         status: "warning",
-        message: `ENUMS out of sync, needs update. New GraphQL ENUM schema is ${validationReport.valid ? "VALID" : "INVALID"
-          }. ${changeReport}`,
+        message: `ENUMS out of sync, needs update. New GraphQL ENUM schema is ${
+          validationReport.valid ? "VALID" : "INVALID"
+        }. ${changeReport}`,
         error: validationReport.error,
       };
     } else {
       status = { status: "ok", message: null, error: null };
     }
-    setTimeout(update, interval)
+    setTimeout(update, interval);
   } catch (err) {
     status = { status: "error", message: null, error: err };
-    setTimeout(update, interval)
+    setTimeout(update, interval);
   }
 }
 
@@ -137,5 +142,5 @@ module.exports = {
   getEnumStatus,
   loadEnums,
   schemaIsValid,
-  getEnumData
+  getEnumData,
 };

@@ -90,7 +90,6 @@ async function initializeServer() {
   app.get("/health", health);
 
   // add various supportive endpoints
-  // require('./api-utils/config')(app);
   let controllers = glob.sync(__dirname + "/api-utils/**/*.ctrl.js");
   controllers.forEach(function (controller) {
     require(controller)(app);

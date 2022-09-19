@@ -1,28 +1,25 @@
 const _ = require("lodash");
-const { graphql } = require("../../../../gql-resolvers");
+const { gbif, ala } = require("gql-resolvers");
 
 const api = _.merge(
-  // require("./resources/dataset").dataSource,
-  graphql.dataset.dataSource,
-  require("./resources/organization").dataSource,
-  require("./resources/taxon").dataSource,
-  require("./resources/network").dataSource,
-  require("./resources/installation").dataSource,
-  require("./resources/node").dataSource,
-  require("./resources/participant").dataSource,
-  // require("./resources/occurrence").dataSource,
-  graphql.occurrence.dataSource,
-  require("./util/wikidata/").dataSource,
-  //require("./resources/collection").dataSource,
-  graphql.collection.dataSource,
-  require("./resources/institution").dataSource,
-  require("./resources/staffMember").dataSource,
-  require("./resources/external/orcid").dataSource,
-  require("./resources/external/viaf").dataSource,
-  require("./resources/external/person").dataSource,
-
-  require("./resources/literature").dataSource,
-  require("./resources/download").dataSource
+  gbif.graphql.dataset.dataSource,
+  gbif.graphql.organization.dataSource,
+  gbif.graphql.taxon.dataSource,
+  gbif.graphql.network.dataSource,
+  gbif.graphql.installation.dataSource,
+  gbif.graphql.node.dataSource,
+  gbif.graphql.participant.dataSource,
+  // gbif.graphql.occurrence.dataSource,
+  gbif.graphql.wikidata.dataSource,
+  gbif.graphql.collection.dataSource,
+  gbif.graphql.institution.dataSource,
+  gbif.graphql.staffMember.dataSource,
+  gbif.graphql.external.orcid.dataSource,
+  gbif.graphql.external.viaf.dataSource,
+  gbif.graphql.external.person.dataSource,
+  gbif.graphql.literature.dataSource,
+  gbif.graphql.download.dataSource,
+  ala.graphql.event.dataSource
   // -- Add imports above this line (required by plopfile.js) --
 );
 
