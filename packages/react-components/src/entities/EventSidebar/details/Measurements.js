@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import {DataTable, TBody, Td, Th} from "../../../components";
-import {Group} from "./Groups";
+import { DataTable, TBody, Td, Th } from "../../../components";
+import { Group } from "./Groups";
 
 export function Measurements({ data }) {
     const [from, setFrom] = useState(0);
@@ -21,7 +21,7 @@ export function Measurements({ data }) {
     };
     const extraFields = ['Accuracy', 'Method', 'Remarks', 'DeterminedDate'].filter((field) => hasField(field));
 
-    const size = 5;
+    const size = 10;
     const total = results.length;
     const first = () => setFrom(0);
     const prev = () => setFrom(Math.max(from - size, 0));
@@ -59,7 +59,7 @@ export function Measurements({ data }) {
 
     return <>
         <Group label="eventDetails.groups.measurementsOrFacts">
-            <DataTable fixedColumn={true} {...{ first, prev, next, size, from, total }} style={{ height: 270 }}>
+            <DataTable fixedColumn={true} {...{ first, prev, next, size, from, total }} style={{ height: 300 }}>
                 <thead>
                 <tr>{headers}</tr>
                 </thead>

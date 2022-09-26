@@ -1,10 +1,12 @@
 import React, { useContext, useState, useEffect } from 'react';
 import ThemeContext from '../../style/themes/ThemeContext';
+import SiteContext from '../../dataManagement/SiteContext';
 import * as css from './styles';
 import { Row, Col, Tabs, Spinner } from "../../components";
 import { useQuery } from '../../dataManagement/api';
 import { Intro } from './details/Intro';
-import {MdClose, MdInfo} from "react-icons/md";
+import { ImageDetails } from './details/ImageDetails';
+import { MdClose, MdInfo, MdImage } from "react-icons/md";
 const { TabList, Tab, TapSeperator } = Tabs;
 
 const { TabPanel } = Tabs;
@@ -24,6 +26,7 @@ export function EventSidebar({
   const { data, error, loading, load } = useQuery(EVENT, { lazyLoad: true, graph: 'EVENT' });
   const [activeId, setTab] = useState( 'details');
   const theme = useContext(ThemeContext);
+  const siteConfig = useContext(SiteContext)
 
   useEffect(() => {
     if (typeof eventID !== 'undefined') {
@@ -71,6 +74,9 @@ export function EventSidebar({
   }, [data, loading]);
 
   const isLoading = loading || !data;
+  const showImages = !isLoading
+    && data.results.occurrenceFacet.genus.length > 0
+    && siteConfig.experimental?.event?.sidebarImages;
 
   return <Tabs activeId={activeId} onChange={id => setTab(id)}>
     <Row wrap="nowrap" style={style} css={css.sideBar({ theme })}>
@@ -85,6 +91,11 @@ export function EventSidebar({
           <Tab tabId="details" direction="left">
             <MdInfo />
           </Tab>
+          {showImages && (
+            <Tab tabId="images" direction="left">
+              <MdImage />
+            </Tab>
+          )}
         </TabList>
       </Col>
       <Col shrink={false} grow={false} css={css.detailDrawerContent({ theme })} >
@@ -93,8 +104,9 @@ export function EventSidebar({
           <h3 style={{ marginTop: 32, marginBottom: 0 }}>Loading event information</h3>
           <p>ID: {eventID}</p>
         </div>}
-        {!isLoading &&
-            <TabPanel tabId='details' style={{height: '100%'}}>
+        {!isLoading && (
+          <>
+            <TabPanel tabId='details' style={{ height: '100%' }}>
               <Intro
                   data={data}
                   loading={loading}
@@ -104,7 +116,15 @@ export function EventSidebar({
                   addEventTypeToSearch={addEventTypeToSearch}
               />
             </TabPanel>
-        }
+            <TabPanel tabId='images' style={{ height: '100%' }}>
+              <ImageDetails
+                  data={data}
+                  loading={loading}
+                  setActiveImage={(img) => console.log(img)}
+              />
+            </TabPanel>
+          </>
+        )}
       </Col>
     </Row>
   </Tabs>

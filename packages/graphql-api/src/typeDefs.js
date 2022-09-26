@@ -37,6 +37,7 @@ async function getSchema() {
     gbif.graphql.node.typeDef,
     gbif.graphql.participant.typeDef,
     // gbif.graphql.occurrence.typeDef,
+    ala.graphql.occurrence.typeDef,
     gbif.graphql.wikidata.typeDef,
     gbif.graphql.collection.typeDef,
     gbif.graphql.institution.typeDef,
