@@ -59,7 +59,7 @@ export function Measurements({ data }) {
 
     return <>
         <Group label="eventDetails.groups.measurementsOrFacts">
-            <DataTable fixedColumn={true} {...{ first, prev, next, size, from, total }} style={{ height: 265 }}>
+            <DataTable fixedColumn={true} {...{ first, prev, next, size, from, total }} style={{ height: 270 }}>
                 <thead>
                 <tr>{headers}</tr>
                 </thead>
