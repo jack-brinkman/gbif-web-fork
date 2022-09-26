@@ -1,8 +1,9 @@
-import React from 'react';
+import { useState } from 'react';
 import {DataTable, TBody, Td, Th} from "../../../components";
 import {Group} from "./Groups";
 
 export function Measurements({ data }) {
+    const [from, setFrom] = useState(0);
     let hasMeasurements = false;
     if (data.results.documents.results
         && data.results.documents.results.length > 0
@@ -20,8 +21,15 @@ export function Measurements({ data }) {
     };
     const extraFields = ['Accuracy', 'Method', 'Remarks', 'DeterminedDate'].filter((field) => hasField(field));
 
+    const size = 5;
+    const total = results.length;
+    const first = () => setFrom(0);
+    const prev = () => setFrom(Math.max(from - size, 0));
+    const next = () => setFrom(Math.min(from + size, total));
+
     const getRows = () => {
-        const rows = results.sort((a, b) => a.measurementType.localeCompare(b.measurementType)).map(row => {
+        const sortedResults = results.sort((a, b) => a.measurementType.localeCompare(b.measurementType));
+        const rows = sortedResults.slice(from, from + size).map(row => {
             return <tr key={row}>
                 <Td key={`measurementType`}>{row.measurementType}</Td>
                 <Td key={`measurementValue`}>{row.measurementValue}{row.measurementUnit === '%' ? '' : ' '}{row.measurementUnit}</Td>
@@ -49,15 +57,9 @@ export function Measurements({ data }) {
         ))
     ];
 
-    const first = () => { };
-    const prev = () => { };
-    const next = () => { };
-    const size = 10;
-    const from = 0;
-    const total = results.length;
     return <>
         <Group label="eventDetails.groups.measurementsOrFacts">
-            <DataTable fixedColumn={true} {...{ first, prev, next, size, from, total }} style={{ height: 300 }}>
+            <DataTable fixedColumn={true} {...{ first, prev, next, size, from, total }} style={{ height: 265 }}>
                 <thead>
                 <tr>{headers}</tr>
                 </thead>
