@@ -121,7 +121,6 @@ export function EventSidebar({
                 <ImageDetails
                     data={data}
                     loading={loading}
-                    setActiveImage={(img) => console.log(img)}
                 />
               </TabPanel>
             )}

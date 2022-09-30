@@ -57,8 +57,6 @@ export function ImageDetails({
     return <div>no images to display</div>
   }
 
-  console.log(data, activeImage);
-
   return <div style={{ padding: '12px 0' }}>
     <Header data={oldData} />
     {activeImage && (
