@@ -48,6 +48,7 @@ async function getSchema() {
     gbif.literature.typeDef,
     gbif.download.typeDef,
     ala.occurrence.typeDef,
+    ala.images.typeDef,
     ala.event.typeDef,
     // -- Add imports above this line (required by plopfile.js) --
   ]);

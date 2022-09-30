@@ -20,6 +20,7 @@ const api = _.merge(
   gbif.literature.dataSource,
   gbif.download.dataSource,
   ala.occurrence.dataSource,
+  ala.images.dataSource,
   ala.event.dataSource
   // -- Add imports above this line (required by plopfile.js) --
 );

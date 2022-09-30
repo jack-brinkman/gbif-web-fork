@@ -21,6 +21,7 @@ const resolvers = merge(
   gbif.literature.resolver,
   gbif.download.resolver,
   ala.occurrence.resolver,
+  ala.images.resolver,
   ala.event.resolver
   // -- Add imports above this line (required by plopfile.js) --
 );
