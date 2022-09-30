@@ -1,6 +1,6 @@
 
 import { jsx } from '@emotion/react';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { MdDone } from 'react-icons/md';
 import ThemeContext from '../../../style/themes/ThemeContext';
@@ -13,55 +13,60 @@ const { Term, Value } = Properties;
 
 export function ImageDetails({
   data: oldData,
-  activeImage,
-  setActiveImage,
   className,
   ...props
 }) {
+  const [activeImage, setActiveImage] = useState(null);
   const theme = useContext(ThemeContext);
   const data = {
     occurrence: {
       stillImages: [
         {
+          id: 0,
           src: `https://via.placeholder.com/150x150`,
           scientificName: 'Puma concolor Linneaus',
-          description: 'Observed in Denmark 19 Januar 2017'
+          description: 'Observed in Denmark 19 January 2018'
         },
         {
+          id: 1,
           src: `https://via.placeholder.com/200x150`,
           scientificName: 'Flabellina',
-          description: 'Catched in Spain 25 Febrary 2019'
+          description: 'Catched in Spain 25 February 2019'
         },
         {
+          id: 2,
           src: `https://via.placeholder.com/150x150`,
           scientificName: 'Puma concolor Linneaus',
-          description: 'Observed in Denmark 19 Januar 2017'
+          description: 'Observed in Denmark 19 January 2015'
         },
         {
+          id: 3,
           src: `https://via.placeholder.com/100x150`,
           scientificName: 'Flabellina',
-          description: 'Catched in Spain 25 Febrary 2019'
+          description: 'Catched in Spain 25 Febrary 2014'
         }
       ]
     }
   };
 
-  useEffect(() => {
-    if (data?.occurrence?.stillImages) setActiveImage(data?.occurrence?.stillImages[0]);
-  }, [data]);
+  // useEffect(() => {
+  //   if (data?.occurrence?.stillImages) setActiveImage(data?.occurrence?.stillImages[0]);
+  // }, [data]);
 
   if (!data?.occurrence?.stillImages) {
     return <div>no images to display</div>
   }
 
+  console.log(data, activeImage);
+
   return <div style={{ padding: '12px 0' }}>
     <Header data={oldData} />
-    {/* {activeImage && (
+    {activeImage && (
       <>
         <div css={css.imageContainer({ theme })}>
-          <Image src={activeImage.identifier} h="450" style={{ maxWidth: '100%', maxHeight: 450 }} />
+          <Image src={activeImage.src} h="450" style={{ maxWidth: '100%', maxHeight: 450 }} />
         </div>
-        <Group label="occurrenceDetails.about" defaultOpen={data?.occurrence?.stillImages?.length === 1}>
+        <Group label="occurrenceDetails.about" defaultOpen={activeImage}>
           <Properties css={css.properties}>
             {['description', 'type', 'format', 'identifier', 'created', 'creator', 'license', 'publisher', 'references', 'rightsholder']
               .filter(x => !!activeImage[x]).map(x => <React.Fragment key={x}>
@@ -75,19 +80,26 @@ export function ImageDetails({
           </Properties>
         </Group>
       </>
-    )} */}
+    )}
     {data?.occurrence?.stillImages?.length > 1 &&
       <Group label="eventDetails.groups.images" defaultOpen={true}>
         <GalleryTiles>
-          {data.occurrence.stillImages.map((x, i) => {
-            return <GalleryTile onSelect={() => setActiveImage(x)} key={i} src={x.src} height={120}>
-              {x === activeImage ? <span style={{ background: 'black', color: 'white', padding: '5px 5px 2px 5px' }}>
-                <MdDone />
-              </span> : null}
-            </GalleryTile>
-          })
-          }
-          <div></div>
+          {data.occurrence.stillImages.map((image, i) => {
+            return (
+              <GalleryTile
+                style={{ position: 'relative' }}
+                onSelect={() => setActiveImage(image)}
+                key={i}
+                src={image.src}
+                height={120}>
+                {image.id === activeImage?.id ? (
+                  <span css={css.imageSelectCheck()}>
+                    <MdDone />
+                  </span>
+                ) : null}
+              </GalleryTile>
+            )
+          })}
         </GalleryTiles>
       </Group>
     }
