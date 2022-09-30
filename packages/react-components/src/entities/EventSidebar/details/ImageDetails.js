@@ -64,7 +64,7 @@ export function ImageDetails({
         <div css={css.imageContainer({ theme })}>
           <Image src={activeImage.src} h="450" style={{ maxWidth: '100%', maxHeight: 450 }} />
         </div>
-        <Group label="occurrenceDetails.about" defaultOpen={activeImage}>
+        <Group label="occurrenceDetails.about" defaultOpen={true}>
           <Properties css={css.properties}>
             {['description', 'type', 'format', 'identifier', 'created', 'creator', 'license', 'publisher', 'references', 'rightsholder']
               .filter(x => !!activeImage[x]).map(x => <React.Fragment key={x}>

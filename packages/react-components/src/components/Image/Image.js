@@ -7,9 +7,17 @@ export const Image = React.forwardRef(({
   src,
   w = '',
   h = '',
+  onLoad = null,
   ...props
 }, ref) => {
-  return <img src={getImageSrc({src, w, h})} ref={ref} {...props} />
+  return (
+    <img
+      src={getImageSrc({src, w, h, onLoad})}
+      onLoad={(e) => { if (onLoad) onLoad(e) }}
+      ref={ref}
+      {...props}
+    />
+  )
 });
 
 Image.propTypes = {
