@@ -116,13 +116,15 @@ export function EventSidebar({
                   addEventTypeToSearch={addEventTypeToSearch}
               />
             </TabPanel>
-            <TabPanel tabId='images' style={{ height: '100%' }}>
-              <ImageDetails
-                  data={data}
-                  loading={loading}
-                  setActiveImage={(img) => console.log(img)}
-              />
-            </TabPanel>
+            {showImages && (
+              <TabPanel tabId='images' style={{ height: '100%' }}>
+                <ImageDetails
+                    data={data}
+                    loading={loading}
+                    setActiveImage={(img) => console.log(img)}
+                />
+              </TabPanel>
+            )}
           </>
         )}
       </Col>
