@@ -1,0 +1,32 @@
+{
+  "details": {
+    "rightsHolder": "Rights holder",
+    "thumbHeight": "Thumbnail height",
+    "extension": "Extension",
+    "imageIdentifier": "Image UID",
+    "dateUploaded": "Date uploaded",
+    "description": "Description",
+    "title": "Title",
+    "contentSHA1Hash": "SHA1 hash",
+    "rights": "Rights",
+    "contentMD5Hash": "MD5 hash",
+    "imageSize": "Image size",
+    "height": "Height",
+    "harvestable": "Harvestable",
+    "creator": "Creator",
+    "dateUploadedYearMonth": "Date uploaded",
+    "format": "Format",
+    "thumbWidth": "Thumbnail width",
+    "occurrenceID": "Occurrence ID",
+    "zoomLevels": "Zoom levels",
+    "recognisedLicence": "Recognised license",
+    "license": "License",
+    "dataResourceUid": "Data resource UID",
+    "fileSize": "File size",
+    "width": "Width",
+    "originalFilename": "Original filename",
+    "dateTaken": "Date taken",
+    "fileType": "File type"
+  },
+  "noImages": "No images found"
+}
