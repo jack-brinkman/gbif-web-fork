@@ -76,7 +76,7 @@ export function EventSidebar({
   const isLoading = loading || !data;
   const showImages = !isLoading
     && data.results.occurrenceFacet.genus.length > 0
-    && siteConfig.experimental?.event?.sidebarImages;
+    && siteConfig.experimental?.event?.sidebar?.images?.enabled;
 
   return <Tabs activeId={activeId} onChange={id => setTab(id)}>
     <Row wrap="nowrap" style={style} css={css.sideBar({ theme })}>
