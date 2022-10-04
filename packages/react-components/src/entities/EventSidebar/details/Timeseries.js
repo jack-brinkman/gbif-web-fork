@@ -15,7 +15,7 @@ const getNumericalMofs = (event) => event.measurementOrFactTypes.filter((mofType
 });
 
 const compareDates = (a, b) => {
-  const diff = (new Date(a)) - (new Date(b));
+  const diff = a - b;
   if (diff === 0) return 0;
   return diff > 0 ? 1 : -1;
 }
