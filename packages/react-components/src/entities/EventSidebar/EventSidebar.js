@@ -6,7 +6,8 @@ import { Row, Col, Tabs, Spinner } from "../../components";
 import { useQuery } from '../../dataManagement/api';
 import { Intro } from './details/Intro';
 import { ImageDetails } from './details/ImageDetails';
-import { MdClose, MdInfo, MdImage } from "react-icons/md";
+import { Timeseries } from './details/Timeseries';
+import { MdClose, MdInfo, MdImage, MdStackedLineChart } from "react-icons/md";
 const { TabList, Tab, TapSeperator } = Tabs;
 
 const { TabPanel } = Tabs;
@@ -76,7 +77,8 @@ export function EventSidebar({
   const isLoading = loading || !data;
   const showImages = !isLoading
     && data.results.occurrenceFacet.genus.length > 0
-    && siteConfig.experimental?.event?.sidebarImages;
+    && siteConfig.experimental?.event?.sidebar?.images?.enabled;
+  const showTimeseries = siteConfig.experimental?.event?.sidebar?.timeseries?.enabled;
 
   return <Tabs activeId={activeId} onChange={id => setTab(id)}>
     <Row wrap="nowrap" style={style} css={css.sideBar({ theme })}>
@@ -94,6 +96,11 @@ export function EventSidebar({
           {showImages && (
             <Tab tabId="images" direction="left">
               <MdImage />
+            </Tab>
+          )}
+          {showTimeseries && (
+            <Tab tabId="timeseries" direction="left">
+              <MdStackedLineChart />
             </Tab>
           )}
         </TabList>
@@ -116,13 +123,24 @@ export function EventSidebar({
                   addEventTypeToSearch={addEventTypeToSearch}
               />
             </TabPanel>
-            <TabPanel tabId='images' style={{ height: '100%' }}>
-              <ImageDetails
+            {showImages && (
+              <TabPanel tabId='images' style={{ height: '100%' }}>
+                <ImageDetails
+                    data={data}
+                    loading={loading}
+                    setActiveImage={(img) => console.log(img)}
+                />
+              </TabPanel>
+            )}
+            {showTimeseries && (
+              <TabPanel tabId='timeseries' style={{ height: '100%' }}>
+                <Timeseries
                   data={data}
                   loading={loading}
-                  setActiveImage={(img) => console.log(img)}
-              />
-            </TabPanel>
+                  error={error}
+                />
+              </TabPanel>
+            )}
           </>
         )}
       </Col>
