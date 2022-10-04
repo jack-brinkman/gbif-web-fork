@@ -78,7 +78,10 @@ export function EventSidebar({
   const showImages = !isLoading
     && data.results.occurrenceFacet.genus.length > 0
     && siteConfig.experimental?.event?.sidebar?.images?.enabled;
-  const showTimeseries = siteConfig.experimental?.event?.sidebar?.timeseries?.enabled;
+    
+  const showTimeseries = !isLoading
+    && siteConfig.experimental?.event?.sidebar?.timeseries?.enabled
+    && data.results.documents.total > 1;
 
   return <Tabs activeId={activeId} onChange={id => setTab(id)}>
     <Row wrap="nowrap" style={style} css={css.sideBar({ theme })}>
@@ -203,11 +206,11 @@ query event($eventID: String, $datasetKey: String, $predicate1: Predicate, $pred
   }
   
   results: eventSearch(
-    predicate:$predicate1,
+    predicate: $predicate1,
     size: $limit, 
     from: $offset
     ) {
-    documents(size: 1) {
+    documents(size: 40) {
       total
       results {
         eventID
