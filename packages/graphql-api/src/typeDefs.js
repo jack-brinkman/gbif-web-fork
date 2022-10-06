@@ -37,7 +37,6 @@ async function getSchema() {
     gbif.node.typeDef,
     gbif.participant.typeDef,
     // gbif.occurrence.typeDef,
-    ala.occurrence.typeDef,
     gbif.wikidata.typeDef,
     gbif.collection.typeDef,
     gbif.institution.typeDef,
