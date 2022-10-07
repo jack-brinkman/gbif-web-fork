@@ -1,43 +1,50 @@
 
-import { jsx } from '@emotion/react';
-import React, { useContext, useEffect, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
+import React, { useEffect, useState } from 'react';
 import { MdDone } from 'react-icons/md';
-import ThemeContext from '../../../../style/themes/ThemeContext';
+import { useQuery } from '../../../../dataManagement/api';
+import { Group } from '../Groups';
+import { Button } from '../../../../components';
 import * as css from '../../styles';
-import { GalleryTiles, GalleryTile } from "../../../../components";
-import { HyperText } from '../../../../components';
-import { Group } from './Groups';
+
+// Project components
+import {
+  GalleryTiles,
+  GalleryTile,
+} from "../../../../components";
+import { image } from '../../../../components/ZoomableImage/styles';
 
 const QUERY_IMAGES = `
-query images($query: String, $size: Int, $from: Int) {
-  biocacheSearch(query: $query, size: $size, from: $from) {
-    species
-    imageMeta {
-      imageIdentifier
-      mimeType
-      originalFileName
-      sizeInBytes
-      rights
-      rightsHolder
-      dateUploaded
-      dateTaken
-      imageUrl
-      height
-      width
-      description
-      title
-      references
-      publisher
-      created
-      creator
-      license
-      dataResourceUid
-      recognisedLicence {
-        acronym
-        name
-        url
+query images($search: String, $size: Int, $from: Int) {
+  result: biocacheSearch(search: $search, size: $size, from: $from) {
+    total: totalRecords
+    occurrences {
+      species
+      meta: imageMeta {
+        imageIdentifier
+        mimeType
+        originalFileName
+        sizeInBytes
+        rights
+        rightsHolder
+        dateUploaded
+        dateTaken
         imageUrl
+        height
+        width
+        description
+        title
+        references
+        publisher
+        created
+        creator
+        license
+        dataResourceUid
+        recognisedLicence {
+          acronym
+          name
+          url
+          imageUrl
+        }
       }
     }
   }
@@ -45,7 +52,7 @@ query images($query: String, $size: Int, $from: Int) {
 `;
 
 export function RelatedImages({
-  occurrence,
+  data: eventData,
   activeImage,
   setActiveImage,
   className,
@@ -58,25 +65,54 @@ export function RelatedImages({
     error,
     loading,
     load
-  } = useQuery(QUERY_IMAGES, { graph: 'EVENT'});
-  const theme = useContext(ThemeContext);
+  } = useQuery(QUERY_IMAGES, { lazyLoad: true, graph: 'EVENT'});
 
+  // Component state variables
+  const [offset, setOffset] = useState(0);
+  const [occurrence] = eventData?.event?.occurrences;
+  const [occurrences, setOccurrences] = useState([]);
 
-  if (!loading && data.length === 0)
+  // Effect hook to store the query output in component state
+  useEffect(() => {
+    if (data)
+      setOccurrences([
+        ...occurrences,
+        ...data.result.occurrences.map((occ) => occ.meta)
+      ]);
+  }, [data]);
+
+  // Effect hook to automatically load the data when the offset/related occurrence changes
+  useEffect(() => {
+    if (occurrence.speciesKey || occurrence.genusKey) {
+      load({
+        keepDataWhileLoading: true,
+        variables: {
+          search: `lsid:${occurrence.speciesKey || occurrence.genusKey}`,
+          size: 15,
+          from: offset
+        }
+      });
+    }
+  }, [occurrence, offset]);
+
+  if (data && occurrences.length === 0)
     return <div>no images to display</div>;
 
   return (
-    <Group label="eventDetails.groups.relatedImages" defaultOpen={true}>
+    <Group
+      label="eventDetails.groups.relatedImages"
+      labelValues={{ taxon: occurrence.species || occurrence.genus }}
+      defaultOpen={true}>
       <GalleryTiles>
-        {!loading && data.map((image, i) => {
+        {data && occurrences.map((image) => {
           return (
             <GalleryTile
               style={{ position: 'relative' }}
               onSelect={() => setActiveImage(image)}
-              key={i}
-              src={image.src}
+              key={image.imageIdentifier}
+              src={image.imageUrl}
               height={120}>
-              {image.id === activeImage?.id ? (
+              {image.imageIdentifier === activeImage?.imageIdentifier ? (
                 <span css={css.imageSelectCheck()}>
                   <MdDone />
                 </span>
@@ -85,6 +121,17 @@ export function RelatedImages({
           )
         })}
       </GalleryTiles>
+      {data && occurrences.length <= data.result.total - 1 && (
+        <div style={{ display: 'flex', justifyContent: 'center', padding: 16 }}>
+          <Button
+            disabled={loading}
+            onClick={() => setOffset(offset + 15)}
+            look='primaryOutline'
+            style={{ fontSize: '11px' }}>
+              Load More
+          </Button>
+        </div>
+      )}
     </Group>
   )
 };

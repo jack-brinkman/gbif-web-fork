@@ -4,67 +4,54 @@ import React, { useContext, useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { MdDone } from 'react-icons/md';
 import ThemeContext from '../../../../style/themes/ThemeContext';
+import env from '../../../../../.env.json';
 import * as css from '../../styles';
-import { Properties, Image, GalleryTiles, GalleryTile, Spinner } from "../../../../components";
+
+// Local components
+import { RelatedImages } from './RelatedImages';
 import { Header } from '../Header';
-import { HyperText } from '../../../../components';
 import { Group } from '../Groups';
+
+// Project components
+import {
+  Properties,
+  Image,
+  GalleryTiles,
+  GalleryTile,
+  Spinner,
+  HyperText
+} from "../../../../components";
 const { Term, Value } = Properties;
 
-const data = {
-  occurrence: {
-    stillImages: [
-      {
-        id: 0,
-        src: `https://via.placeholder.com/150x150`,
-        scientificName: 'Puma concolor Linneaus',
-        description: 'Observed in Denmark 19 January 2018'
-      },
-      {
-        id: 1,
-        src: `https://via.placeholder.com/200x150`,
-        scientificName: 'Flabellina',
-        description: 'Catched in Spain 25 February 2019'
-      },
-      {
-        id: 2,
-        src: `https://via.placeholder.com/150x150`,
-        scientificName: 'Puma concolor Linneaus',
-        description: 'Observed in Denmark 19 January 2015'
-      },
-      {
-        id: 3,
-        src: `https://via.placeholder.com/100x150`,
-        scientificName: 'Flabellina',
-        description: 'Catched in Spain 25 Febrary 2014'
-      }
-    ]
-  }
-};
-
 export function ImageDetails({
-  data: oldData,
+  data,
   className,
   ...props
 }) {
   const [loading, setLoading] = useState(true);
-  const [loadedImages, setLoadedImages] = useState([]);
   const [activeImage, setActiveImage] = useState(null);
 
   // Setup query loading & theming
   const theme = useContext(ThemeContext);
   const IMAGE_HEIGHT = 350;
+  // console.log('oldData', data);
 
-  useEffect(() => {
-    if (data?.occurrence?.stillImages) setActiveImage(data?.occurrence?.stillImages[0]);
-  }, [data]);
+  // useEffect(() => {
+  //   if (data?.occurrence?.stillImages) setActiveImage(data?.occurrence?.stillImages[0]);
+  // }, [data]);
 
-  if (!data?.occurrence?.stillImages) {
-    return <div>no images to display</div>
-  }
+  // if (!data?.occurrence?.stillImages) {
+  //   return <div>no images to display</div>
+  // }
+
+  // Event handler for active images
+  const handleActiveImage = (image) => {
+    setLoading(true);
+    setActiveImage(image);
+  };
 
   return <div style={{ padding: '12px 0' }}>
-    <Header data={oldData} />
+    <Header data={data} />
     {activeImage && (
       <>
         <div css={css.imageContainer({ theme })}>
@@ -80,7 +67,7 @@ export function ImageDetails({
             </div>
           )}
           <Image
-            src={activeImage.src}
+            src={activeImage.imageUrl}
             h={IMAGE_HEIGHT.toString()}
             style={{
               display: loading ? 'none' : 'block',
@@ -91,15 +78,27 @@ export function ImageDetails({
         </div>
         <Group label="occurrenceDetails.about" defaultOpen={true}>
           <Properties css={css.properties}>
-            {['description', 'type', 'format', 'identifier', 'created', 'creator', 'license', 'publisher', 'references', 'rightsholder']
-              .filter(x => !!activeImage[x]).map(x => <React.Fragment key={x}>
+            {['title', 'description', 'creator', 'dateTaken', 'format', 'license','rightsHolder']
+              .filter((property) => Boolean(activeImage[property]))
+              .map((property) => (
+                <React.Fragment key={property}>
+                  <Term>
+                    <FormattedMessage id={`images.details.${property}`} />
+                  </Term>
+                  <Value>
+                    <HyperText text={activeImage[property]} />
+                  </Value>
+                </React.Fragment>
+              ))}
+              <>
                 <Term>
-                  <FormattedMessage id={`occurrenceFieldNames.${x}`} />
+                  <FormattedMessage id="images.details.originalFilename" />
                 </Term>
                 <Value>
-                  <HyperText text={activeImage[x]} />
+                  {/* Hacky fix, for now */}
+                  <HyperText text={env.IMAGE_VIEW_URL.replace('{imageIdentifier}', activeImage.imageIdentifier)} />
                 </Value>
-              </React.Fragment>)}
+              </>
           </Properties>
         </Group>
       </>
@@ -111,17 +110,11 @@ export function ImageDetails({
             return (
               <GalleryTile
                 style={{ position: 'relative' }}
-                onSelect={() => {
-                  if (!loadedImages.includes(image.src)) {
-                    setLoading(true);
-                    setLoadedImages([...loadedImages, image.src]);
-                  }
-                  setActiveImage(image);
-                }}
+                onSelect={() => handleActiveImage(image)}
                 key={i}
                 src={image.src}
                 height={120}>
-                {image.id === activeImage?.id ? (
+                {image.imageIdentifier === activeImage?.imageIdentifier ? (
                   <span css={css.imageSelectCheck()}>
                     <MdDone />
                   </span>
@@ -132,5 +125,11 @@ export function ImageDetails({
         </GalleryTiles>
       </Group>
     }
+    {data?.event?.occurrenceCount === 1 && (
+      <RelatedImages
+        data={data}
+        activeImage={activeImage}
+        setActiveImage={handleActiveImage} />
+    )}
   </div>
 };

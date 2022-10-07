@@ -29,6 +29,7 @@ function builder({ locale = 'en', folder = 'translations', keepEmptyStrings = fa
       eventDetails: getFile(locale, `../${folder}/${locale}/components/eventDetails`),
       download: getFile(locale, `../${folder}/${locale}/components/download`),
       map: getFile(locale, `../${folder}/${locale}/components/map`),
+      images: getFile(locale, `../${folder}/${locale}/components/images`),
       enums: {
         basisOfRecord: getFile(locale, `../${folder}/${locale}/enums/basisOfRecord`),
         countryCode: getFile(locale, `../${folder}/${locale}/enums/countryCode`),

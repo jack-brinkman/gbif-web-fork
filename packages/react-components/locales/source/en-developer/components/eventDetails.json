@@ -35,6 +35,6 @@
     "measurementsOrFacts": "Measurements",
     "overview": "Overview",
     "images": "Images",
-    "relatedImages": "Images of {taxon}"
+    "relatedImages": "Related images of {taxon}"
   }
 }

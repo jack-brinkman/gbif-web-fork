@@ -23,9 +23,9 @@ export function Groups({
   </>
 }
 
-export function Group({ label, ...props }) {
+export function Group({ label, labelValues, ...props }) {
   return <Accordion
-    summary={<FormattedMessage id={label} />}
+    summary={<FormattedMessage id={label} values={labelValues} />}
     defaultOpen={true}
     css={css.group()}
     {...props}

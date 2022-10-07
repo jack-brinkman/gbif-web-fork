@@ -174,6 +174,12 @@ query event($eventID: String, $datasetKey: String, $predicate1: Predicate, $pred
       gte
       lte
     }
+    occurrences(size: 1) {
+      genus
+      genusKey
+      species
+      speciesKey
+    }
   }
 
   mofResults: eventSearch(predicate: $predicate2){
