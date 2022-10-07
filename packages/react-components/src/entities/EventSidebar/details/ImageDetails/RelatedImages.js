@@ -14,8 +14,8 @@ import {
 import { image } from '../../../../components/ZoomableImage/styles';
 
 const QUERY_IMAGES = `
-query images($search: String, $size: Int, $from: Int) {
-  result: biocacheSearch(search: $search, size: $size, from: $from) {
+query images($search: String, $size: Int, $from: Int, $sort: String, $dir: String, $facet: String, $filters: [String]) {
+  result: biocacheSearch(search: $search, size: $size, from: $from, sort: $sort, dir: $dir, facet: $facet, filters: $filters) {
     total: totalRecords
     occurrences {
       species
@@ -89,7 +89,19 @@ export function RelatedImages({
         variables: {
           search: `lsid:${occurrence.speciesKey || occurrence.genusKey}`,
           size: 15,
-          from: offset
+          from: offset,
+          sort: 'identification_qualifier_s',
+          facet: 'off',
+          dir: 'asc',
+          filters: [
+            'multimedia:"Image"',
+            '-type_status:*',
+            '-basis_of_record:PreservedSpecimen',
+            '-identification_qualifier_s:"Uncertain"',
+            'geospatial_kosher:true',
+            '-user_assertions:50001',
+            '-user_assertions:50005',
+          ]
         }
       });
     }
