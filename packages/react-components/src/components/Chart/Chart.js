@@ -4,19 +4,42 @@ import ThemeContext from '../../style/themes/ThemeContext';
 import ApexChart from "react-apexcharts";
 import styles from './styles';
 
+
 export function Chart({
   className,
   options,
   series,
   type,
   height,
+  colourWrap = null,
+  colourWrapRepeat = 4,
   ...props
 }) {
   const theme = useContext(ThemeContext);
+  const chartColours = theme.chart?.colours || [
+    '#F26649',
+    '#C44D34',
+    '#637073',
+    '#FFC557',
+    '#B7CD96',
+    '#6BDAD5',
+    '#003A70',
+    '#A191B2',
+    '#691C32',
+  ];
+
+  let colours = colourWrap ? [] : chartColours;
+  if (colourWrap) {
+    for (let wrap = 0; wrap < colourWrapRepeat; wrap += 1) {
+      colours = [...colours, ...chartColours.slice(0, colourWrap)];
+    }
+  }
+
   return (
     <ApexChart
       options={{
         ...(options || {}),
+        colors: (series || []).map((_, i) => colours[i]),
         chart: {
           fontFamily: theme.fontFamily,
           ...(options?.chart || {})

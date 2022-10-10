@@ -35,5 +35,9 @@
     "measurementsOrFacts": "Measurements",
     "overview": "Overview",
     "images": "Images"
+  },
+  "timeseries": {
+    "showAvg": "Show averaged data",
+    "showRaw": "Show raw data (scatterplot)"
   }
 }

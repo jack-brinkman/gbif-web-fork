@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import ThemeContext from '../../../style/themes/ThemeContext';
 import { FormattedMessage } from 'react-intl';
 import * as css from '../styles';
-import { Row, Col, Chart } from "../../../components";
+import { Row, Col, Chart, Switch } from "../../../components";
 import { Header } from './Header';
 import { C } from 'apexcharts';
 
@@ -28,7 +28,8 @@ export function Timeseries({
   ...props
 }) {
   const theme = useContext(ThemeContext);
-  const [showAll, setShowAll] = useState(false);
+  const [showAvg, setShowAvg] = useState(true);
+  const [showRaw, setShowRaw] = useState(false);
 
   // Extract the event object from the data
   const { results } = data.results.documents;
@@ -65,8 +66,10 @@ export function Timeseries({
 
   // Then, re-map each valid event & calculate the average MoF value for each
   // measurement or fact
-  validResults = validResults.map((result) => {
+  const validResultsAvg = validResults.map((result, i) => {
     const mofs = {};
+    const date = new Date(result.temporalCoverage.gte);
+     // const date = new Date(1640959200000 + (i * 86400000));
     numericMofs.forEach((mofType) => {
       // Retrieve all MoFs for each valid type, and filter out
       // bad / NaN values
@@ -76,54 +79,110 @@ export function Timeseries({
 
       // Calculate the average of the measurement values
       const mofAvg = relevantMofs.reduce((prev, cur) => prev + parseFloat(cur.measurementValue), 0) / relevantMofs.length;
-      mofs[mofType] = Math.round(mofAvg * 100) / 100;
+      mofs[mofType] = { x: date.getTime(), y: Math.round(mofAvg * 100) / 100 };
     });
 
-    return {
-      date: new Date(result.temporalCoverage.gte),
-      mofs
-    };
+    return { date, values: mofs };
   }).sort((a, b) => compareDates(a.date, b.date));
 
-  // console.log('full vs valid', results.sort((a, b) => compareDates(new Date(a.temporalCoverage.gte), new Date(b.temporalCoverage.gte))), validResults);
+  const validResultsScatter = validResults.map((result) => {
+    const mofs = {};
+    const date = new Date(result.temporalCoverage.gte);
+    numericMofs.forEach((mofType) => {
+      // Retrieve all MoFs for each valid type, and filter out
+      // bad / NaN values
+      const relevantMofs = result.measurementOrFacts.filter((mof) => 
+        mof.measurementType === mofType && !Number.isNaN(parseFloat(mof.measurementValue))
+      );
+
+      // Aggregate all MoF values
+      const mofIds = [];
+      mofs[mofType] = relevantMofs
+        .filter((mof) => {
+          const ID = `${mof.measurementType}-${mof.measurementMethod}-${mof.measurementValue}`;
+          if (mofIds.includes(ID))
+            return false;
+
+          mofIds.push(ID);
+          return true;
+        })
+        .map((mof) => ({x: date.getTime(), y: parseFloat(mof.measurementValue) }));
+    });
+    
+    return { date, values: mofs };
+  }).sort((a, b) => compareDates(a.date, b.date));
 
   const chart = {
     options: {
       chart: {
-        id: "basic-bar",
-      },
-      xaxis: {
-        categories: validResults.map(({ date }) => `${date.getDay()}-${date.getMonth()}-${date.getFullYear()}`),
-        // type: 'datetime',
+        height: 350,
+        type: 'scatter',
+        zoom: {
+          enabled: true,
+          type: 'xy'
+        },
+        animations: {
+          enabled: false,
+        }
       },
       stroke: {
         curve: 'smooth',
+      },
+      markers: {
+        size: [
+          ...(showRaw ? Array(numericMofs.length).fill(6) : []),
+          ...(showAvg ? Array(numericMofs.length).fill(0) : [])
+        ]
+      },
+      tooltip: {
+        shared: false,
+        intersect: true,
+      },
+      xaxis: {
+        type: 'datetime'
+      },
+      yaxis: {
+        labels: {
+          formatter: function (value) {
+            return Math.round(value * 100) / 100;
+          }
+        },
       }
     },
-    series: numericMofs.map((mof) => ({
-      name: mof,
-      data: validResults.map((result) => result.mofs[mof] || null)
-    }))
-    // series: numericMofs.map((mof) => ({
-    //   name: mof,
-    //   data: validResults.map((result) => [result.date, result.mofs[mof] || null])
-    // }))
+    series: [
+      ...(showRaw ? numericMofs : []).map((mof) => ({
+        type: 'scatter',
+        name: mof,
+        data: validResultsScatter.reduce((agg, result) => [...agg, ...result.values[mof]], [])
+      })),
+      ...(showAvg ? numericMofs : []).map((mof) => ({
+        type: 'line',
+        name: `Avg. ${mof}`,
+        data: validResultsAvg.map((result) => result.values[mof] || null)
+      })),
+    ]
   };
 
-  return <Row direction="column" wrap="nowrap" style={{ maxHeight: '100%', overflow: 'hidden' }}>
-    <Col style={{ padding: '12px 0', paddingBottom: 50, overflow: 'auto' }} grow>
-      <Header data={data} error={error} />
-      <div style={{ padding: 12, overflow: 'hidden' }}>
-        <Chart options={chart.options} series={chart.series} type="line" height="350" />
-      </div>
-    </Col>
-    {/* <Col css={css.controlFooter({ theme })} grow={false}>
-      <Row justifyContent="flex-end" halfGutter={8}>
-        <Col grow={false}>
-          <FormattedMessage id={`eventDetails.showAllFields`}/>
-          <Switch checked={showAll} onChange={() => setShowAll(!showAll)} direction="top" tip="Shortcut s" />
-        </Col>
-      </Row>
-    </Col> */}
-  </Row>
+  const { options, series } = chart;
+
+  return (
+    <Row direction="column" wrap="nowrap" style={{ maxHeight: '100%', overflow: 'hidden' }}>
+      <Col style={{ padding: '12px 0', paddingBottom: 50, overflow: 'auto' }} grow>
+        <Header data={data} error={error} />
+        <div style={{ padding: 12, overflow: 'hidden' }}>
+          <Chart options={options} series={series} type="line" height="350" colourWrap={numericMofs.length} colourWrapRepeat={2} />
+        </div>
+        <div css={css.timeseriesFooter({ theme })}>
+          <div style={{ marginRight: 8 }}>
+            <Switch style={{ marginRight: 8 }} checked={showAvg} onChange={() => setShowAvg(!showAvg)} direction="top" />
+            <FormattedMessage id={`eventDetails.timeseries.showAvg`}/>
+          </div>
+          <div style={{ marginLeft: 8 }}>
+            <Switch style={{ marginRight: 8 }} checked={showRaw} onChange={() => setShowRaw(!showRaw)} direction="top"/>
+            <FormattedMessage id={`eventDetails.timeseries.showRaw`}/>
+          </div>
+        </div>
+      </Col>
+    </Row>
+  )
 };

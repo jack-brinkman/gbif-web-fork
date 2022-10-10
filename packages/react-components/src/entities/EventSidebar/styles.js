@@ -214,3 +214,11 @@ export const issuePill = ({ severity, ...props }) => css`
   padding: 0 4px;
   margin-right: 4px;
 `;
+
+export const timeseriesFooter = ({ theme }) => css`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  background: ${theme.paperBackground500};
+`;
