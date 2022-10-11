@@ -96,7 +96,7 @@ export function ImageDetails({
                 </Term>
                 <Value>
                   {/* Hacky fix, for now */}
-                  <HyperText text={env.IMAGE_VIEW_URL.replace('{imageIdentifier}', activeImage.imageIdentifier)} />
+                  <HyperText text={(env.IMAGE_VIEW_URL || '').replace('{imageIdentifier}', activeImage.imageIdentifier)} />
                 </Value>
               </>
           </Properties>
