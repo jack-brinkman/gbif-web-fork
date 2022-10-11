@@ -4,7 +4,6 @@ import { FormattedMessage } from 'react-intl';
 import * as css from '../styles';
 import { Row, Col, Chart, Switch } from "../../../components";
 import { Header } from './Header';
-import { C } from 'apexcharts';
 
 const getNumericalMofs = (event) => event.measurementOrFactTypes.filter((mofType) => {
   const mofOfType = event.measurementOrFacts.find(
@@ -13,6 +12,11 @@ const getNumericalMofs = (event) => event.measurementOrFactTypes.filter((mofType
   );
   return (/^(\d*\.)?\d+$/ig).test(mofOfType?.measurementValue);
 });
+
+const getDateString = (timestamp) => {
+  const date = new Date(timestamp);
+  return `${date.getDate()}-${date.getMonth()}-${date.getYear()}`;
+}
 
 const compareDates = (a, b) => {
   const diff = a - b;
@@ -66,7 +70,20 @@ export function Timeseries({
 
   // Then, re-map each valid event & calculate the average MoF value for each
   // measurement or fact
-  const validResultsAvg = validResults.map((result, i) => {
+  const validResultsAvg = validResults.reduce((prev, cur, index, arr) => {
+    const sameDate = arr.find((item) =>
+      getDateString(cur.temporalCoverage.gte) === getDateString(item.temporalCoverage.gte)
+    );
+    
+    // If an event with this date already exists
+    return sameDate ? [
+      ...(prev.filter((item) => item.eventID !== cur.eventID)),
+      {
+        ...sameDate,
+        measurementOrFacts: [...sameDate.measurementOrFacts, cur.measurementOrFacts]
+      }
+    ] : [...prev, cur];
+  }, []).map((result, i) => {
     const mofs = {};
     const date = new Date(result.temporalCoverage.gte);
      // const date = new Date(1640959200000 + (i * 86400000));
@@ -129,10 +146,10 @@ export function Timeseries({
         curve: 'smooth',
       },
       markers: {
-        size: [
-          ...(showRaw ? Array(numericMofs.length).fill(6) : []),
-          ...(showAvg ? Array(numericMofs.length).fill(0) : [])
-        ]
+        size: numericMofs.map(() => [
+          showRaw ? 6 : null,
+          showAvg ? 4 : null
+        ].filter((item) => item !== null)).flat()
       },
       tooltip: {
         shared: false,
@@ -149,28 +166,41 @@ export function Timeseries({
         },
       }
     },
-    series: [
-      ...(showRaw ? numericMofs : []).map((mof) => ({
+    // series: [
+    //   ...(showRaw ? numericMofs : []).map((mof) => ({
+    //     type: 'scatter',
+    //     name: mof,
+    //     data: validResultsScatter.reduce((agg, result) => [...agg, ...result.values[mof]], [])
+    //   })),
+    //   ...(showAvg ? numericMofs : []).map((mof) => ({
+    //     type: 'line',
+    //     name: `AVG. ${mof}`,
+    //     data: validResultsAvg.map((result) => result.values[mof] || null)
+    //   })),
+    // ],
+    series: numericMofs.map((mof) => [
+      showRaw ? {
         type: 'scatter',
         name: mof,
-        data: validResultsScatter.reduce((agg, result) => [...agg, ...result.values[mof]], [])
-      })),
-      ...(showAvg ? numericMofs : []).map((mof) => ({
+        data: validResultsScatter
+          .reduce((agg, result) => [...agg, ...result.values[mof]], [])
+      } : null,
+      showAvg ? {
         type: 'line',
-        name: `Avg. ${mof}`,
+        name: `[AVG] ${mof}`,
         data: validResultsAvg.map((result) => result.values[mof] || null)
-      })),
-    ]
+      } : null
+    ].filter((item) => item !== null)).flat()
   };
 
   const { options, series } = chart;
 
-  return (
+  return ( 
     <Row direction="column" wrap="nowrap" style={{ maxHeight: '100%', overflow: 'hidden' }}>
       <Col style={{ padding: '12px 0', paddingBottom: 50, overflow: 'auto' }} grow>
         <Header data={data} error={error} />
         <div style={{ padding: 12, overflow: 'hidden' }}>
-          <Chart options={options} series={series} type="line" height="350" colourWrap={numericMofs.length} colourWrapRepeat={2} />
+          <Chart options={options} series={series} type="line" height="350" colourWrap={(showAvg && showRaw) ? 2 : null} colourWrapRepeat={numericMofs.length} />
         </div>
         <div css={css.timeseriesFooter({ theme })}>
           <div style={{ marginRight: 8 }}>

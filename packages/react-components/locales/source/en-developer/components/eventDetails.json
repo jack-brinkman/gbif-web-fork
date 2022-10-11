@@ -37,7 +37,7 @@
     "images": "Images"
   },
   "timeseries": {
-    "showAvg": "Show averaged data",
-    "showRaw": "Show raw data (scatterplot)"
+    "showAvg": "Include averaged data",
+    "showRaw": "Include raw data"
   }
 }

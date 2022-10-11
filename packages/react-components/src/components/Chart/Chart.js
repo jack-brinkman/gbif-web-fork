@@ -31,7 +31,7 @@ export function Chart({
   let colours = colourWrap ? [] : chartColours;
   if (colourWrap) {
     for (let wrap = 0; wrap < colourWrapRepeat; wrap += 1) {
-      colours = [...colours, ...chartColours.slice(0, colourWrap)];
+      colours = [...colours, ...(Array(colourWrap).fill(chartColours[wrap]))];
     }
   }
 
