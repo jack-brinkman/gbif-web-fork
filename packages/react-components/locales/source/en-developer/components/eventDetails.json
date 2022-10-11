@@ -36,5 +36,9 @@
     "overview": "Overview",
     "images": "Images",
     "relatedImages": "Related images of {taxon}"
+  },
+  "timeseries": {
+    "showAvg": "Include averaged data",
+    "showRaw": "Include raw data"
   }
 }

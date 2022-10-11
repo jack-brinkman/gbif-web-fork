@@ -223,3 +223,11 @@ export const imageSelectCheck = props => css`
   color: white;
   padding: 5px 5px 2px 5px;
 `;
+
+export const timeseriesFooter = ({ theme }) => css`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  background: ${theme.paperBackground500};
+`;

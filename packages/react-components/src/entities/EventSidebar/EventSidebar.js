@@ -6,7 +6,8 @@ import { Row, Col, Tabs, Spinner } from "../../components";
 import { useQuery } from '../../dataManagement/api';
 import { Intro } from './details/Intro';
 import { ImageDetails } from './details/ImageDetails';
-import { MdClose, MdInfo, MdImage } from "react-icons/md";
+import { Timeseries } from './details/Timeseries';
+import { MdClose, MdInfo, MdImage, MdStackedLineChart } from "react-icons/md";
 const { TabList, Tab, TapSeperator } = Tabs;
 
 const { TabPanel } = Tabs;
@@ -77,6 +78,11 @@ export function EventSidebar({
   const showImages = !isLoading
     && data.results.occurrenceFacet.genus.length > 0
     && siteConfig.experimental?.event?.sidebar?.images?.enabled;
+    
+  const showTimeseries = !isLoading
+    && siteConfig.experimental?.event?.sidebar?.timeseries?.enabled
+    && data.results.documents.total > 1
+    && data.results.documents.results.reduce((prev, cur) => [...prev, ...cur.measurementOrFacts], []).length > 0;
 
   return <Tabs activeId={activeId} onChange={id => setTab(id)}>
     <Row wrap="nowrap" style={style} css={css.sideBar({ theme })}>
@@ -94,6 +100,11 @@ export function EventSidebar({
           {showImages && (
             <Tab tabId="images" direction="left">
               <MdImage />
+            </Tab>
+          )}
+          {showTimeseries && (
+            <Tab tabId="timeseries" direction="left">
+              <MdStackedLineChart />
             </Tab>
           )}
         </TabList>
@@ -121,6 +132,16 @@ export function EventSidebar({
                 <ImageDetails
                     data={data}
                     loading={loading}
+                    setActiveImage={(img) => console.log(img)}
+                />
+              </TabPanel>
+            )}
+            {showTimeseries && (
+              <TabPanel tabId='timeseries' style={{ height: '100%' }}>
+                <Timeseries
+                  data={data}
+                  loading={loading}
+                  error={error}
                 />
               </TabPanel>
             )}
@@ -192,11 +213,11 @@ query event($eventID: String, $datasetKey: String, $predicate1: Predicate, $pred
   }
   
   results: eventSearch(
-    predicate:$predicate1,
+    predicate: $predicate1,
     size: $limit, 
     from: $offset
     ) {
-    documents(size: 1) {
+    documents(size: 40) {
       total
       results {
         eventID
