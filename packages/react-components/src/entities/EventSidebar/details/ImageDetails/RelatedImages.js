@@ -74,7 +74,7 @@ export function RelatedImages({
 
   // Effect hook to store the query output in component state
   useEffect(() => {
-    if (data)
+    if (data && data.result)
       setOccurrences([
         ...occurrences,
         ...data.result.occurrences.map((occ) => occ.meta)
