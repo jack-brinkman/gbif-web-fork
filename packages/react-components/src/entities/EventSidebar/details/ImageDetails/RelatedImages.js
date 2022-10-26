@@ -1,16 +1,12 @@
-
 import React, { useEffect, useState } from 'react';
 import { MdDone } from 'react-icons/md';
 import { useQuery } from '../../../../dataManagement/api';
 import { Group } from '../Groups';
-import { Button } from '../../../../components';
+import { Button, Spinner } from '../../../../components';
 import * as css from '../../styles';
 
 // Project components
-import {
-  GalleryTiles,
-  GalleryTile,
-} from "../../../../components";
+import { GalleryTiles, GalleryTile } from '../../../../components';
 import { image } from '../../../../components/ZoomableImage/styles';
 
 const QUERY_IMAGES = `
@@ -58,14 +54,11 @@ export function RelatedImages({
   className,
   ...props
 }) {
-
   // Setup query loading & theming
-  const {
-    data,
-    error,
-    loading,
-    load
-  } = useQuery(QUERY_IMAGES, { lazyLoad: true, graph: 'EVENT'});
+  const { data, error, loading, load } = useQuery(QUERY_IMAGES, {
+    lazyLoad: true,
+    graph: 'EVENT',
+  });
 
   // Component state variables
   const [offset, setOffset] = useState(0);
@@ -77,7 +70,7 @@ export function RelatedImages({
     if (data && data.result)
       setOccurrences([
         ...occurrences,
-        ...data.result.occurrences.map((occ) => occ.meta)
+        ...data.result.occurrences.map((occ) => occ.meta),
       ]);
   }, [data]);
 
@@ -101,37 +94,45 @@ export function RelatedImages({
             'geospatial_kosher:true',
             '-user_assertions:50001',
             '-user_assertions:50005',
-          ]
-        }
+          ],
+        },
       });
     }
   }, [occurrence, offset]);
 
   if (data && occurrences.length === 0)
-    return <div>no images to display</div>;
+    return <div css={css.loadContainer}>No images to display.</div>;
 
   return (
     <Group
-      label="eventDetails.groups.relatedImages"
+      label='eventDetails.groups.relatedImages'
       labelValues={{ taxon: occurrence.species || occurrence.genus }}
-      defaultOpen={true}>
+      defaultOpen={true}
+    >
+      {!data && (
+        <div css={css.loadContainer}>
+          <Spinner />
+        </div>
+      )}
       <GalleryTiles>
-        {data && occurrences.map((image) => {
-          return (
-            <GalleryTile
-              style={{ position: 'relative' }}
-              onSelect={() => setActiveImage(image)}
-              key={image.imageIdentifier}
-              src={image.imageUrl}
-              height={120}>
-              {image.imageIdentifier === activeImage?.imageIdentifier ? (
-                <span css={css.imageSelectCheck()}>
-                  <MdDone />
-                </span>
-              ) : null}
-            </GalleryTile>
-          )
-        })}
+        {data &&
+          occurrences.map((image) => {
+            return (
+              <GalleryTile
+                style={{ position: 'relative' }}
+                onSelect={() => setActiveImage(image)}
+                key={image.imageIdentifier}
+                src={image.imageUrl}
+                height={120}
+              >
+                {image.imageIdentifier === activeImage?.imageIdentifier ? (
+                  <span css={css.imageSelectCheck()}>
+                    <MdDone />
+                  </span>
+                ) : null}
+              </GalleryTile>
+            );
+          })}
       </GalleryTiles>
       {data && occurrences.length <= data.result.total - 1 && (
         <div style={{ display: 'flex', justifyContent: 'center', padding: 16 }}>
@@ -139,11 +140,12 @@ export function RelatedImages({
             disabled={loading}
             onClick={() => setOffset(offset + 15)}
             look='primaryOutline'
-            style={{ fontSize: '11px' }}>
-              Load More
+            style={{ fontSize: '11px' }}
+          >
+            Load More
           </Button>
         </div>
       )}
     </Group>
-  )
-};
+  );
+}

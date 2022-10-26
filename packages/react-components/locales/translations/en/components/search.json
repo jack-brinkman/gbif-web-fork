@@ -3,7 +3,8 @@
     "table": "Table",
     "gallery": "Gallery",
     "map": "Map",
-    "datasets": "Datasets",
+    "datasets": "Dataset Information",
+    "events": "Accessions/Trials",
     "download": "Download"
   },
   "table": {
