@@ -1,9 +1,9 @@
 export const filters = [
-  'eventSamplingProtocol',
   'country',
   'eventDatasetKey',
   'measurementOrFactTypes',
   'year',
+  'month',
   'eventStateProvince',
   'eventID',
   'eventTaxonKey',
@@ -13,13 +13,13 @@ export const filters = [
 
 const highlighted = [
   'eventTaxonKey',
-  'eventDatasetKey',
   'eventType',
-  'eventSamplingProtocol',
-  'measurementOrFactTypes',
+  'eventDatasetKey',
+  'month',
   'year',
-  'eventStateProvince',
   'locationId',
+  'eventStateProvince',
+  'measurementOrFactTypes',
 ];
 
 export default { filters, included: filters, highlighted };
