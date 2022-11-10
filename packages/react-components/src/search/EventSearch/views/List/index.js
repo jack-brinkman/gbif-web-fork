@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from 'react';
 import PredicateDataFetcher from '../../../PredicateDataFetcher';
 import { List } from './List';
 import { FormattedNumber } from 'react-intl';
@@ -48,9 +48,18 @@ const defaultTableConfig = {
       trKey: 'filters.eventID.name',
       value: {
         key: 'eventID',
-        formatter: (value, item) => <div>
-          <ResourceLink type='eventKey' discreet id={item.eventID} otherIds={{datasetKey: item.datasetKey}}>{item.eventID}</ResourceLink>
-        </div>
+        formatter: (value, item) => (
+          <div>
+            <ResourceLink
+              type='eventKey'
+              discreet
+              id={item.eventID}
+              otherIds={{ datasetKey: item.datasetKey }}
+            >
+              {item.eventID}
+            </ResourceLink>
+          </div>
+        ),
       },
     },
     {
@@ -58,16 +67,16 @@ const defaultTableConfig = {
       value: {
         key: 'eventType.concept',
         labelHandle: 'eventTypeVocabulary',
-        hideFalsy: true
-      }
+        hideFalsy: true,
+      },
     },
     {
       trKey: 'filters.parentEventID.name',
       filterKey: 'parentEventID',
       value: {
         key: 'parentEventID',
-        hideFalsy: true
-      }
+        hideFalsy: true,
+      },
     },
     {
       trKey: 'filters.datasetKey.name',
@@ -75,17 +84,17 @@ const defaultTableConfig = {
       value: {
         key: 'datasetKey',
         formatter: (value, item) => item?.datasetTitle,
-        hideFalsy: true
+        hideFalsy: true,
       },
-      width: 'wide'
+      width: 'wide',
     },
     {
       trKey: 'filters.year.name',
       filterKey: 'year',
       value: {
         key: 'year',
-        hideFalsy: true
-      }
+        hideFalsy: true,
+      },
     },
     {
       trKey: 'filters.samplingProtocol.name',
@@ -93,8 +102,8 @@ const defaultTableConfig = {
       value: {
         key: 'samplingProtocol',
         formatter: (value, item) => item?.samplingProtocol[0],
-        hideFalsy: true
-      }
+        hideFalsy: true,
+      },
     },
     {
       name: 'coordinates',
@@ -102,37 +111,37 @@ const defaultTableConfig = {
       value: {
         key: 'formattedCoordinates',
       },
-      noWrap: true
+      noWrap: true,
     },
     {
       name: 'stateProvince',
       trKey: 'filters.stateProvince.name',
       value: {
         key: 'stateProvince',
-      }
+      },
     },
     {
       name: 'countryCode',
       trKey: 'filters.country.name',
       value: {
         key: 'countryCode',
-        labelHandle: 'countryCode'
-      }
+        labelHandle: 'countryCode',
+      },
     },
     {
       name: 'measurementOrFactTypes',
       trKey: 'filters.measurementOrFactTypes.name',
       value: {
         key: 'measurementOrFactTypes',
-        formatter: (value, item) => <>{value.join(', ')}</>
-      }
+        formatter: (value, item) => <>{(value || []).join(', ')}</>,
+      },
     },
     {
       name: 'measurementOrFactCount',
       trKey: 'filters.measurementOrFactCount.name',
       value: {
         key: 'measurementOrFactCount',
-        hideFalsy: true
+        hideFalsy: true,
       },
       noWrap: true,
     },
@@ -143,23 +152,25 @@ const defaultTableConfig = {
         key: 'occurrenceCount',
         formatter: (value, item) => <FormattedNumber value={value} />,
         hideFalsy: true,
-        rightAlign: true
+        rightAlign: true,
       },
-      noWrap: true
+      noWrap: true,
     },
-  ]
+  ],
 };
 
 function Table() {
-  return <PredicateDataFetcher
-    graphQuery={QUERY}
-    graph='EVENT'
-    limit={50}
-    componentProps={{
-      defaultTableConfig
-    }}
-    presentation={List}
-  />
+  return (
+    <PredicateDataFetcher
+      graphQuery={QUERY}
+      graph='EVENT'
+      limit={50}
+      componentProps={{
+        defaultTableConfig,
+      }}
+      presentation={List}
+    />
+  );
 }
 
 export default Table;

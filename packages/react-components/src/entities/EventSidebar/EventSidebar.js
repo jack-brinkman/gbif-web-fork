@@ -80,9 +80,9 @@ export function EventSidebar({
     && siteConfig.experimental?.event?.sidebar?.images?.enabled;
     
   const showTimeseries = !isLoading
-    && siteConfig.experimental?.event?.sidebar?.timeseries?.enabled
     && data.results.documents.total > 1
-    && data.results.documents.results.reduce((prev, cur) => [...prev, ...cur.measurementOrFacts], []).length > 0;
+    && (data?.results?.documents?.results || []).reduce((prev, cur) => [...prev, ...(cur.measurementOrFacts || [])], []).length > 0
+    && siteConfig.experimental?.event?.sidebar?.timeseries?.enabled;
 
   return <Tabs activeId={activeId} onChange={id => setTab(id)}>
     <Row wrap="nowrap" style={style} css={css.sideBar({ theme })}>

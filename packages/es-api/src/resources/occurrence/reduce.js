@@ -32,7 +32,7 @@ function reduce(item) {
   // const source = item._source;
   const source = item._source.occurrence != null ? item._source.occurrence : item._source;
   // return _.pick(item._source, whitelist);
-  const verbatim = removeUndefined({
+  const verbatim = source.verbatim && removeUndefined({
     abstract:                           source.verbatim.core['http://purl.org/dc/terms/abstract'],
     acceptedNameUsage:                  source.verbatim.core['http://rs.tdwg.org/dwc/terms/acceptedNameUsage'],
     acceptedNameUsageID:                source.verbatim.core['http://rs.tdwg.org/dwc/terms/acceptedNameUsageID'],
@@ -335,7 +335,7 @@ function reduce(item) {
     facts:                              source.measurementOrFactItems || [],
     identifiers:                        [],
     relations:                          [],
-    extensions:                         source.verbatim.extensions,
+    extensions:                         source.verbatim && source.verbatim.extensions,
     gbifClassification:                 source.gbifClassification,
 
     // not in v1

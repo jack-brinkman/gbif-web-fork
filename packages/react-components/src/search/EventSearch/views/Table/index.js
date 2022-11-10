@@ -1,7 +1,7 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from 'react';
 import PredicateDataFetcher from '../../../PredicateDataFetcher';
 import { EventsTable } from './EventsTable';
-import {FormattedMessage, FormattedNumber} from 'react-intl';
+import { FormattedMessage, FormattedNumber } from 'react-intl';
 
 const QUERY = `
 query list($predicate: Predicate, $offset: Int, $limit: Int){
@@ -50,22 +50,22 @@ const defaultTableConfig = {
       trKey: 'filters.eventID.name',
       value: {
         key: 'eventID',
-        hideFalsy: true
+        hideFalsy: true,
       },
     },
     {
       trKey: 'filters.eventType.name',
       value: {
         key: 'eventType.concept',
-        hideFalsy: true
-      }
+        hideFalsy: true,
+      },
     },
     {
       trKey: 'filters.dataStructure.name',
       value: {
         key: 'eventTypeHierarchyJoined',
-        hideFalsy: true
-      }
+        hideFalsy: true,
+      },
     },
     {
       trKey: 'filters.datasetKey.name',
@@ -73,26 +73,28 @@ const defaultTableConfig = {
       value: {
         key: 'datasetKey',
         formatter: (value, item) => item?.datasetTitle,
-        hideFalsy: true
+        hideFalsy: true,
       },
-      width: 'wide'
+      width: 'wide',
     },
     {
       trKey: 'filters.month.name',
       filterKey: 'month',
       value: {
         key: 'month',
-        formatter: (value, item) => <FormattedMessage id={`enums.month.${value}`} /> ,
-        hideFalsy: true
-      }
+        formatter: (value, item) => (
+          <FormattedMessage id={`enums.month.${value}`} />
+        ),
+        hideFalsy: true,
+      },
     },
     {
       trKey: 'filters.year.name',
       filterKey: 'year',
       value: {
         key: 'year',
-        hideFalsy: true
-      }
+        hideFalsy: true,
+      },
     },
     {
       trKey: 'filters.samplingProtocol.name',
@@ -100,8 +102,8 @@ const defaultTableConfig = {
       value: {
         key: 'samplingProtocol',
         formatter: (value, item) => item?.samplingProtocol[0],
-        hideFalsy: true
-      }
+        hideFalsy: true,
+      },
     },
     {
       trKey: 'filters.locationID.name',
@@ -109,15 +111,20 @@ const defaultTableConfig = {
       value: {
         key: 'locationID',
         // tricky how to do an untuitive not cluttered UI for this.
-        formatter: (value, item, {filterContext}) => <span 
-          // style={{padding: '0 3px', whiteSpace: 'nowrap', border: '1px solid #aaa', borderRadius: 3}} 
-          onClick={(e) => {
-          filterContext.setField('locationId', [value], true);
-          e.preventDefault();
-          e.stopPropagation();
-        }}>{value}</span>,
-        hideFalsy: true
-      }
+        formatter: (value, item, { filterContext }) => (
+          <span
+            // style={{padding: '0 3px', whiteSpace: 'nowrap', border: '1px solid #aaa', borderRadius: 3}}
+            onClick={(e) => {
+              filterContext.setField('locationId', [value], true);
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+          >
+            {value}
+          </span>
+        ),
+        hideFalsy: true,
+      },
     },
     {
       name: 'coordinates',
@@ -125,30 +132,30 @@ const defaultTableConfig = {
       value: {
         key: 'formattedCoordinates',
       },
-      noWrap: true
+      noWrap: true,
     },
     {
       name: 'stateProvince',
       trKey: 'filters.stateProvince.name',
       value: {
         key: 'stateProvince',
-      }
+      },
     },
     {
       name: 'countryCode',
       trKey: 'filters.country.name',
       value: {
         key: 'countryCode',
-        labelHandle: 'countryCode'
-      }
+        labelHandle: 'countryCode',
+      },
     },
     {
       name: 'measurementOrFactTypes',
       trKey: 'filters.measurementOrFactTypes.name',
       value: {
         key: 'measurementOrFactTypes',
-        formatter: (value, item) => <>{value.join(', ')}</>
-      }
+        formatter: (value, item) => <>{(value || []).join(', ')}</>,
+      },
     },
     {
       name: 'occurrenceCount',
@@ -157,9 +164,9 @@ const defaultTableConfig = {
         key: 'occurrenceCount',
         formatter: (value, item) => <FormattedNumber value={value} />,
         hideFalsy: true,
-        rightAlign: true
+        rightAlign: true,
       },
-      noWrap: true
+      noWrap: true,
     },
     {
       name: 'speciesCount',
@@ -168,23 +175,25 @@ const defaultTableConfig = {
         key: 'speciesCount',
         formatter: (value, item) => <FormattedNumber value={value} />,
         hideFalsy: true,
-        rightAlign: true
+        rightAlign: true,
       },
-      noWrap: true
+      noWrap: true,
     },
-  ]
+  ],
 };
 
 function Table() {
-  return <PredicateDataFetcher
-    graphQuery={QUERY}
-    graph='EVENT'
-    limit={50}
-    componentProps={{
-      defaultTableConfig
-    }}
-    presentation={EventsTable}
-  />
+  return (
+    <PredicateDataFetcher
+      graphQuery={QUERY}
+      graph='EVENT'
+      limit={50}
+      componentProps={{
+        defaultTableConfig,
+      }}
+      presentation={EventsTable}
+    />
+  );
 }
 
 export default Table;
